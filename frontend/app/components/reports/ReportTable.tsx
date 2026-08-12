@@ -12,7 +12,7 @@ export interface ScanLog {
   id?: string | number;
 
   scan_time: string | null;
-  factory_code?: string;
+  campus_code?: string;
   guard_name?: string;
   qr_name: string;
 
@@ -154,7 +154,7 @@ const ReportTable: React.FC<ReportTableProps> = ({ logs, loading }) => {
   // -------------------------------
   const validLogs = useMemo(() => {
     return logs.filter(
-      (log) => log.round >= 1 && log.round <= 33
+      (log) => log.round >= 1 && log.round <= 24
     );
   }, [logs]);
 

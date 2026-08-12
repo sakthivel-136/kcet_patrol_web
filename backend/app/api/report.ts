@@ -44,7 +44,7 @@ const api = axios.create({
 // API Function
 // -----------------------------
 export async function getPatrolReport(
-  factoryCode: string,
+  campusCode: string,
   reportDate: string
 ): Promise<PatrolReportItem[]> {
 
@@ -56,7 +56,7 @@ export async function getPatrolReport(
       "/report/download",
       {
         params: {
-          factory_code: factoryCode,
+          campus_code: campusCode,
           report_date: reportDate,
         },
       }

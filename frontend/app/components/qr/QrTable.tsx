@@ -24,7 +24,7 @@ const normalizeQR = (data: QRData): QRCode => ({
       ? data.status
       : "inactive",
   created_at: data.created_at,
-  factory_code: data.factory_code || "",
+  campus_code: data.campus_code || "",
   waiting_time:
     typeof data.waiting_time === "number" ? data.waiting_time : 15,
 });
@@ -94,9 +94,9 @@ export default function QrTable({
                     </span>
                   </td>
 
-                  {/* Factory */}
+                  {/* Campus */}
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
-                    {qr.factory_code}
+                    {qr.campus_code}
                   </td>
 
                   {/* Coordinates */}

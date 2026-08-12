@@ -8,17 +8,9 @@ __turbopack_context__.s([
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = /*#__PURE__*/ __turbopack_context__.i("[project]/node_modules/next/dist/build/polyfills/process.js [app-client] (ecmascript)");
 const getApiUrl = ()=>{
-    const envUrl = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].env.NEXT_PUBLIC_API_URL;
-    if (envUrl) {
-        return envUrl;
-    }
+    const envUrl = ("TURBOPACK compile-time value", "http://127.0.0.1:8000");
     if ("TURBOPACK compile-time truthy", 1) {
-        const hostname = window.location.hostname;
-        if (hostname.includes("trycloudflare.com")) {
-            return `https://${hostname}`;
-        }
-        // Dynamically connect to the backend running on the same host IP
-        return `http://${hostname}:8000`;
+        return envUrl;
     }
     //TURBOPACK unreachable
     ;
@@ -419,7 +411,7 @@ function UserForm({ user, onClose, onSave }) {
                 security_id: user?.security_id ?? '',
                 security_name: user?.security_name ?? '',
                 security_password: '',
-                factory: user?.factory ?? FIXED_CAMPUS,
+                campus: user?.campus ?? FIXED_CAMPUS,
                 role: user?.role ?? 'Guard'
             })
     }["UserForm.useMemo[initialData]"], [
@@ -459,7 +451,7 @@ function UserForm({ user, onClose, onSave }) {
             if (user) {
                 await (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$api$2f$securityUsers$2e$api$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["updateSecurityUser"])(user.security_id, {
                     security_name: formData.security_name,
-                    factory: FIXED_CAMPUS,
+                    campus: FIXED_CAMPUS,
                     role: formData.role,
                     ...password.trim() ? {
                         security_password: password
@@ -470,7 +462,7 @@ function UserForm({ user, onClose, onSave }) {
                     security_id: formData.security_id,
                     security_name: formData.security_name,
                     security_password: password,
-                    factory: FIXED_CAMPUS,
+                    campus: FIXED_CAMPUS,
                     role: formData.role
                 });
             }

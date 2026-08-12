@@ -24,7 +24,7 @@ export const config = {
     "/report-download/:path*",
     "/analytics/:path*",
     "/user-crud/:path*",
-    "/factory/:path*",
+    "/campus/:path*",
     "/scan-points/:path*",
     "/security-activity/:path*",
     "/security-info/:path*",

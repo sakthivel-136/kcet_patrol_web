@@ -19,7 +19,7 @@ const normalizeQR = (data: QRData): QRCode => ({
   lon: typeof data.lon === 'number' ? data.lon : 0,
   status: (data.status === "active" || data.status === "inactive") ? data.status : "inactive",
   created_at: data.created_at,
-  factory_code: data.factory_code || "",
+  campus_code: data.campus_code || "",
   waiting_time: data.waiting_time ?? 15, // Default to 15 in table if missing
 });
 
@@ -37,7 +37,7 @@ export default function QrTable({
             <tr>
               <th className="px-6 py-4 text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider">QR Name</th>
               <th className="px-6 py-4 text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider">ID</th>
-              <th className="px-6 py-4 text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider">Factory</th>
+              <th className="px-6 py-4 text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider">Campus</th>
               <th className="px-6 py-4 text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider">Coordinates</th>
               <th className="px-6 py-4 text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider">Wait Time</th>
               <th className="px-6 py-4 text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider">Status</th>
@@ -56,7 +56,7 @@ export default function QrTable({
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className="text-sm text-slate-600 bg-slate-50 px-2 py-1 rounded border border-slate-100 font-mono">{qr.qr_id}</span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{qr.factory_code}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{qr.campus_code}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center gap-1 text-sm text-slate-600 font-mono">
                       <span>{qr.lat}</span><span className="text-slate-300">/</span><span>{qr.lon}</span>

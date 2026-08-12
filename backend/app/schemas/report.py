@@ -9,26 +9,26 @@ IST = pytz.timezone("Asia/Kolkata")
 # -----------------------------
 # Generate Scan Report (FAST)
 # -----------------------------
-def generate_report(db, factory_code: str, report_date: str):
+def generate_report(db, campus_code: str, report_date: str):
 
     if not db:
         raise RuntimeError("Supabase client not initialized")
 
 
     # ==============================
-    # 1️⃣ Fetch factory details
+    # 1️⃣ Fetch campus details
     # ==============================
-    factory = (
-        db.table("factories")
-        .select("factory_name, factory_address")
-        .eq("factory_code", factory_code)
+    campus = (
+        db.table("campuses")
+        .select("campus_name, campus_address")
+        .eq("campus_code", campus_code)
         .single()
         .execute()
         .data
     )
 
-    if not factory:
-        raise ValueError("Factory not found")
+    if not campus:
+        raise ValueError("Campus not found")
 
 
     # ==============================
@@ -43,7 +43,7 @@ def generate_report(db, factory_code: str, report_date: str):
     qr_codes = (
         db.table("qr")
         .select("qr_id, qr_name")
-        .eq("factory_code", factory_code)
+        .eq("campus_code", campus_code)
         .execute()
         .data or []
     )
@@ -55,7 +55,7 @@ def generate_report(db, factory_code: str, report_date: str):
     scans = (
         db.table("scanning_details")
         .select("*")
-        .eq("factory_code", factory_code)
+        .eq("campus_code", campus_code)
         .gte("scan_time", f"{report_date}T00:00:00+05:30")
         .lte("scan_time", f"{report_date}T23:59:59+05:30")
         .execute()
@@ -137,11 +137,11 @@ def generate_report(db, factory_code: str, report_date: str):
     # ==============================
     return {
 
-        "factory_code": factory_code,
+        "campus_code": campus_code,
 
-        "factory_name": factory.get("factory_name"),
+        "campus_name": campus.get("campus_name"),
 
-        "factory_address": factory.get("factory_address"),
+        "campus_address": campus.get("campus_address"),
 
         "report_date": report_date,
 

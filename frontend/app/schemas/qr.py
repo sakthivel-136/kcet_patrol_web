@@ -10,7 +10,7 @@ class QRCreate(BaseModel):
     lat: Optional[float] = None
     lon: Optional[float] = None
     status: Optional[str] = "active"
-    factory_code: Optional[str] = None
+    campus_code: Optional[str] = None
 
 
 # 🟡 UPDATE (qr_id NOT editable)
@@ -19,7 +19,7 @@ class QRUpdate(BaseModel):
     lat: Optional[float] = None
     lon: Optional[float] = None
     status: Optional[str] = None
-    factory_code: Optional[str] = None
+    campus_code: Optional[str] = None
 
 
 # 🔵 RESPONSE

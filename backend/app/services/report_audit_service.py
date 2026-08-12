@@ -8,7 +8,7 @@ IST = timezone(timedelta(hours=5, minutes=30))
 def save_report_audit(
     db,
     report_type: str,
-    factory_code: str,
+    campus_code: str,
     report_date: str,
     current_user: dict
 ):
@@ -17,7 +17,7 @@ def save_report_audit(
 
     audit_payload = {
         "report_type": report_type,
-        "factory_code": factory_code,
+        "campus_code": campus_code,
         "report_date": report_date,
         "generated_by_user_id": current_user["user_id"],
         "generated_by_name": current_user.get("name"),

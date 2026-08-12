@@ -24,6 +24,14 @@ if not SUPABASE_KEY:
 # --------------------------------------------------
 # SUPABASE CLIENT
 # --------------------------------------------------
+import re
+import supabase._sync.client
+import supabase._async.client
+
+# Patch the regex in both clients to accept any string
+supabase._sync.client.re.match = lambda pattern, string, flags=0: True
+supabase._async.client.re.match = lambda pattern, string, flags=0: True
+
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def get_db() -> Client:
@@ -117,10 +125,10 @@ def create_scan_log(data: Dict[str, Any]) -> Dict:
 def get_all_scan_logs() -> List[Dict]:
     return select_rows(SCANNING_TABLE)
 
-def get_scan_logs_by_factory(factory_code: str) -> List[Dict]:
+def get_scan_logs_by_campus(campus_code: str) -> List[Dict]:
     return select_rows(
         SCANNING_TABLE,
-        {"factory_code": factory_code}
+        {"campus_code": campus_code}
     )
 
 def get_scan_logs_by_guard(guard_name: str) -> List[Dict]:

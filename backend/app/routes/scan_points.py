@@ -13,10 +13,10 @@ router = APIRouter(
 # ---------------------------
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=ScanPointResponse)
 def create_scan_point(payload: ScanPointCreate, _: dict = Depends(admin_only)):
-    # Check if factory exists
-    factory = supabase.table("factories").select("factory_code").eq("factory_code", payload.factory_id).execute()
-    if not factory.data:
-        raise HTTPException(status_code=404, detail="Factory not found")
+    # Check if campus exists
+    campus = supabase.table("campuses").select("campus_code").eq("campus_code", payload.campus_code).execute()
+    if not campus.data:
+        raise HTTPException(status_code=404, detail="Campus not found")
 
     # Check duplicate name
     existing = supabase.table("scan_points").select("*").eq("scan_point_name", payload.scan_point_name).execute()
@@ -24,7 +24,7 @@ def create_scan_point(payload: ScanPointCreate, _: dict = Depends(admin_only)):
         raise HTTPException(status_code=400, detail="Scan Point with this name already exists")
 
     insert_data = {
-        "factory_id": payload.factory_id,
+        "campus_code": payload.campus_code,
         "scan_point_name": payload.scan_point_name,
         "scan_point_code": payload.scan_point_code or payload.scan_point_name,
         "location": payload.location,
@@ -42,13 +42,13 @@ def create_scan_point(payload: ScanPointCreate, _: dict = Depends(admin_only)):
     return result.data[0]
 
 # ---------------------------
-# GET all scan points (optionally filter by factory)
+# GET all scan points (optionally filter by campus)
 # ---------------------------
 @router.get("", response_model=list[ScanPointResponse])
-def get_scan_points(factory_id: str = Query(None, description="Filter by Factory ID"), _: dict = Depends(get_current_user)):
+def get_scan_points(campus_code: str = Query(None, description="Filter by Campus ID"), _: dict = Depends(get_current_user)):
     query = supabase.table("scan_points").select("*")
-    if factory_id:
-        query = query.eq("factory_id", factory_id)
+    if campus_code:
+        query = query.eq("campus_code", campus_code)
     result = query.execute()
     return result.data or []
 

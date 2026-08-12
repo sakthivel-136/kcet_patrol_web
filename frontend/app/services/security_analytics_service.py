@@ -46,17 +46,17 @@ def generate_report_download(payload):
     if not supabase:
         raise RuntimeError("Supabase not initialized")
 
-    # 🔹 Factory
-    factory_res = supabase.table("factories") \
-        .select("factory_name, factory_address") \
-        .eq("factory_code", payload.factory_code) \
+    # 🔹 Campus
+    campus_res = supabase.table("campuses") \
+        .select("campus_name, campus_address") \
+        .eq("campus_code", payload.campus_code) \
         .single() \
         .execute()
 
-    if not factory_res.data:
-        raise ValueError("Factory not found")
+    if not campus_res.data:
+        raise ValueError("Campus not found")
 
-    factory = factory_res.data
+    campus = campus_res.data
 
     # 🔹 Admin
     admin_res = supabase.table("users") \
@@ -77,7 +77,7 @@ def generate_report_download(payload):
             longitude,
             scan_time
         """) \
-        .eq("factory_code", payload.factory_code) \
+        .eq("campus_code", payload.campus_code) \
         .gte("scan_time", f"{payload.report_date}T00:00:00") \
         .lte("scan_time", f"{payload.report_date}T23:59:59") \
         .order("scan_time") \
@@ -99,8 +99,8 @@ def generate_report_download(payload):
     elements = []
 
     # 🔹 Header
-    elements.append(Paragraph(f"<b>{factory['factory_name']}</b>", styles["Title"]))
-    elements.append(Paragraph(factory["factory_address"], styles["Normal"]))
+    elements.append(Paragraph(f"<b>{campus['campus_name']}</b>", styles["Title"]))
+    elements.append(Paragraph(campus["campus_address"], styles["Normal"]))
     elements.append(Spacer(1, 10))
     elements.append(Paragraph(
         f"<b>Security Patrol Report : {payload.report_date}</b>",

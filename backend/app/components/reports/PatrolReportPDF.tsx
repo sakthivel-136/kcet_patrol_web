@@ -12,9 +12,9 @@ import { ROUND_TIMES } from "./roundtime";
 interface PatrolReportPDFProps {
   logs: ScanLog[];
 
-  factoryCode: string;
-  factoryName: string;
-  factoryAddress: string;
+  campusCode: string;
+  campusName: string;
+  campusAddress: string;
 
   reportDate: string;
   generatedBy: string;
@@ -24,9 +24,9 @@ interface PatrolReportPDFProps {
 // ================= Component =================
 const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
   logs,
-  factoryCode,
-  factoryName,
-  factoryAddress,
+  campusCode,
+  campusName,
+  campusAddress,
   reportDate,
   generatedBy,
 }) => {
@@ -56,9 +56,9 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
 
   }, [
     logs,
-    factoryCode,
-    factoryName,
-    factoryAddress,
+    campusCode,
+    campusName,
+    campusAddress,
     reportDate,
     generatedBy,
   ]);
@@ -121,7 +121,7 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
     doc.text("Security Patrol Report", width / 2, 20, { align: "center" });
 
     doc.setFontSize(16);
-    doc.text(factoryName.toUpperCase(), width / 2, 30, {
+    doc.text(campusName.toUpperCase(), width / 2, 30, {
       align: "center",
     });
 
@@ -131,7 +131,7 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
 
 
     // Address
-    doc.text(factoryAddress, width / 2, 38, {
+    doc.text(campusAddress, width / 2, 38, {
       align: "center",
     });
 
@@ -342,7 +342,7 @@ for (let i = 1; i <= pages; i++) {
 
 
     // ================= Save =================
-    doc.save(`Patrol_Report_${factoryCode}_${reportDate}.pdf`);
+    doc.save(`Patrol_Report_${campusCode}_${reportDate}.pdf`);
   };
 
 

@@ -9,7 +9,7 @@ class ScanCreate(BaseModel):
     lat: Optional[float]
     log: Optional[float]
     status: Optional[str]
-    factory_code: Optional[str]
+    campus_code: Optional[str]
 
 class ScanResponse(ScanCreate):
     id: int

@@ -5,11 +5,11 @@ import { getPatrolReportPDF, PatrolReportResponse } from "../api/report"; // cre
 import PatrolReportPDF from "./PatrolReportPDF";
 
 interface ReportPDFUIProps {
-  factoryCode: string;
+  campusCode: string;
   reportDate: string;
 }
 
-const ReportPDFUI: React.FC<ReportPDFUIProps> = ({ factoryCode, reportDate }) => {
+const ReportPDFUI: React.FC<ReportPDFUIProps> = ({ campusCode, reportDate }) => {
   const [reportData, setReportData] = useState<PatrolReportResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -18,7 +18,7 @@ const ReportPDFUI: React.FC<ReportPDFUIProps> = ({ factoryCode, reportDate }) =>
     setLoading(true);
     setError(null);
     try {
-      const data = await getPatrolReportPDF(factoryCode, reportDate); // backend call
+      const data = await getPatrolReportPDF(campusCode, reportDate); // backend call
       setReportData(data);
     } catch (err: any) {
       setError(err.message || "Failed to fetch report");
@@ -28,10 +28,10 @@ const ReportPDFUI: React.FC<ReportPDFUIProps> = ({ factoryCode, reportDate }) =>
   };
 
   useEffect(() => {
-    if (factoryCode && reportDate) {
+    if (campusCode && reportDate) {
       fetchReport();
     }
-  }, [factoryCode, reportDate]);
+  }, [campusCode, reportDate]);
 
   return (
     <div>
@@ -46,7 +46,7 @@ const ReportPDFUI: React.FC<ReportPDFUIProps> = ({ factoryCode, reportDate }) =>
       {error && <p className="text-red-600">{error}</p>}
 
       {/* Render PDF generator once data is fetched */}
-      {reportData && <PatrolReportPDF reportData={reportData} factoryCode={factoryCode} />}
+      {reportData && <PatrolReportPDF reportData={reportData} campusCode={campusCode} />}
     </div>
   );
 };

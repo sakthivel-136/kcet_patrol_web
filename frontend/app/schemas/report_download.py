@@ -5,22 +5,22 @@ from app.utils.round_slots import generate_round_slots
 # -----------------------------
 # Generate Scan Report
 # -----------------------------
-def generate_report(db, factory_code: str, report_date: str):
+def generate_report(db, campus_code: str, report_date: str):
     if not db:
         raise RuntimeError("Supabase client not initialized")
 
-    # 1️⃣ Fetch factory details (THIS WAS MISSING)
-    factory = (
-        db.table("factories")
-        .select("factory_name, factory_address")
-        .eq("factory_code", factory_code)
+    # 1️⃣ Fetch campus details (THIS WAS MISSING)
+    campus = (
+        db.table("campuses")
+        .select("campus_name, campus_address")
+        .eq("campus_code", campus_code)
         .single()
         .execute()
         .data
     )
 
-    if not factory:
-        raise ValueError("Factory not found")
+    if not campus:
+        raise ValueError("Campus not found")
 
     # 2️⃣ Generate round slots
     round_slots = generate_round_slots(report_date)
@@ -29,7 +29,7 @@ def generate_report(db, factory_code: str, report_date: str):
     qr_codes = (
         db.table("qr")
         .select("qr_id, qr_name")
-        .eq("factory_code", factory_code)
+        .eq("campus_code", campus_code)
         .execute()
         .data or []
     )
@@ -38,7 +38,7 @@ def generate_report(db, factory_code: str, report_date: str):
     scans = (
         db.table("scanning_details")
         .select("*")
-        .eq("factory_code", factory_code)
+        .eq("campus_code", campus_code)
         .gte("scan_time", f"{report_date}T00:00:00+05:30")
         .lte("scan_time", f"{report_date}T23:59:59+05:30")
         .execute()
@@ -71,9 +71,9 @@ def generate_report(db, factory_code: str, report_date: str):
 
     # 6️⃣ FINAL RESPONSE (FACTORY DATA INCLUDED ONCE)
     return {
-        "factory_code": factory_code,
-        "factory_name": factory.get("factory_name"),
-        "factory_address": factory.get("factory_address"),
+        "campus_code": campus_code,
+        "campus_name": campus.get("campus_name"),
+        "campus_address": campus.get("campus_address"),
         "report_date": report_date,
         "data": report
     }

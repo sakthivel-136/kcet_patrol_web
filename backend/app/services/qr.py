@@ -24,8 +24,8 @@ def create_qr(data: dict):
 
 
 # ---------------- READ BY FACTORY ----------------
-def get_qr_by_factory(factory_code: str):
-    return select_rows(TABLE, {"factory_code": factory_code}) or []
+def get_qr_by_campus(campus_code: str):
+    return select_rows(TABLE, {"campus_code": campus_code}) or []
 
 
 # ---------------- READ BY ID ----------------

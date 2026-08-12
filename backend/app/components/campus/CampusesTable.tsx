@@ -1,9 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { FactoryForm } from './FactoryForm'
+import { CampusForm } from './CampusForm'
 
-interface Factory {
+interface Campus {
   id: string
   name: string
   location?: string
@@ -23,11 +23,11 @@ const getAuthHeaders = () => {
 
 /* ============================================== */
 
-export const FactoriesTable = () => {
+export const CampusesTable = () => {
 
   /* ================= STATE ================= */
 
-  const [factories, setFactories] = useState<Factory[]>([])
+  const [campuses, setCampuses] = useState<Campus[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -41,12 +41,12 @@ export const FactoriesTable = () => {
 
   /* ================= LOAD ================= */
 
-  const loadFactories = async () => {
+  const loadCampuses = async () => {
     setLoading(true)
     setError('')
 
     try {
-      const res = await fetch(`${API_BASE_URL}/factories`, {
+      const res = await fetch(`${API_BASE_URL}/campuses`, {
         headers: getAuthHeaders(),
       })
 
@@ -54,19 +54,19 @@ export const FactoriesTable = () => {
         if (res.status === 401) {
           throw new Error('Unauthorized. Please login again.')
         }
-        throw new Error('Failed to load factories')
+        throw new Error('Failed to load campuses')
       }
 
       const data = await res.json()
 
       const normalized = data.map((f: any) => ({
-        id: f.factory_code,
-        name: f.factory_name,
+        id: f.campus_code,
+        name: f.campus_name,
         location: f.location || '',
-        address: f.factory_address || '',
+        address: f.campus_address || '',
       }))
 
-      setFactories(normalized)
+      setCampuses(normalized)
 
     } catch (err: any) {
       console.error(err)
@@ -79,7 +79,7 @@ export const FactoriesTable = () => {
 
   /* ================= CREATE ================= */
 
-  const addFactory = async (payload: {
+  const addCampus = async (payload: {
     name: string
     code: string
     location?: string
@@ -87,20 +87,20 @@ export const FactoriesTable = () => {
   }) => {
 
     try {
-      const res = await fetch(`${API_BASE_URL}/factories`, {
+      const res = await fetch(`${API_BASE_URL}/campuses`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({
-          factory_name: payload.name,
-          factory_code: payload.code,
+          campus_name: payload.name,
+          campus_code: payload.code,
           location: payload.location || '',
-          factory_address: payload.address || '',
+          campus_address: payload.address || '',
         }),
       })
 
       if (!res.ok) throw new Error('Create failed')
 
-      await loadFactories()
+      await loadCampuses()
 
     } catch (err: any) {
       alert(err.message)
@@ -112,21 +112,21 @@ export const FactoriesTable = () => {
   const saveEdit = async (id: string) => {
 
     try {
-      const res = await fetch(`${API_BASE_URL}/factories/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/campuses/${id}`, {
         method: 'PUT',
         headers: getAuthHeaders(),
         body: JSON.stringify({
-          factory_name: editName,
-          factory_code: id,
+          campus_name: editName,
+          campus_code: id,
           location: editLocation,
-          factory_address: editAddress,
+          campus_address: editAddress,
         }),
       })
 
       if (!res.ok) throw new Error('Update failed')
 
       setEditingId(null)
-      await loadFactories()
+      await loadCampuses()
 
     } catch (err: any) {
       alert(err.message)
@@ -135,12 +135,12 @@ export const FactoriesTable = () => {
 
   /* ================= DELETE ================= */
 
-  const deleteFactory = async (id: string) => {
+  const deleteCampus = async (id: string) => {
 
-    if (!confirm('Delete this factory?')) return
+    if (!confirm('Delete this campus?')) return
 
     try {
-      const res = await fetch(`${API_BASE_URL}/factories/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/campuses/${id}`, {
         method: 'DELETE',
         headers: getAuthHeaders(),
       })
@@ -149,7 +149,7 @@ export const FactoriesTable = () => {
         throw new Error('Delete failed')
       }
 
-      await loadFactories()
+      await loadCampuses()
 
     } catch (err: any) {
       alert(err.message)
@@ -158,7 +158,7 @@ export const FactoriesTable = () => {
 
   /* ================= EDIT ================= */
 
-  const startEdit = (f: Factory) => {
+  const startEdit = (f: Campus) => {
     setEditingId(f.id)
     setEditName(f.name)
     setEditLocation(f.location || '')
@@ -168,7 +168,7 @@ export const FactoriesTable = () => {
   /* ================= INIT ================= */
 
   useEffect(() => {
-    loadFactories()
+    loadCampuses()
   }, [])
 
 
@@ -197,7 +197,7 @@ export const FactoriesTable = () => {
     <div className="min-h-screen bg-slate-50 py-10 px-4">
 
       <h2 className="text-2xl font-bold mb-6">
-        Factories Management
+        Campuses Management
       </h2>
 
       {/* Error */}
@@ -208,7 +208,7 @@ export const FactoriesTable = () => {
       )}
 
       {/* Add */}
-      <FactoryForm onSubmit={addFactory} />
+      <CampusForm onSubmit={addCampus} />
 
 
       {/* Loading */}
@@ -237,15 +237,15 @@ export const FactoriesTable = () => {
 
             <tbody>
 
-              {factories.length === 0 && (
+              {campuses.length === 0 && (
                 <tr>
                   <td colSpan={5} className="p-4 text-center">
-                    No factories
+                    No campuses
                   </td>
                 </tr>
               )}
 
-              {factories.map((f) => (
+              {campuses.map((f) => (
 
                 <tr key={f.id}>
 
@@ -329,7 +329,7 @@ export const FactoriesTable = () => {
                         </button>
 
                         <button
-                          onClick={() => deleteFactory(f.id)}
+                          onClick={() => deleteCampus(f.id)}
                           className="text-red-600"
                         >
                           Delete

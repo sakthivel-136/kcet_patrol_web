@@ -11,10 +11,12 @@ import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import { useAuthGuard } from '@/app/services/auth.guard'
 
+import { LOGO_BASE64 } from '../components/reports/logoBase64'
+
 /* ================================================================
    TYPES
 ================================================================ */
-type Factory = { factory_code: string; factory_name: string }
+type Campus = { campus_code: string; campus_name: string }
 
 type DashboardStats = {
   total: number; completed: number; missed: number; pending: number; rate: number
@@ -36,8 +38,8 @@ function fmtTime(t: string | null) {
 
 function exportDashboardPDF(
   statsData: DashboardStats,
-  factory: string,
-  factoryName: string,
+  campus: string,
+  campusName: string,
   date: string,
   adminName: string
 ) {
@@ -57,12 +59,18 @@ function exportDashboardPDF(
     drawBorder()
 
     // ========== HEADER ==========
+    try {
+      doc.addImage(LOGO_BASE64, "JPEG", 14, 12, 28, 28);
+    } catch (e) {
+      console.warn("Could not load logo", e);
+    }
+    
     doc.setFont('times', 'bold')
     doc.setTextColor(0, 0, 150)
     doc.setFontSize(20)
     doc.text('Security Patrol Analytics Report', w / 2, 22, { align: 'center' })
     doc.setFontSize(14)
-    doc.text(factoryName.toUpperCase(), w / 2, 32, { align: 'center' })
+    doc.text(campusName.toUpperCase(), w / 2, 32, { align: 'center' })
     doc.setFont('times', 'bold')
     doc.setFontSize(12)
     doc.setTextColor(0, 0, 150)
@@ -259,7 +267,7 @@ function exportDashboardPDF(
       doc.text(`Page ${i} of ${pages} | KCET Security Rounds`, w / 2, h - 12, { align: 'center' })
     }
 
-    doc.save(`Analytics_Report_${factory}_${date}.pdf`)
+    doc.save(`Analytics_Report_${campus}_${date}.pdf`)
   } catch (err) {
     console.error('PDF export error:', err)
     alert('Failed to generate PDF. Please try again.')
@@ -366,7 +374,7 @@ export default function DashboardPage() {
       .finally(() => setLoading(false))
   }, [selectedDate, authorized])
 
-  /* auto-fetch when factory/date changes */
+  /* auto-fetch when campus/date changes */
   useEffect(() => {
     fetchReport()
   }, [fetchReport])
@@ -384,12 +392,13 @@ export default function DashboardPage() {
 
     const isToday = selectedDate === today
 
-    /* ── time-boundary ── */
     const ROUND_TIMES = [
-      "00:00","00:30","01:00","01:30","02:00","02:30","03:00","03:30",
-      "04:00","04:30","05:00","05:30","06:00","07:00","08:00","09:00",
-      "10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00",
-      "18:00","19:00","20:00","21:00","21:30","22:00","22:30","23:00","23:30"
+      "00:00","01:00","02:00","03:00",
+      "04:00","05:00","06:00","07:00",
+      "08:00","09:00","10:00","11:00",
+      "12:00","13:00","14:00","15:00",
+      "16:00","17:00","18:00","19:00",
+      "20:00","21:00","22:00","23:00"
     ];
 
     let dueRoundsCount = ROUND_TIMES.length;
@@ -515,7 +524,7 @@ export default function DashboardPage() {
     }
   }, [report, selectedDate, today])
 
-  const selectedFactoryName = "KCET Main Campus"
+  const selectedCampusName = "KCET Main Campus"
 
   if (!authorized) {
     return <div className="p-6 text-white min-h-screen bg-[#07071f] flex items-center justify-center">Checking access...</div>
@@ -530,7 +539,7 @@ export default function DashboardPage() {
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-slate-900">Analytics Dashboard</h1>
             <p className="mt-1 text-slate-500 text-sm">
-              <span className="font-medium text-indigo-600">{selectedFactoryName}</span>
+              <span className="font-medium text-indigo-600">{selectedCampusName}</span>
               {' · '}
               Patrol performance overview
               {lastUpdated && <span className="ml-2 text-emerald-600 font-medium">· Updated {lastUpdated}</span>}
@@ -572,7 +581,7 @@ export default function DashboardPage() {
             {report.length > 0 && (
               <button
                 id="pdf-export-btn"
-                onClick={() => exportDashboardPDF(stats, FIXED_CAMPUS, selectedFactoryName, selectedDate, adminName)}
+                onClick={() => exportDashboardPDF(stats, FIXED_CAMPUS, selectedCampusName, selectedDate, adminName)}
                 className="border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 text-sm transition-colors"
               >
                 📊 Export PDF

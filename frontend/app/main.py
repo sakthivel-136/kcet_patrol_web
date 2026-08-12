@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routes import (
     auth,
     admin,
-    factories,
+    campuses,
     scan_points,
     security_users,
     qr,
@@ -48,7 +48,7 @@ app.include_router(
 )
 
 # Other Routers
-app.include_router(factories.router)
+app.include_router(campuses.router)
 app.include_router(scan_points.router)
 app.include_router(security_users.router)
 app.include_router(qr.router)

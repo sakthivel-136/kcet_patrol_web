@@ -7,7 +7,7 @@ from datetime import datetime
 from app.database import (
     create_scan_log,
     get_all_scan_logs,
-    get_scan_logs_by_factory,
+    get_scan_logs_by_campus,
     get_scan_logs_by_guard,
     delete_scan_log,
 )
@@ -60,14 +60,14 @@ def create_scan(scan: ScanCreate):
 
 @router.get("/", response_model=List[ScanResponse])
 def read_scans(
-    factory_code: Optional[str] = None,
+    campus_code: Optional[str] = None,
     guard_name: Optional[str] = None
 ):
 
     try:
 
-        if factory_code:
-            data = get_scan_logs_by_factory(factory_code)
+        if campus_code:
+            data = get_scan_logs_by_campus(campus_code)
 
         elif guard_name:
             data = get_scan_logs_by_guard(guard_name)

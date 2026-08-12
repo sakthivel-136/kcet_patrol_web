@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 
 
 /* ✅ UPDATED TYPE */
-export interface FactoryFormData {
+export interface CampusFormData {
   name: string
   code: string
   location?: string
@@ -13,13 +13,13 @@ export interface FactoryFormData {
 
 
 interface Props {
-  onSubmit: (data: FactoryFormData) => void
-  initialData?: FactoryFormData
+  onSubmit: (data: CampusFormData) => void
+  initialData?: CampusFormData
   onCancel?: () => void
 }
 
 
-export const FactoryForm = ({
+export const CampusForm = ({
   onSubmit,
   initialData,
   onCancel,
@@ -88,7 +88,7 @@ export const FactoryForm = ({
         <div className="md:col-span-4">
 
           <label className="block text-xs font-bold mb-2">
-            Factory Name
+            Campus Name
           </label>
 
           <input
@@ -96,7 +96,7 @@ export const FactoryForm = ({
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="w-full border rounded px-3 py-2"
-            placeholder="Factory name"
+            placeholder="Campus name"
           />
 
         </div>

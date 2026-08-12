@@ -35,7 +35,7 @@ export default function UserForm({
     security_id: user?.security_id ?? '',
     security_name: user?.security_name ?? '',
     security_password: '',
-    factory: user?.factory ?? FIXED_CAMPUS,
+    campus: user?.campus ?? FIXED_CAMPUS,
     role: user?.role ?? 'Guard',
   }), [user])
 
@@ -88,7 +88,7 @@ export default function UserForm({
       if (user) {
         await updateSecurityUser(user.security_id, {
           security_name: formData.security_name,
-          factory: FIXED_CAMPUS,
+          campus: FIXED_CAMPUS,
           role: formData.role,
           ...(password.trim()
             ? { security_password: password }
@@ -100,7 +100,7 @@ export default function UserForm({
           security_id: formData.security_id,
           security_name: formData.security_name,
           security_password: password,
-          factory: FIXED_CAMPUS,
+          campus: FIXED_CAMPUS,
           role: formData.role,
         })
       }

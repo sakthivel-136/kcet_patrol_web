@@ -6,11 +6,11 @@ import QrForm from "@/app/components/qr/QrForm";
 import QrPreview from "@/app/components/qr/QrPreview";
 import QrFilters from "@/app/components/qr/QrFilters";
 import {
-  fetchQRByFactory,
+  fetchQRByCampus,
   createQR,
   updateQR,
   deleteQR,
-  fetchFactories,
+  fetchCampuses,
   QRData,
 } from "@/app/api/qr.api";
 import { useAuthGuard } from "@/app/services/auth.guard";
@@ -19,9 +19,9 @@ import { useAuthGuard } from "@/app/services/auth.guard";
 
 export type QRCode = QRData;
 
-export interface Factory {
-  factory_code: string;
-  factory_name: string;
+export interface Campus {
+  campus_code: string;
+  campus_name: string;
 }
 
 // ----------------- MAIN COMPONENT -----------------
@@ -46,7 +46,7 @@ export default function QrCrudPage() {
     lon: typeof data.lon === "number" ? data.lon : 0,
     status: data.status ?? "inactive",
     created_at: data.created_at,
-    factory_code: data.factory_code ?? FIXED_CAMPUS,
+    campus_code: data.campus_code ?? FIXED_CAMPUS,
     waiting_time:
       typeof data.waiting_time === "number"
         ? data.waiting_time
@@ -60,7 +60,7 @@ export default function QrCrudPage() {
   const loadQRCodes = async () => {
     if (!authorized) return;
     try {
-      const rawData = await fetchQRByFactory(FIXED_CAMPUS);
+      const rawData = await fetchQRByCampus(FIXED_CAMPUS);
       const mappedData = rawData.map(normalizeQR);
       setQrCodes(mappedData);
     } catch (err) {
@@ -104,7 +104,7 @@ export default function QrCrudPage() {
         qr_name: qrData.qr_name,
         lat: Number(qrData.lat),
         lon: Number(qrData.lon),
-        factory_code: qrData.factory_code,
+        campus_code: qrData.campus_code,
         status: qrData.status ?? "inactive",
         waiting_time: qrData.waiting_time ?? 15,
       };

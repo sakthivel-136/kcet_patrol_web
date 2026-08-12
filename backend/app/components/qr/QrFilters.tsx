@@ -1,15 +1,15 @@
 "use client";
 
-import { Factory } from "@/app/dashboard/qr-crud/page";
+import { Campus } from "@/app/dashboard/qr-crud/page";
 import { ChevronDown, Building2 } from "lucide-react"; // Professional icons
 
 interface QrFiltersProps {
   value: string; 
-  onChange: (factoryCode: string) => void;
-  factories: Factory[];
+  onChange: (campusCode: string) => void;
+  campuses: Campus[];
 }
 
-export default function QrFilters({ value, onChange, factories }: QrFiltersProps) {
+export default function QrFilters({ value, onChange, campuses }: QrFiltersProps) {
   return (
     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 hover:shadow-md transition-shadow duration-300 flex items-center gap-4">
       
@@ -17,7 +17,7 @@ export default function QrFilters({ value, onChange, factories }: QrFiltersProps
       <div className="flex items-center gap-2">
         <Building2 className="w-5 h-5 text-blue-600" />
         <label className="text-sm font-bold text-slate-700 uppercase tracking-wider whitespace-nowrap">
-          Factory
+          Campus
         </label>
       </div>
 
@@ -32,10 +32,10 @@ export default function QrFilters({ value, onChange, factories }: QrFiltersProps
           onChange={(e) => onChange(e.target.value)}
           className="w-full appearance-none bg-slate-50 border border-slate-200 text-slate-800 font-medium rounded-xl py-3 pl-4 pr-10 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 hover:bg-white hover:border-blue-300 transition-all cursor-pointer"
         >
-          <option value="" disabled className="text-slate-400">Select a factory location...</option>
-          {factories.map((f) => (
-            <option key={f.factory_code} value={f.factory_code}>
-              {f.factory_name}
+          <option value="" disabled className="text-slate-400">Select a campus location...</option>
+          {campuses.map((f) => (
+            <option key={f.campus_code} value={f.campus_code}>
+              {f.campus_name}
             </option>
           ))}
         </select>

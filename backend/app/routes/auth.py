@@ -37,7 +37,7 @@ async def login(
         # ==============================
         res = (
             db.table("security_users")
-            .select("security_id, security_password, security_name, factory, role")
+            .select("security_id, security_password, security_name, campus, role")
             .eq("security_id", payload.user_id)
             .limit(1)
             .execute()

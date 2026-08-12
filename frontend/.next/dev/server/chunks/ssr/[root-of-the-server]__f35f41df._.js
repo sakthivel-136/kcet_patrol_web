@@ -91,13 +91,12 @@ __turbopack_context__.s([
     ()=>getApiUrl
 ]);
 const getApiUrl = ()=>{
-    const envUrl = process.env.NEXT_PUBLIC_API_URL;
-    if (envUrl) {
+    const envUrl = ("TURBOPACK compile-time value", "http://127.0.0.1:8000");
+    if ("TURBOPACK compile-time truthy", 1) {
         return envUrl;
     }
-    if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
+    //TURBOPACK unreachable
     ;
-    return "http://10.10.3.2:8000";
 };
 }),
 "[project]/app/api/report.ts [app-ssr] (ecmascript)", ((__turbopack_context__) => {

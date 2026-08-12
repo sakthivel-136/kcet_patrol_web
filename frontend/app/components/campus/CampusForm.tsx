@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react'
 
-/* ✅ THIS TYPE MATCHES FactoriesTable EXACTLY */
-export interface FactoryFormData {
+/* ✅ THIS TYPE MATCHES CampusesTable EXACTLY */
+export interface CampusFormData {
   name: string
   code: string
   location?: string
@@ -11,12 +11,12 @@ export interface FactoryFormData {
 }
 
 interface Props {
-  onSubmit: (data: FactoryFormData) => void
-  initialData?: FactoryFormData
+  onSubmit: (data: CampusFormData) => void
+  initialData?: CampusFormData
   onCancel?: () => void
 }
 
-export const FactoryForm = ({
+export const CampusForm = ({
   onSubmit,
   initialData,
   onCancel,
@@ -61,7 +61,7 @@ export const FactoryForm = ({
     >
       <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-start">
         
-        {/* Factory Name Input (Takes up 6 cols) */}
+        {/* Campus Name Input (Takes up 6 cols) */}
         <div className="md:col-span-6">
           <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">
             Campus Name
@@ -75,7 +75,7 @@ export const FactoryForm = ({
           />
         </div>
 
-        {/* Factory Code Input (Takes up 6 cols) */}
+        {/* Campus Code Input (Takes up 6 cols) */}
         <div className="md:col-span-6">
           <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">
             Code

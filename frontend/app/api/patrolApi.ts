@@ -19,8 +19,8 @@ export interface PatrolRound {
 }
 
 export interface PatrolReportResponse {
-  factory_name: string;
-  factory_address: string;
+  campus_name: string;
+  campus_address: string;
   report_date: string;
   generated_by: string;
   generated_at: string;
@@ -29,12 +29,12 @@ export interface PatrolReportResponse {
 
 /**
  * Fetches the patrol report from the backend server
- * @param factoryCode - The factory code (e.g., "F001")
+ * @param campusCode - The campus code (e.g., "F001")
  * @param date - The date string (e.g., "2026-01-22")
  * @returns The PatrolReportResponse object
  */
 export async function getPatrolReport(
-  factoryCode: string, 
+  campusCode: string, 
   date: string
 ): Promise<PatrolReportResponse> {
   // Ensure the URL matches your backend server address (localhost:8000)
@@ -42,7 +42,7 @@ export async function getPatrolReport(
   
   // Construct the query parameters
   const params = new URLSearchParams({
-    factory_code: factoryCode,
+    campus_code: campusCode,
     date: date,
   });
 

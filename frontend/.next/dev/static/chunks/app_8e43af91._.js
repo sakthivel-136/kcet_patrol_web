@@ -8,17 +8,9 @@ __turbopack_context__.s([
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = /*#__PURE__*/ __turbopack_context__.i("[project]/node_modules/next/dist/build/polyfills/process.js [app-client] (ecmascript)");
 const getApiUrl = ()=>{
-    const envUrl = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].env.NEXT_PUBLIC_API_URL;
-    if (envUrl) {
-        return envUrl;
-    }
+    const envUrl = ("TURBOPACK compile-time value", "http://127.0.0.1:8000");
     if ("TURBOPACK compile-time truthy", 1) {
-        const hostname = window.location.hostname;
-        if (hostname.includes("trycloudflare.com")) {
-            return `https://${hostname}`;
-        }
-        // Dynamically connect to the backend running on the same host IP
-        return `http://${hostname}:8000`;
+        return envUrl;
     }
     //TURBOPACK unreachable
     ;

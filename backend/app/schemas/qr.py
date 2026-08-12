@@ -11,7 +11,7 @@ class QRCreate(BaseModel):
     lat: Optional[float] = None
     lon: Optional[float] = None
     status: Optional[str] = "active"
-    factory_code: Optional[str] = None
+    campus_code: Optional[str] = None
 
     # ✅ Make optional; default handled in backend
     waiting_time: Optional[int] = Field(
@@ -29,7 +29,7 @@ class QRUpdate(BaseModel):
     lat: Optional[float] = None
     lon: Optional[float] = None
     status: Optional[str] = None
-    factory_code: Optional[str] = None
+    campus_code: Optional[str] = None
 
     # ✅ Optional for update
     waiting_time: Optional[int] = Field(
@@ -48,7 +48,7 @@ class QROut(BaseModel):
     lat: Optional[float] = None
     lon: Optional[float] = None
     status: Optional[str] = None
-    factory_code: Optional[str] = None
+    campus_code: Optional[str] = None
     waiting_time: int
     created_at: datetime
 

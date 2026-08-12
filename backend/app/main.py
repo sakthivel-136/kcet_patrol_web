@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routes import (
     auth,
     admin,
-    factories,
+    campuses,
     scan_points,
     security_users,
     qr,
@@ -38,6 +38,7 @@ app = FastAPI(
 # -----------------------------
 origins = [
     "http://localhost:3000",
+    "http://localhost:3001",
     "http://172.16.16.100:3000",
     "http://10.10.3.2:3000",
     "https://apps.pentagontextiles.com"
@@ -65,8 +66,8 @@ app.include_router(
     dependencies=[Depends(get_current_user)]
 )
 
-# 🏭 Factories
-app.include_router(factories.router)
+# 🏭 Campuses
+app.include_router(campuses.router)
 
 # 📍 Scan Points
 app.include_router(scan_points.router)

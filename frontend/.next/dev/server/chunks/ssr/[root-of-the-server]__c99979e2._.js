@@ -91,13 +91,12 @@ __turbopack_context__.s([
     ()=>getApiUrl
 ]);
 const getApiUrl = ()=>{
-    const envUrl = process.env.NEXT_PUBLIC_API_URL;
-    if (envUrl) {
+    const envUrl = ("TURBOPACK compile-time value", "http://127.0.0.1:8000");
+    if ("TURBOPACK compile-time truthy", 1) {
         return envUrl;
     }
-    if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
+    //TURBOPACK unreachable
     ;
-    return "http://10.10.3.2:8000";
 };
 }),
 "[project]/app/api/axiosClient.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
@@ -473,7 +472,7 @@ function UserForm({ user, onClose, onSave }) {
             security_id: user?.security_id ?? '',
             security_name: user?.security_name ?? '',
             security_password: '',
-            factory: user?.factory ?? FIXED_CAMPUS,
+            campus: user?.campus ?? FIXED_CAMPUS,
             role: user?.role ?? 'Guard'
         }), [
         user
@@ -510,7 +509,7 @@ function UserForm({ user, onClose, onSave }) {
             if (user) {
                 await (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$api$2f$securityUsers$2e$api$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["updateSecurityUser"])(user.security_id, {
                     security_name: formData.security_name,
-                    factory: FIXED_CAMPUS,
+                    campus: FIXED_CAMPUS,
                     role: formData.role,
                     ...password.trim() ? {
                         security_password: password
@@ -521,7 +520,7 @@ function UserForm({ user, onClose, onSave }) {
                     security_id: formData.security_id,
                     security_name: formData.security_name,
                     security_password: password,
-                    factory: FIXED_CAMPUS,
+                    campus: FIXED_CAMPUS,
                     role: formData.role
                 });
             }

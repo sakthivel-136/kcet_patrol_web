@@ -29,7 +29,7 @@ export interface ScanLog {
   lat?: number;
   log?: number;
   status?: string;
-  factory_code?: string;
+  campus_code?: string;
   scan_time: string;
 }
 
@@ -49,21 +49,21 @@ export const getAllScanLogs = async (): Promise<ScanLog[]> => {
   }
 };
 
-export const getScanLogsByFactory = async (
-  factoryCode: string
+export const getScanLogsByCampus = async (
+  campusCode: string
 ): Promise<ScanLog[]> => {
   try {
     const db = getPool();
     const res = await db.query(
       `SELECT *
        FROM public.scanning_details
-       WHERE factory_code = $1
+       WHERE campus_code = $1
        ORDER BY scan_time DESC`,
-      [factoryCode]
+      [campusCode]
     );
     return res.rows;
   } catch (error) {
-    console.error(`❌ Error fetching logs for factory ${factoryCode}:`, error);
+    console.error(`❌ Error fetching logs for campus ${campusCode}:`, error);
     throw new Error('Database query failed');
   }
 };

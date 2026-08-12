@@ -14,8 +14,8 @@ class QR(Base):
     status = Column(Text, default="active")
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
 
-    factory_code = Column(
+    campus_code = Column(
         Text,
-        ForeignKey("factories.factory_code"),
+        ForeignKey("campuses.campus_code"),
         nullable=True
     )

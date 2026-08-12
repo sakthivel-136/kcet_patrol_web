@@ -21,4 +21,4 @@ class ScanningDetails(Base):
 
     scan_time = Column(TIMESTAMP(timezone=True), server_default=func.now())
     status = Column(Text)
-    factory_code = Column(Text)
+    campus_code = Column(Text)

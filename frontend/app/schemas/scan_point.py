@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import Optional
 
 class ScanPointCreate(BaseModel):
-    factory_id: str
+    campus_code: str
     scan_point_name: str
     scan_point_code: Optional[str]
     location: Optional[str]
@@ -13,7 +13,7 @@ class ScanPointCreate(BaseModel):
     is_active: Optional[bool] = True
 
 class ScanPointUpdate(BaseModel):
-    factory_id: Optional[str]
+    campus_code: Optional[str]
     scan_point_name: Optional[str]
     scan_point_code: Optional[str]
     location: Optional[str]
@@ -25,7 +25,7 @@ class ScanPointUpdate(BaseModel):
 
 class ScanPointResponse(BaseModel):
     id: str
-    factory_id: str
+    campus_code: str
     scan_point_name: str
     scan_point_code: Optional[str]
     location: Optional[str]

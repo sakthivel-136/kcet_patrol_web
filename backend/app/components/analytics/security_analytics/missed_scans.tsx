@@ -7,10 +7,10 @@ import {
 } from "@/app/api/analytics.api";
 
 interface MissedScansProps {
-  factoryCode: string;
+  campusCode: string;
 }
 
-export default function MissedScans({ factoryCode }: MissedScansProps) {
+export default function MissedScans({ campusCode }: MissedScansProps) {
   const [data, setData] = useState<MissedScansResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -19,11 +19,11 @@ export default function MissedScans({ factoryCode }: MissedScansProps) {
     setLoading(true);
     setError(null);
 
-    getMissedScans(factoryCode)
+    getMissedScans(campusCode)
       .then((res) => setData(res))
       .catch(() => setError("Failed to load missed scans"))
       .finally(() => setLoading(false));
-  }, [factoryCode]);
+  }, [campusCode]);
 
   if (loading) return <p>Loading missed scans...</p>;
   if (error) return <p className="text-red-600">{error}</p>;

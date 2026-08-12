@@ -10,7 +10,7 @@ IST = timezone(timedelta(hours=5, minutes=30))
 
 def build_report_filename(
     report_type: str,
-    factory_code: str,
+    campus_code: str,
     report_date: str,
     user_name: str | None,
     generated_at: datetime,
@@ -20,12 +20,12 @@ def build_report_filename(
     """
     safe_name = (user_name or "UNKNOWN").replace(" ", "_")
     ts = generated_at.strftime("%Y%m%d_%H%M%S")
-    return f"{report_type}_{factory_code}_{report_date}_{safe_name}_{ts}.pdf"
+    return f"{report_type}_{campus_code}_{report_date}_{safe_name}_{ts}.pdf"
 
 
 def generate_report(
     db,
-    factory_code: str,
+    campus_code: str,
     report_date: str,
     current_user: dict
 ):
@@ -33,19 +33,19 @@ def generate_report(
         raise RuntimeError("Supabase client not initialized")
 
     # -----------------------------
-    # 1️⃣ Fetch factory
+    # 1️⃣ Fetch campus
     # -----------------------------
-    factory = (
-        db.table("factories")
-        .select("factory_name, factory_address")
-        .eq("factory_code", factory_code)
+    campus = (
+        db.table("campuses")
+        .select("campus_name, campus_address")
+        .eq("campus_code", campus_code)
         .single()
         .execute()
         .data
     )
 
-    if not factory:
-        raise ValueError("Factory not found")
+    if not campus:
+        raise ValueError("Campus not found")
 
     # -----------------------------
     # 2️⃣ Generate round slots
@@ -58,7 +58,7 @@ def generate_report(
     qr_codes = (
         db.table("qr")
         .select("qr_id, qr_name")
-        .eq("factory_code", factory_code)
+        .eq("campus_code", campus_code)
         .execute()
         .data or []
     )
@@ -69,7 +69,7 @@ def generate_report(
     scans = (
         db.table("scanning_details")
         .select("*")
-        .eq("factory_code", factory_code)
+        .eq("campus_code", campus_code)
         .gte("scan_time", f"{report_date}T00:00:00+05:30")
         .lte("scan_time", f"{report_date}T23:59:59+05:30")
         .execute()
@@ -111,7 +111,7 @@ def generate_report(
     audit_id = save_report_audit(
         db=db,
         report_type="PATROL_REPORT",
-        factory_code=factory_code,
+        campus_code=campus_code,
         report_date=report_date,
         current_user=current_user,
         generated_at=generated_at,
@@ -122,7 +122,7 @@ def generate_report(
     # -----------------------------
     audit_filename = build_report_filename(
         report_type="PATROL_REPORT",
-        factory_code=factory_code,
+        campus_code=campus_code,
         report_date=report_date,
         user_name=current_user.get("name"),
         generated_at=generated_at,
@@ -132,9 +132,9 @@ def generate_report(
     # 8️⃣ Final response
     # -----------------------------
     return {
-        "factory_code": factory_code,
-        "factory_name": factory.get("factory_name"),
-        "factory_address": factory.get("factory_address"),
+        "campus_code": campus_code,
+        "campus_name": campus.get("campus_name"),
+        "campus_address": campus.get("campus_address"),
         "report_date": report_date,
 
         "generated_by": {

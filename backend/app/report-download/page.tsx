@@ -2,19 +2,19 @@
 
 import { useState, useEffect, useRef, useMemo } from "react";
 import { getPatrolReport, PatrolReportItem } from "../api/report";
-import { getFactories } from "../api/factories.api";
+import { getCampuses } from "../api/campuses.api";
 import PatrolReportPDF from "../components/reports/PatrolReportPDF";
 import ReportTable from "../components/reports/ReportTable";
 
 // ================= TYPES =================
-type Factory = {
-  factory_code: string;
-  factory_name: string;
-  factory_address: string | null;
+type Campus = {
+  campus_code: string;
+  campus_name: string;
+  campus_address: string | null;
 };
 
 // ================= ICONS (SVG) =================
-const IconFactory = () => (
+const IconCampus = () => (
   <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
 );
 
@@ -37,8 +37,8 @@ const IconSpinner = () => (
 export default function ReportDownloadPage() {
   // State
   const [adminName, setAdminName] = useState("");
-  const [factories, setFactories] = useState<Factory[]>([]);
-  const [factoryCode, setFactoryCode] = useState("");
+  const [campuses, setCampuses] = useState<Campus[]>([]);
+  const [campusCode, setCampusCode] = useState("");
   const [reportDate, setReportDate] = useState(new Date().toISOString().slice(0, 10));
   const [report, setReport] = useState<PatrolReportItem[]>([]);
   
@@ -63,13 +63,13 @@ export default function ReportDownloadPage() {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await getFactories();
+        const res = await getCampuses();
         if (res?.data?.length) {
-          setFactories(res.data);
-          setFactoryCode(res.data[0].factory_code);
+          setCampuses(res.data);
+          setCampusCode(res.data[0].campus_code);
         }
       } catch {
-        setError("Failed to load factories list.");
+        setError("Failed to load campuses list.");
       }
     };
     load();
@@ -77,14 +77,14 @@ export default function ReportDownloadPage() {
 
   // ================= FETCH =================
   const fetchReport = async () => {
-    if (!factoryCode) return;
+    if (!campusCode) return;
     
     setLoading(true);
     setError(null);
     setPdfTrigger(null); // Reset PDF trigger on new fetch
 
     try {
-      const data = await getPatrolReport(factoryCode, reportDate);
+      const data = await getPatrolReport(campusCode, reportDate);
       setReport(data);
       if (data.length === 0) setError("No patrol records found for this date.");
     } catch (err) {
@@ -113,8 +113,8 @@ export default function ReportDownloadPage() {
     }));
   }, [report]);
 
-  const currentFactory = factories.find((f) => f.factory_code === factoryCode);
-  const factoryName = currentFactory?.factory_name || factoryCode;
+  const currentCampus = campuses.find((f) => f.campus_code === campusCode);
+  const campusName = currentCampus?.campus_name || campusCode;
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-indigo-100 selection:text-indigo-700">
@@ -146,21 +146,21 @@ export default function ReportDownloadPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
             
-            {/* Factory Input */}
+            {/* Campus Input */}
             <div className="md:col-span-5 space-y-2">
-              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Factory Location</label>
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Campus Location</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <IconFactory />
+                  <IconCampus />
                 </div>
                 <select
                   className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors appearance-none cursor-pointer"
-                  value={factoryCode}
-                  onChange={(e) => setFactoryCode(e.target.value)}
+                  value={campusCode}
+                  onChange={(e) => setCampusCode(e.target.value)}
                 >
-                  {factories.map((f) => (
-                    <option key={f.factory_code} value={f.factory_code}>
-                      {f.factory_name}
+                  {campuses.map((f) => (
+                    <option key={f.campus_code} value={f.campus_code}>
+                      {f.campus_name}
                     </option>
                   ))}
                 </select>
@@ -235,7 +235,7 @@ export default function ReportDownloadPage() {
               </div>
               <h3 className="text-slate-900 font-medium text-lg">No records found</h3>
               <p className="text-slate-500 mt-1 max-w-sm">
-                Select a factory and date, then click "View Report" to load patrol data.
+                Select a campus and date, then click "View Report" to load patrol data.
               </p>
             </div>
           )}
@@ -248,9 +248,9 @@ export default function ReportDownloadPage() {
             <PatrolReportPDF
               key={pdfTrigger}
               logs={cleanLogs}
-              factoryCode={factoryCode}
-              factoryName={factoryName}
-              factoryAddress={currentFactory?.factory_address || "N/A"}
+              campusCode={campusCode}
+              campusName={campusName}
+              campusAddress={currentCampus?.campus_address || "N/A"}
               reportDate={reportDate}
               generatedBy={adminName}
             />

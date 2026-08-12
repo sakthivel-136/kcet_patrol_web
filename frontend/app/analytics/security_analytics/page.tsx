@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuthGuard } from '@/app/services/auth.guard'
 import { useState } from "react";
 import axiosClient from "@/app/api/axiosClient.js";
 // ✅ FIX: Updated imports to use 'security_analytics' folder
@@ -20,7 +21,10 @@ interface ProcessResponse {
 }
 
 export default function SecurityAnalyticsPage() {
-  const [factoryCode, setFactoryCode] = useState("F001");
+  const { authorized } = useAuthGuard({ allowedRoles: ['ADMIN'] })
+  if (!authorized) return null
+
+  const [campusCode, setCampusCode] = useState("F001");
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
   
   // State for processing status
@@ -31,9 +35,9 @@ export default function SecurityAnalyticsPage() {
   const handleFixScans = async () => {
     setIsProcessing(true);
     try {
-      // ✅ FIX: Added FactoryCode filter support
+      // ✅ FIX: Added CampusCode filter support
       const res = await axiosClient.post<ProcessResponse>("/analytics/process-scans", {
-        params: { factory_code: factoryCode },
+        params: { campus_code: campusCode },
       });
       
       // ✅ FIX: Access .data to get the actual response object, not the Axios wrapper
@@ -107,13 +111,13 @@ export default function SecurityAnalyticsPage() {
           {/* LEFT: ACTIVITY CHART */}
           <div className="bg-white p-6 rounded-2xl shadow-sm border-gray-100 
                       transition-all duration-300 hover:shadow-lg h-[400px]">
-            <DashboardCharts type="activity" factoryCode={factoryCode} />
+            <DashboardCharts type="activity" campusCode={campusCode} />
           </div>
 
           {/* RIGHT: GUARD PERFORMANCE CHART */}
           <div className="bg-white p-6 rounded-2xl shadow-sm border-gray-100 
                       transition-all duration-300 hover:shadow-lg h-[400px]">
-            <DashboardCharts type="guard" factoryCode={factoryCode} />
+            <DashboardCharts type="guard" campusCode={campusCode} />
           </div>
 
         </div>
@@ -138,7 +142,7 @@ export default function SecurityAnalyticsPage() {
           <div className="bg-white rounded-2xl p-1 shadow-sm border-gray-100 
                       transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
             <div className="bg-gray-50/50 rounded-xl p-6 h-full">
-              <MissedScans factoryCode={factoryCode} />
+              <MissedScans campusCode={campusCode} />
             </div>
           </div> {/* ✅ FIX: Added missing closing tag */}
 

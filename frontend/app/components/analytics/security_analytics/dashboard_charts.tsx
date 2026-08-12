@@ -17,10 +17,10 @@ import { getDashboardCharts, DashboardChartsResponse } from "@/app/api/analytics
 
 export default function DashboardCharts({ 
   type, 
-  factoryCode 
+  campusCode 
 }: { 
   type: "activity" | "guard"; 
-  factoryCode?: string 
+  campusCode?: string 
 }) {
   const [data, setData] = useState<DashboardChartsResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -30,9 +30,9 @@ export default function DashboardCharts({
     setLoading(true);
     setError(null);
     
-    console.log(`🔍 Fetching charts for factory: ${factoryCode}`);
+    console.log(`🔍 Fetching charts for campus: ${campusCode}`);
 
-    getDashboardCharts(factoryCode) // Passing factory code
+    getDashboardCharts(campusCode) // Passing campus code
       .then((res) => {
         console.log("✅ API Response:", res);
         setData(res);
@@ -42,7 +42,7 @@ export default function DashboardCharts({
         setError("Failed to load chart data");
       })
       .finally(() => setLoading(false));
-  }, [factoryCode]); 
+  }, [campusCode]); 
 
   // 1. ERROR STATE (Fixed Height + Border)
   if (error) {
@@ -77,7 +77,7 @@ export default function DashboardCharts({
       <div className="h-[400px] w-full flex items-center justify-center p-6 bg-blue-50 border-2 border-blue-200 rounded-xl">
         <div className="text-center">
           <p className="text-blue-400 text-xl font-bold">No Data Available</p>
-          <p className="text-blue-500 text-sm mt-1">No scans found for this factory.</p>
+          <p className="text-blue-500 text-sm mt-1">No scans found for this campus.</p>
         </div>
       </div>
     );

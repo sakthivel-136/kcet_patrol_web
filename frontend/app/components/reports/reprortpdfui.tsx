@@ -5,12 +5,12 @@ import { PatrolReportResponse } from "@/app/api/report";
 
 interface PatrolReportPDFProps {
   reportData: PatrolReportResponse;
-  factoryCode: string;
+  campusCode: string;
 }
 
 const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
   reportData,
-  factoryCode,
+  campusCode,
 }) => {
   return (
     <div className="hidden">
@@ -22,7 +22,7 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
         </h1>
 
         <p className="mb-2">
-          <strong>Factory Code:</strong> {factoryCode}
+          <strong>Campus Code:</strong> {campusCode}
         </p>
 
         <p className="mb-4">

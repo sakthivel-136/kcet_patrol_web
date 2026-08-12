@@ -8,13 +8,16 @@ import { ScanLog } from "../../types/scanlog";
 import { ROUND_TIMES } from "./roundtime";
 
 
+import { LOGO_BASE64 } from "./logoBase64";
+
+
 // ================= Props =================
 interface PatrolReportPDFProps {
   logs: ScanLog[];
 
-  factoryCode: string;
-  factoryName: string;
-  factoryAddress: string;
+  campusCode: string;
+  campusName: string;
+  campusAddress: string;
 
   reportDate: string;
   generatedBy: string;
@@ -24,9 +27,9 @@ interface PatrolReportPDFProps {
 // ================= Component =================
 const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
   logs,
-  factoryCode,
-  factoryName,
-  factoryAddress,
+  campusCode,
+  campusName,
+  campusAddress,
   reportDate,
   generatedBy,
 }) => {
@@ -56,9 +59,9 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
 
   }, [
     logs,
-    factoryCode,
-    factoryName,
-    factoryAddress,
+    campusCode,
+    campusName,
+    campusAddress,
     reportDate,
     generatedBy,
   ]);
@@ -119,13 +122,20 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
 
     // ================= Header Drawer =================
     const drawHeader = (targetDoc: jsPDF, targetDate: string) => {
+      
+      try {
+        targetDoc.addImage(LOGO_BASE64, "JPEG", 14, 12, 28, 28);
+      } catch (e) {
+        console.warn("Could not load logo to PDF", e);
+      }
+      
       targetDoc.setTextColor(0, 0, 150);
       targetDoc.setFont("times", "bold");
       targetDoc.setFontSize(20);
       targetDoc.text("Security Patrol Report", width / 2, 20, { align: "center" });
 
       targetDoc.setFontSize(16);
-      targetDoc.text(factoryName.toUpperCase(), width / 2, 30, {
+      targetDoc.text(campusName.toUpperCase(), width / 2, 30, {
         align: "center",
       });
 
@@ -133,7 +143,7 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
       targetDoc.setFontSize(11);
 
       // Address
-      targetDoc.text(factoryAddress, width / 2, 38, {
+      targetDoc.text(campusAddress, width / 2, 38, {
         align: "center",
       });
 
@@ -316,7 +326,7 @@ for (let i = 1; i <= pages; i++) {
 
 
     // ================= Save =================
-    doc.save(`Patrol_Report_${factoryCode}_${reportDate}.pdf`);
+    doc.save(`Patrol_Report_${campusCode}_${reportDate}.pdf`);
   };
 
 

@@ -4,7 +4,7 @@ from typing import Optional
 # Optional model for typed objects (useful for internal operations)
 class ScanPoint(BaseModel):
     id: str
-    factory_id: str
+    campus_code: str
     scan_point_name: str
     scan_point_code: Optional[str]
     location: Optional[str]

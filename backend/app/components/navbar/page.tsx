@@ -19,7 +19,7 @@ const Navbar = () => {
     { name: 'Reports', href: '/report-download' },
     { name: 'Users Management', href: '/user-crud' },
     { name: 'QR', href: '/dashboard/qr-crud' },
-    { name: 'Factories', href: '/factory' },
+    { name: 'Campuses', href: '/campus' },
     { name: 'Download App', href: 'https://drive.google.com/file/d/1Oo7J1pmQvwb2ANvkryuO5lAdWbFr5V1R' }, // New Item Added
   ]
 

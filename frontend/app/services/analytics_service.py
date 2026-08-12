@@ -54,7 +54,7 @@ def update_all_scan_statuses(target_date: date):
     # 1. Fetch Scans
     # FIXED: Corrected syntax error in .select string (removed stray quote, fixed parentheses)
     response = supabase.table('scanning_details') \
-        .select('id, scan_time, guard_name, guard_id, factory_code') \
+        .select('id, scan_time, guard_name, guard_id, campus_code') \
         .gte('scan_time', datetime.combine(target_date, datetime.min.time())) \
         .lte('scan_time', datetime.combine(target_date, datetime.max.time())) \
         .execute()

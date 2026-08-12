@@ -15,7 +15,7 @@ export default function SecurityUsersPage() {
   const [showForm, setShowForm] = useState(false)
 
   // TODO: later fetch from backend
-  const factories = ['F001', 'F002', 'F003']
+  const campuses = ['F001', 'F002', 'F003']
 
   const fetchUsers = async () => {
     try {
@@ -63,7 +63,7 @@ export default function SecurityUsersPage() {
       {showForm && (
         <UserForm
           user={editingUser}
-          factories={factories}
+          campuses={campuses}
           onClose={() => setShowForm(false)}
           onSave={() => {
             fetchUsers()

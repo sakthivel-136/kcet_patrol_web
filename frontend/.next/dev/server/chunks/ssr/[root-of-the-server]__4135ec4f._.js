@@ -91,13 +91,12 @@ __turbopack_context__.s([
     ()=>getApiUrl
 ]);
 const getApiUrl = ()=>{
-    const envUrl = process.env.NEXT_PUBLIC_API_URL;
-    if (envUrl) {
+    const envUrl = ("TURBOPACK compile-time value", "http://127.0.0.1:8000");
+    if ("TURBOPACK compile-time truthy", 1) {
         return envUrl;
     }
-    if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
+    //TURBOPACK unreachable
     ;
-    return "http://10.10.3.2:8000";
 };
 }),
 "[project]/app/api/report.ts [app-ssr] (ecmascript)", ((__turbopack_context__) => {
@@ -183,134 +182,98 @@ __turbopack_context__.s([
 const ROUND_TIMES = {
     1: {
         start: "12:00 AM",
-        end: "12:30 AM"
-    },
-    2: {
-        start: "12:30 AM",
         end: "1:00 AM"
     },
-    3: {
+    2: {
         start: "1:00 AM",
-        end: "1:30 AM"
-    },
-    4: {
-        start: "1:30 AM",
         end: "2:00 AM"
     },
-    5: {
+    3: {
         start: "2:00 AM",
-        end: "2:30 AM"
-    },
-    6: {
-        start: "2:30 AM",
         end: "3:00 AM"
     },
-    7: {
+    4: {
         start: "3:00 AM",
-        end: "3:30 AM"
-    },
-    8: {
-        start: "3:30 AM",
         end: "4:00 AM"
     },
-    9: {
+    5: {
         start: "4:00 AM",
-        end: "4:30 AM"
-    },
-    10: {
-        start: "4:30 AM",
         end: "5:00 AM"
     },
-    11: {
+    6: {
         start: "5:00 AM",
-        end: "5:30 AM"
-    },
-    12: {
-        start: "5:30 AM",
         end: "6:00 AM"
     },
-    13: {
+    7: {
         start: "6:00 AM",
         end: "7:00 AM"
     },
-    14: {
+    8: {
         start: "7:00 AM",
         end: "8:00 AM"
     },
-    15: {
+    9: {
         start: "8:00 AM",
         end: "9:00 AM"
     },
-    16: {
+    10: {
         start: "9:00 AM",
         end: "10:00 AM"
     },
-    17: {
+    11: {
         start: "10:00 AM",
         end: "11:00 AM"
     },
-    18: {
+    12: {
         start: "11:00 AM",
         end: "12:00 PM"
     },
-    19: {
+    13: {
         start: "12:00 PM",
         end: "1:00 PM"
     },
-    20: {
+    14: {
         start: "1:00 PM",
         end: "2:00 PM"
     },
-    21: {
+    15: {
         start: "2:00 PM",
         end: "3:00 PM"
     },
-    22: {
+    16: {
         start: "3:00 PM",
         end: "4:00 PM"
     },
-    23: {
+    17: {
         start: "4:00 PM",
         end: "5:00 PM"
     },
-    24: {
+    18: {
         start: "5:00 PM",
         end: "6:00 PM"
     },
-    25: {
+    19: {
         start: "6:00 PM",
         end: "7:00 PM"
     },
-    26: {
+    20: {
         start: "7:00 PM",
         end: "8:00 PM"
     },
-    27: {
+    21: {
         start: "8:00 PM",
         end: "9:00 PM"
     },
-    28: {
+    22: {
         start: "9:00 PM",
-        end: "9:30 PM"
-    },
-    29: {
-        start: "9:30 PM",
         end: "10:00 PM"
     },
-    30: {
+    23: {
         start: "10:00 PM",
-        end: "10:30 PM"
-    },
-    31: {
-        start: "10:30 PM",
         end: "11:00 PM"
     },
-    32: {
+    24: {
         start: "11:00 PM",
-        end: "11:30 PM"
-    },
-    33: {
-        start: "11:30 PM",
         end: "12:00 AM"
     }
 };
@@ -687,7 +650,7 @@ const ReportTable = ({ logs, loading })=>{
     // Filter Logs
     // -------------------------------
     const validLogs = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useMemo"])(()=>{
-        return logs.filter((log)=>log.round >= 1 && log.round <= 33);
+        return logs.filter((log)=>log.round >= 1 && log.round <= 24);
     }, [
         logs
     ]);

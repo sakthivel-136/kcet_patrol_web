@@ -1,26 +1,26 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { FactoryForm } from './FactoryForm'
+import { CampusForm } from './CampusForm'
 import {
-  getFactories,
-  createFactory,
-  updateFactory,
-  deleteFactory as deleteFactoryApi,
-} from '@/app/api/factories.api'
+  getCampuses,
+  createCampus,
+  updateCampus,
+  deleteCampus as deleteCampusApi,
+} from '@/app/api/campuses.api'
 
-interface Factory {
+interface Campus {
   id: string
   name: string
   location?: string
   address?: string
 }
 
-export const FactoriesTable = () => {
+export const CampusesTable = () => {
 
   /* ================= STATE ================= */
 
-  const [factories, setFactories] = useState<Factory[]>([])
+  const [campuses, setCampuses] = useState<Campus[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -31,26 +31,26 @@ export const FactoriesTable = () => {
 
   /* ================= LOAD ================= */
 
-  const loadFactories = async () => {
+  const loadCampuses = async () => {
     setLoading(true)
     setError('')
 
     try {
-      const res = await getFactories()
+      const res = await getCampuses()
       const data = res.data || res
 
       const normalized = data.map((f: any) => ({
-        id: f.factory_code,
-        name: f.factory_name,
+        id: f.campus_code,
+        name: f.campus_name,
         location: f.location || '',
-        address: f.factory_address || '',
+        address: f.campus_address || '',
       }))
 
-      setFactories(normalized)
+      setCampuses(normalized)
 
     } catch (err: any) {
       console.error(err)
-      setError('Failed to load factories')
+      setError('Failed to load campuses')
     } finally {
       setLoading(false)
     }
@@ -58,20 +58,20 @@ export const FactoriesTable = () => {
 
   /* ================= CREATE ================= */
 
-  const addFactory = async (payload: {
+  const addCampus = async (payload: {
     name: string
     code: string
     location?: string
     address?: string
   }) => {
     try {
-      await createFactory({
-        factory_name: payload.name,
-        factory_code: payload.code,
+      await createCampus({
+        campus_name: payload.name,
+        campus_code: payload.code,
         location: payload.location || '',
-        factory_address: payload.address || '',
+        campus_address: payload.address || '',
       })
-      await loadFactories()
+      await loadCampuses()
     } catch (err: any) {
       const errMsg = err.response?.data?.detail || err.message || 'Create failed'
       alert(errMsg)
@@ -82,14 +82,14 @@ export const FactoriesTable = () => {
 
   const saveEdit = async (id: string) => {
     try {
-      await updateFactory(id, {
-        factory_name: editName,
-        factory_code: id,
+      await updateCampus(id, {
+        campus_name: editName,
+        campus_code: id,
         location: editLocation,
-        factory_address: editAddress,
+        campus_address: editAddress,
       })
       setEditingId(null)
-      await loadFactories()
+      await loadCampuses()
     } catch (err: any) {
       const errMsg = err.response?.data?.detail || err.message || 'Update failed'
       alert(errMsg)
@@ -98,12 +98,12 @@ export const FactoriesTable = () => {
 
   /* ================= DELETE ================= */
 
-  const deleteFactory = async (id: string) => {
-    if (!confirm('Delete this factory?')) return
+  const deleteCampus = async (id: string) => {
+    if (!confirm('Delete this campus?')) return
 
     try {
-      await deleteFactoryApi(id)
-      await loadFactories()
+      await deleteCampusApi(id)
+      await loadCampuses()
     } catch (err: any) {
       const errMsg = err.response?.data?.detail || err.message || 'Delete failed'
       alert(errMsg)
@@ -112,7 +112,7 @@ export const FactoriesTable = () => {
 
   /* ================= EDIT ================= */
 
-  const startEdit = (f: Factory) => {
+  const startEdit = (f: Campus) => {
     setEditingId(f.id)
     setEditName(f.name)
     setEditLocation(f.location || '')
@@ -122,7 +122,7 @@ export const FactoriesTable = () => {
   /* ================= INIT ================= */
 
   useEffect(() => {
-    loadFactories()
+    loadCampuses()
   }, [])
 
   /* ================= UI ================= */
@@ -138,13 +138,13 @@ export const FactoriesTable = () => {
 
       {/* Add */}
       <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-        <FactoryForm onSubmit={addFactory} />
+        <CampusForm onSubmit={addCampus} />
       </div>
 
       {/* Loading */}
       {loading ? (
         <div className="flex items-center justify-center p-12">
-          <p className="text-slate-500 font-medium">Loading factories...</p>
+          <p className="text-slate-500 font-medium">Loading campuses...</p>
         </div>
       ) : (
         /* Table */
@@ -171,7 +171,7 @@ export const FactoriesTable = () => {
             </thead>
 
             <tbody className="bg-white divide-y divide-slate-100">
-              {factories.length === 0 ? (
+              {campuses.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center">
                     <div className="flex flex-col items-center justify-center space-y-2">
@@ -180,13 +180,13 @@ export const FactoriesTable = () => {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                         </svg>
                       </div>
-                      <p className="text-sm font-medium text-slate-500">No factories found</p>
-                      <p className="text-xs text-slate-400">Add a new factory location to get started.</p>
+                      <p className="text-sm font-medium text-slate-500">No campuses found</p>
+                      <p className="text-xs text-slate-400">Add a new campus location to get started.</p>
                     </div>
                   </td>
                 </tr>
               ) : (
-                factories.map((f) => (
+                campuses.map((f) => (
                   <tr 
                     key={f.id} 
                     className="hover:bg-slate-50 transition-colors duration-150 group"
@@ -263,7 +263,7 @@ export const FactoriesTable = () => {
                               Edit
                             </button>
                             <button
-                              onClick={() => deleteFactory(f.id)}
+                              onClick={() => deleteCampus(f.id)}
                               className="text-slate-600 hover:text-red-600 transition-colors duration-200 font-medium"
                             >
                               Delete

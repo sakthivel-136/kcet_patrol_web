@@ -7,7 +7,7 @@ import React, { useState } from "react";
  */
 export interface ScanPoint {
   id: string;
-  factory_id: string;
+  campus_code: string;
 
   scan_point_code: string;
   scan_point_name: string;
@@ -34,7 +34,7 @@ export const ScanPointForm = ({
   onSubmit,
 }: ScanPointFormProps) => {
   const [formData, setFormData] = useState({
-    factory_id: scanPoint?.factory_id || "",
+    campus_code: scanPoint?.campus_code || "",
     scan_point_name: scanPoint?.scan_point_name || "",
     scan_point_code: scanPoint?.scan_point_code || "",
     scan_type: scanPoint?.scan_type || "",
@@ -60,7 +60,7 @@ export const ScanPointForm = ({
     e.preventDefault();
 
     onSubmit({
-      factory_id: formData.factory_id,
+      campus_code: formData.campus_code,
       scan_point_name: formData.scan_point_name,
       scan_point_code: formData.scan_point_code,
       scan_type: formData.scan_type,
@@ -115,8 +115,8 @@ export const ScanPointForm = ({
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <Input
                 label="Campus ID"
-                name="factory_id"
-                value={formData.factory_id}
+                name="campus_code"
+                value={formData.campus_code}
                 onChange={handleChange}
                 disabled // Usually immutable in edit
               />

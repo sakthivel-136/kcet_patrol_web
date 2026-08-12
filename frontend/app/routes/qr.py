@@ -29,9 +29,9 @@ def create_qr_endpoint(data: dict):
 # ---------------------------
 # GET QR BY FACTORY
 # ---------------------------
-@router.get("/factory/{factory_code}")
-def get_qr_by_factory(factory_code: str):
-    results = select_rows(TABLE, {"factory_code": factory_code})
+@router.get("/campus/{campus_code}")
+def get_qr_by_campus(campus_code: str):
+    results = select_rows(TABLE, {"campus_code": campus_code})
     return results or []
 
 # ---------------------------

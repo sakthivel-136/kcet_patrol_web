@@ -12,7 +12,7 @@ from app.dependencies import get_current_user, admin_only
 class SecurityUserBase(BaseModel):
     security_id: str = Field(..., description="Unique Security ID")
     security_name: str = Field(..., description="Name of the security user")
-    factory: str = Field(..., description="Factory ID or Name")
+    campus: str = Field(..., description="Campus ID or Name")
     role: str = Field("Guard", description="Role of the security user")
 
 
@@ -23,7 +23,7 @@ class SecurityUserCreate(SecurityUserBase):
 class SecurityUserUpdate(BaseModel):
     security_name: Optional[str] = None
     security_password: Optional[str] = None
-    factory: Optional[str] = None
+    campus: Optional[str] = None
     role: Optional[str] = None
 
 
@@ -98,7 +98,7 @@ def create_security_user(payload: SecurityUserCreate, _: dict = Depends(admin_on
         "security_id": payload.security_id,
         "security_name": payload.security_name,
         "security_password": payload.security_password,  # Plain PIN
-        "factory": payload.factory,
+        "campus": payload.campus,
         "role": payload.role
     }
 

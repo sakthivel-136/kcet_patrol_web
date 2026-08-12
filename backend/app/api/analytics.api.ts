@@ -18,7 +18,7 @@ export interface GuardScan {
 }
 
 export interface MissedScansResponse {
-  factory_code: string;
+  campus_code: string;
   missed_scan_count: number;
   missed_scan_points: string[];
 }
@@ -89,13 +89,13 @@ export const getScansByGuard = async (): Promise<GuardScan[]> => {
 };
 
 /**
- * 🔹 Missed scan points by factory
+ * 🔹 Missed scan points by campus
  */
 export const getMissedScans = async (
-  factoryCode: string
+  campusCode: string
 ): Promise<MissedScansResponse> => {
   const response = await axios.get("/analytics/missed-scans", {
-    params: { factory_code: factoryCode },
+    params: { campus_code: campusCode },
   });
   return response.data;
 };
@@ -116,10 +116,10 @@ export const getGuardPerformance = async (
  * 🔹 Dashboard Charts Data
  */
 export const getDashboardCharts = async (
-  factoryCode?: string 
+  campusCode?: string 
 ): Promise<DashboardChartsResponse> => {
   const response = await axios.get("/analytics/dashboard-charts", {
-    params: { factory_code: factoryCode },
+    params: { campus_code: campusCode },
   });
   return response.data;
 };

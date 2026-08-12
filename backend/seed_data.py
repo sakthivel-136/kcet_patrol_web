@@ -6,7 +6,7 @@ from app.database import supabase
 
 # Seed Guards
 guards_data = [
-    {"security_id": f"{i:04d}", "security_name": name, "security_password": "password123", "role": "Guard", "factory": "KCET01"}
+    {"security_id": f"{i:04d}", "security_name": name, "security_password": "password123", "role": "Guard", "campus": "KCET01"}
     for i, name in enumerate([
         "Adam", "Sathis", "Ravi", "Kumar", "Vijay", "Ajith", "Surya", "Vikram", "Dhanush", "Siva",
         "Karthi", "Jayam", "Vishal", "Arya", "Jiiva", "Simbu", "Madhavan", "Kamal", "Rajini", "Vijayakanth"
@@ -32,7 +32,7 @@ qr_data = [
     {
         "scan_point_name": name, 
         "scan_point_code": f"QR{i:02d}", 
-        "factory_id": "KCET01", 
+        "campus_code": "KCET01", 
         "location": "0.0,0.0", 
         "scan_type": "QR", 
         "floor": "Ground", 

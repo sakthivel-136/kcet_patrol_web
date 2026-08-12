@@ -5,7 +5,7 @@ import { ScanPointsTable, ScanPoint } from '../components/scan/ScanPointsTable'
 import { ScanPointForm } from '../components/scan/ScanPointForm'
 
 import {
-  getScanPointsByFactory,
+  getScanPointsByCampus,
   createScanPoint,
   updateScanPoint,
 } from '../api/scanPoints.api'
@@ -14,7 +14,7 @@ import { getApiUrl } from '../utils/apiUrl'
 
 /* ================= TYPES ================= */
 
-interface Factory {
+interface Campus {
   id: string
   name: string
 }
@@ -23,10 +23,10 @@ type StatusFilter = 'All' | 'Active' | 'Inactive'
 type PriorityFilter = 'All' | 'Low' | 'Medium' | 'High'
 
 export default function ScanPointsPage() {
-  const { authorized } = useAuthGuard()
+  const { authorized } = useAuthGuard({ allowedRoles: ['ADMIN'] })
   const [scanPoints, setScanPoints] = useState<ScanPoint[]>([])
-  const [factories, setFactories] = useState<Factory[]>([])
-  const [selectedFactory, setSelectedFactory] = useState<string>('')
+  const [campuses, setCampuses] = useState<Campus[]>([])
+  const [selectedCampus, setSelectedCampus] = useState<string>('')
 
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false)
   const [editingScanPoint, setEditingScanPoint] = useState<ScanPoint | null>(null)
@@ -38,7 +38,7 @@ export default function ScanPointsPage() {
   useEffect(() => {
     if (!authorized) return
     const API_BASE_URL = getApiUrl();
-    const FACTORY_ENDPOINT = `${API_BASE_URL}/factories/minimal`;
+    const FACTORY_ENDPOINT = `${API_BASE_URL}/campuses/minimal`;
 
     console.log(`🔍 Fetching from: ${FACTORY_ENDPOINT}`); // Debug Log
 
@@ -52,27 +52,27 @@ export default function ScanPointsPage() {
         return res.json()
       })
       .then((data) => {
-        const factoryArray = Array.isArray(data) ? data : []
-        console.log('✅ Factories loaded:', factoryArray)
+        const campusArray = Array.isArray(data) ? data : []
+        console.log('✅ Campuses loaded:', campusArray)
         
-        setFactories(factoryArray)
-        if (factoryArray.length > 0) {
-          setSelectedFactory(factoryArray[0].id)
+        setCampuses(campusArray)
+        if (campusArray.length > 0) {
+          setSelectedCampus(campusArray[0].id)
         } else {
-          setSelectedFactory('')
+          setSelectedCampus('')
         }
       })
       .catch((err: unknown) => {
         console.error('⚠️ Network or Parsing Error:', err)
-        setFactories([]) 
+        setCampuses([]) 
       })
   }, [authorized])
 
   /* ================= LOAD SCAN POINTS ================= */
   useEffect(() => {
-    if (!authorized || !selectedFactory) return
+    if (!authorized || !selectedCampus) return
 
-    getScanPointsByFactory(selectedFactory)
+    getScanPointsByCampus(selectedCampus)
       .then((data: ScanPoint[]) => {
         setScanPoints(Array.isArray(data) ? data : [])
       })
@@ -80,7 +80,7 @@ export default function ScanPointsPage() {
         console.error('Failed to load scan points:', err)
         setScanPoints([])
       })
-  }, [selectedFactory, authorized])
+  }, [selectedCampus, authorized])
 
   /* ================= FILTER ================= */
   const visibleScanPoints = scanPoints.filter(sp => {
@@ -123,23 +123,23 @@ export default function ScanPointsPage() {
       <div className="max-w-7xl mx-auto mb-8 glass-panel rounded-3xl p-5">
         <div className="flex flex-wrap gap-6 items-center">
           
-          {/* Factory Select */}
+          {/* Campus Select */}
           <div className="flex flex-col gap-1.5 min-w-[200px]">
             <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Campus Location</label>
             <div className="relative">
               <select
-                value={selectedFactory}
-                onChange={e => setSelectedFactory(e.target.value)}
+                value={selectedCampus}
+                onChange={e => setSelectedCampus(e.target.value)}
                 className="w-full appearance-none bg-slate-50 border border-slate-200 text-slate-700 py-2.5 pl-4 pr-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all hover:bg-white hover:border-blue-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={factories.length === 0}
+                disabled={campuses.length === 0}
               >
-                {(factories || []).map(f => (
+                {(campuses || []).map(f => (
                   <option key={f.id} value={f.id}>
                     {f.name}
                   </option>
                 ))}
-                {factories.length === 0 && (
-                  <option value="" disabled>No factories available</option>
+                {campuses.length === 0 && (
+                  <option value="" disabled>No campuses available</option>
                 )}
               </select>
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
@@ -238,7 +238,7 @@ export default function ScanPointsPage() {
               } else {
                 const created = await createScanPoint({
                   ...data,
-                  factory_id: selectedFactory,
+                  campus_code: selectedCampus,
                 })
                 setScanPoints(prev => [...prev, created])
               }

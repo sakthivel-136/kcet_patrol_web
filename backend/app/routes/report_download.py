@@ -16,7 +16,7 @@ IST = pytz.timezone("Asia/Kolkata")
 
 @router.get("/download")
 def download_report(
-    factory_code: str = Query(...),
+    campus_code: str = Query(...),
     report_date: str = Query(..., description="Start date (YYYY-MM-DD)"),
     end_date: str = Query(None, description="End date (YYYY-MM-DD)"),
     db=Depends(get_db),
@@ -39,7 +39,7 @@ def download_report(
         qr_codes = (
             db.table("qr")
             .select("qr_id, qr_name")
-            .eq("factory_code", factory_code)
+            .eq("campus_code", campus_code)
             .execute()
             .data or []
         )
@@ -62,7 +62,7 @@ def download_report(
             batch = (
                 db.table("scanning_details")
                 .select("id, qr_id, guard_name, scan_time, lat, log, status, round_slot")
-                .eq("factory_code", factory_code)
+                .eq("campus_code", campus_code)
                 .gte("scan_time", fetch_start)
                 .lte("scan_time", f"{end_date}T23:59:59+05:30")
                 .order("scan_time")

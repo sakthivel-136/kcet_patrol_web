@@ -60,6 +60,22 @@ def allocate_guards_bulk(allocations: List[ShiftAllocationCreate], _: dict = Dep
             ]
             result = supabase.table("shift_allocations").insert(data).execute()
             
+            # Sync to security_users for mobile app support
+            try:
+                shift_res = supabase.table("shifts").select("start_time, end_time").eq("shift_id", shift_id).execute()
+                if shift_res.data:
+                    start_time = shift_res.data[0]["start_time"]
+                    end_time = shift_res.data[0]["end_time"]
+                    
+                    for a in allocations:
+                        if a.guard_id != "CLEAR":
+                            supabase.table("security_users").update({
+                                "shift_start": start_time[:5], # "HH:MM" format
+                                "shift_end": end_time[:5]
+                            }).eq("security_id", a.guard_id).execute()
+            except Exception as e:
+                print(f"Warning: Failed to sync shift times to security_users: {e}")
+            
             return {"message": "Success", "allocations_inserted": len(result.data)}
             
         return {"message": "No allocations provided", "allocations_inserted": 0}

@@ -1,9 +1,9 @@
 'use client';
-import { FactoriesTable } from '@/app/components/factory/FactoriesTable';
+import { CampusesTable } from '@/app/components/campus/CampusesTable';
 import { useAuthGuard } from '@/app/services/auth.guard';
 
-export default function FactoryPage() {
-  const { authorized } = useAuthGuard();
+export default function CampusPage() {
+  const { authorized } = useAuthGuard({ allowedRoles: ['ADMIN'] });
 
   if (!authorized) {
     return (
@@ -18,13 +18,13 @@ export default function FactoryPage() {
       {/* HEADER SECTION */}
       <div className="max-w-7xl mx-auto mb-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">Factories</h1>
+          <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">Campuses</h1>
           <p className="text-slate-500 mt-1 font-medium">Create, edit, and manage campus locations</p>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto">
-        <FactoriesTable />
+        <CampusesTable />
       </div>
     </div>
   );

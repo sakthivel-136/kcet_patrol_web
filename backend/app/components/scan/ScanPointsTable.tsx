@@ -5,7 +5,7 @@ import { StatusBadge } from "./StatusBadge";
 
 export interface ScanPoint {
   id: string;
-  factory_id: string;
+  campus_code: string;
   scan_point_code: string;
   scan_point_name: string;
   scan_type?: string | null;
@@ -108,7 +108,7 @@ export const ScanPointsTable: React.FC<ScanPointsTableProps> = ({
                 {/* Name */}
                 <td className="px-6 py-4">
                   <div className="text-sm font-medium text-slate-700">{sp.scan_point_name}</div>
-                  <div className="text-xs text-slate-400 mt-0.5">{sp.factory_id}</div>
+                  <div className="text-xs text-slate-400 mt-0.5">{sp.campus_code}</div>
                 </td>
 
                 {/* Type */}

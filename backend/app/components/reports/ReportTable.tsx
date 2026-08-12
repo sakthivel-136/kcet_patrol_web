@@ -12,7 +12,7 @@ export interface ScanLog {
   id?: string | number;
 
   scan_time: string | null;
-  factory_code?: string;
+  campus_code?: string;
   guard_name?: string;
   qr_name: string;
 
@@ -119,7 +119,7 @@ const ReportTable: React.FC<ReportTableProps> = ({ logs, loading }) => {
   // -------------------------------
   const columns: Column[] = [
     { key: "scan_time", label: "Scan Time" },
-    { key: "factory_code", label: "Factory" },
+    { key: "campus_code", label: "Campus" },
     { key: "guard_name", label: "Guard" },
     { key: "qr_name", label: "Scan Point" },
     { key: "lat", label: "Latitude" },

@@ -6,16 +6,16 @@ export interface QRData {
   qr_name: string;
   lat: number;
   lon: number;
-  factory_code: string;
+  campus_code: string;
   status?: string;
   created_at?: string;
   waiting_time?: number; // ✅ ADDED
 }
 
-// ----------------- Factory Data -----------------
-export interface Factory {
-  factory_code: string;
-  factory_name: string;
+// ----------------- Campus Data -----------------
+export interface Campus {
+  campus_code: string;
+  campus_name: string;
 }
 
 // ----------------- CREATE QR -----------------
@@ -25,8 +25,8 @@ export const createQR = async (data: QRData): Promise<QRData> => {
 };
 
 // ----------------- GET QR BY FACTORY -----------------
-export const fetchQRByFactory = async (factoryCode: string): Promise<QRData[]> => {
-  const res = await axiosClient.get(`/qr/factory/${factoryCode}`);
+export const fetchQRByCampus = async (campusCode: string): Promise<QRData[]> => {
+  const res = await axiosClient.get(`/qr/campus/${campusCode}`);
   return res.data;
 };
 
@@ -42,7 +42,7 @@ export const deleteQR = async (qrId: number): Promise<void> => {
 };
 
 // ----------------- FETCH FACTORIES -----------------
-export const fetchFactories = async (): Promise<Factory[]> => {
-  const res = await axiosClient.get("/factories");
+export const fetchCampuses = async (): Promise<Campus[]> => {
+  const res = await axiosClient.get("/campuses");
   return res.data;
 };

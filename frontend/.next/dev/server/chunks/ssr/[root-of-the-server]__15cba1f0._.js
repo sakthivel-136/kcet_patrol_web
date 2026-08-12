@@ -21,7 +21,7 @@ const normalizeQR = (data)=>({
         lon: typeof data.lon === "number" ? data.lon : 0,
         status: data.status === "active" || data.status === "inactive" ? data.status : "inactive",
         created_at: data.created_at,
-        factory_code: data.factory_code || "",
+        campus_code: data.campus_code || "",
         waiting_time: typeof data.waiting_time === "number" ? data.waiting_time : 15
     });
 function QrTable({ qrCodes, onEdit, onView, onDelete, onToggleStatus }) {
@@ -160,7 +160,7 @@ function QrTable({ qrCodes, onEdit, onView, onDelete, onToggleStatus }) {
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
                                             className: "px-6 py-4 whitespace-nowrap text-sm text-slate-600",
-                                            children: qr.factory_code
+                                            children: qr.campus_code
                                         }, void 0, false, {
                                             fileName: "[project]/app/components/qr/QrTable.tsx",
                                             lineNumber: 98,
@@ -416,10 +416,10 @@ function QrForm({ qr, isEditMode, onSave, onClose }) {
         lat: 0,
         lon: 0,
         status: "inactive",
-        factory_code: FIXED_CAMPUS,
+        campus_code: FIXED_CAMPUS,
         waiting_time: 15
     });
-    // Populate form when editing or when factories load
+    // Populate form when editing or when campuses load
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
         if (qr) {
             const wt = qr.waiting_time ?? 15;
@@ -456,7 +456,7 @@ function QrForm({ qr, isEditMode, onSave, onClose }) {
         }
         const updatedFormData = {
             ...formData,
-            factory_code: FIXED_CAMPUS,
+            campus_code: FIXED_CAMPUS,
             waiting_time: finalWaitingTime
         };
         setIsSubmitting(true);
@@ -1197,13 +1197,12 @@ __turbopack_context__.s([
     ()=>getApiUrl
 ]);
 const getApiUrl = ()=>{
-    const envUrl = process.env.NEXT_PUBLIC_API_URL;
-    if (envUrl) {
+    const envUrl = ("TURBOPACK compile-time value", "http://127.0.0.1:8000");
+    if ("TURBOPACK compile-time truthy", 1) {
         return envUrl;
     }
-    if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
+    //TURBOPACK unreachable
     ;
-    return "http://10.10.3.2:8000";
 };
 }),
 "[project]/app/api/axiosClient.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
@@ -1251,10 +1250,10 @@ __turbopack_context__.s([
     ()=>createQR,
     "deleteQR",
     ()=>deleteQR,
-    "fetchFactories",
-    ()=>fetchFactories,
-    "fetchQRByFactory",
-    ()=>fetchQRByFactory,
+    "fetchCampuses",
+    ()=>fetchCampuses,
+    "fetchQRByCampus",
+    ()=>fetchQRByCampus,
     "fetchQRById",
     ()=>fetchQRById,
     "updateQR",
@@ -1270,8 +1269,8 @@ const createQR = async (data)=>{
     const res = await __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$api$2f$axiosClient$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"].post("/qr/", payload);
     return res.data;
 };
-const fetchQRByFactory = async (factoryCode)=>{
-    const res = await __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$api$2f$axiosClient$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"].get(`/qr/factory/${factoryCode}`);
+const fetchQRByCampus = async (campusCode)=>{
+    const res = await __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$api$2f$axiosClient$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"].get(`/qr/campus/${campusCode}`);
     return res.data;
 };
 const fetchQRById = async (qrId)=>{
@@ -1290,8 +1289,8 @@ const updateQR = async (qrId, data)=>{
 const deleteQR = async (qrId)=>{
     await __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$api$2f$axiosClient$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"].delete(`/qr/${qrId}`);
 };
-const fetchFactories = async ()=>{
-    const res = await __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$api$2f$axiosClient$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"].get("/factories");
+const fetchCampuses = async ()=>{
+    const res = await __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$api$2f$axiosClient$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"].get("/campuses");
     return res.data;
 };
 }),
@@ -1455,7 +1454,7 @@ function QrCrudPage() {
             lon: typeof data.lon === "number" ? data.lon : 0,
             status: data.status ?? "inactive",
             created_at: data.created_at,
-            factory_code: data.factory_code ?? FIXED_CAMPUS,
+            campus_code: data.campus_code ?? FIXED_CAMPUS,
             waiting_time: typeof data.waiting_time === "number" ? data.waiting_time : 15
         });
     const { authorized } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$services$2f$auth$2e$guard$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useAuthGuard"])({
@@ -1467,7 +1466,7 @@ function QrCrudPage() {
     const loadQRCodes = async ()=>{
         if (!authorized) return;
         try {
-            const rawData = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$api$2f$qr$2e$api$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["fetchQRByFactory"])(FIXED_CAMPUS);
+            const rawData = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$api$2f$qr$2e$api$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["fetchQRByCampus"])(FIXED_CAMPUS);
             const mappedData = rawData.map(normalizeQR);
             setQrCodes(mappedData);
         } catch (err) {
@@ -1513,7 +1512,7 @@ function QrCrudPage() {
                 qr_name: qrData.qr_name,
                 lat: Number(qrData.lat),
                 lon: Number(qrData.lon),
-                factory_code: qrData.factory_code,
+                campus_code: qrData.campus_code,
                 status: qrData.status ?? "inactive",
                 waiting_time: qrData.waiting_time ?? 15
             };

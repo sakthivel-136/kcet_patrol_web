@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { QRCode, Factory } from "@/app/dashboard/qr-crud/page";
+import { QRCode, Campus } from "@/app/dashboard/qr-crud/page";
 import { X, MapPin, Save, Loader2 } from "lucide-react";
 
 interface QrFormProps {
@@ -23,11 +23,11 @@ export default function QrForm({ qr, isEditMode, onSave, onClose }: QrFormProps)
     lat: 0,
     lon: 0,
     status: "inactive",
-    factory_code: FIXED_CAMPUS,
+    campus_code: FIXED_CAMPUS,
     waiting_time: 15,
   });
 
-  // Populate form when editing or when factories load
+  // Populate form when editing or when campuses load
   useEffect(() => {
     if (qr) {
       const wt = qr.waiting_time ?? 15;
@@ -64,7 +64,7 @@ export default function QrForm({ qr, isEditMode, onSave, onClose }: QrFormProps)
 
     const updatedFormData = {
       ...formData,
-      factory_code: FIXED_CAMPUS,
+      campus_code: FIXED_CAMPUS,
       waiting_time: finalWaitingTime,
     };
 

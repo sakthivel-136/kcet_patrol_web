@@ -4,16 +4,16 @@ import axiosClient from "./axiosClient";
    Scan Points API
 ============================== */
 
-/* GET scan points by factory */
-export const getScanPointsByFactory = async (factoryId) => {
+/* GET scan points by campus */
+export const getScanPointsByCampus = async (campusCode) => {
   try {
     const response = await axiosClient.get(`/scan-points`, {
-      params: { factory_id: factoryId },
+      params: { campus_code: campusCode },
     });
     // Supabase usually returns data directly
     return response.data;
   } catch (error) {
-    console.error("Failed to get scan points by factory:", error);
+    console.error("Failed to get scan points by campus:", error);
     throw error;
   }
 };

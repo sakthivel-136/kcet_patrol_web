@@ -1,18 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { QRCode, Factory } from "@/app/dashboard/qr-crud/page";
+import { QRCode, Campus } from "@/app/dashboard/qr-crud/page";
 import { X, MapPin, Save, Loader2, Clock } from "lucide-react";
 
 interface QrFormProps {
   qr: QRCode | null;
-  factories: Factory[];
+  campuses: Campus[];
   isEditMode: boolean;
   onSave: (qrData: QRCode) => Promise<void>;
   onClose: () => void;
 }
 
-export default function QrForm({ qr, factories, isEditMode, onSave, onClose }: QrFormProps) {
+export default function QrForm({ qr, campuses, isEditMode, onSave, onClose }: QrFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Initialize form state
@@ -22,32 +22,32 @@ export default function QrForm({ qr, factories, isEditMode, onSave, onClose }: Q
     lat: 0,
     lon: 0,
     status: "inactive",
-    factory_code: "",
+    campus_code: "",
     waiting_time: 15, // ✅ ADDED: Default value
   });
 
-  // Populate form when editing or when factories load
+  // Populate form when editing or when campuses load
   useEffect(() => {
     if (qr) {
       setFormData(qr);
-    } else if (factories.length > 0) {
+    } else if (campuses.length > 0) {
       setFormData({
         qr_id: 0,
         qr_name: "",
         lat: 0,
         lon: 0,
         status: "inactive",
-        factory_code: factories[0].factory_code,
+        campus_code: campuses[0].campus_code,
         waiting_time: 15, // ✅ ADDED: Default for new entry
       });
     }
-  }, [qr, factories]);
+  }, [qr, campuses]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.qr_name || !formData.factory_code) {
-      alert("Please fill in Name and Factory.");
+    if (!formData.qr_name || !formData.campus_code) {
+      alert("Please fill in Name and Campus.");
       return;
     }
 
@@ -86,18 +86,18 @@ export default function QrForm({ qr, factories, isEditMode, onSave, onClose }: Q
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-8 space-y-6">
           
-          {/* Factory Select */}
+          {/* Campus Select */}
           <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Factory Location</label>
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Campus Location</label>
             <div className="relative group">
               <select
-                value={formData.factory_code}
-                onChange={(e) => setFormData({ ...formData, factory_code: e.target.value })}
+                value={formData.campus_code}
+                onChange={(e) => setFormData({ ...formData, campus_code: e.target.value })}
                 className="w-full appearance-none bg-slate-50 border border-slate-200 text-slate-800 font-medium rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 hover:bg-white hover:border-slate-300 transition-all cursor-pointer"
                 required
               >
-                {factories.map((f) => (
-                  <option key={f.factory_code} value={f.factory_code}>{f.factory_name}</option>
+                {campuses.map((f) => (
+                  <option key={f.campus_code} value={f.campus_code}>{f.campus_name}</option>
                 ))}
               </select>
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400 group-hover:text-blue-500 transition-colors">

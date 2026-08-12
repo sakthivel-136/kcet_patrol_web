@@ -12,20 +12,20 @@ interface UserFormProps {
   user: SecurityUser | null
   onClose: () => void
   onSave: () => void
-  factories: string[]
+  campuses: string[]
 }
 
 export default function UserForm({
   user,
   onClose,
   onSave,
-  factories,
+  campuses,
 }: UserFormProps) {
   const [formData, setFormData] = useState<SecurityUser>({
     security_id: '',
     security_name: '',
     security_password: '',
-    factory: factories?.[0] || '',
+    campus: campuses?.[0] || '',
   })
 
   /* ================= LOAD USER FOR EDIT ================= */
@@ -35,7 +35,7 @@ export default function UserForm({
         security_id: user.security_id,
         security_name: user.security_name,
         security_password: '',
-        factory: user.factory,
+        campus: user.campus,
       })
     } else {
       // Reset when adding new user
@@ -43,10 +43,10 @@ export default function UserForm({
         security_id: '',
         security_name: '',
         security_password: '',
-        factory: factories?.[0] || '',
+        campus: campuses?.[0] || '',
       })
     }
-  }, [user, factories])
+  }, [user, campuses])
 
   /* ================= HANDLE INPUT ================= */
   const handleChange = (
@@ -85,7 +85,7 @@ export default function UserForm({
         // UPDATE
         await updateSecurityUser(user.security_id, {
           security_name: formData.security_name,
-          factory: formData.factory,
+          campus: formData.campus,
 
           ...(formData.security_password
             ? { security_password: formData.security_password }
@@ -97,7 +97,7 @@ export default function UserForm({
           security_id: formData.security_id,
           security_name: formData.security_name,
           security_password: formData.security_password,
-          factory: formData.factory,
+          campus: formData.campus,
         })
       }
 
@@ -161,15 +161,15 @@ export default function UserForm({
             required={!user}
           />
 
-          {/* Factory */}
+          {/* Campus */}
           <select
-            name="factory"
-            value={formData.factory}
+            name="campus"
+            value={formData.campus}
             onChange={handleChange}
             className="w-full border p-2 rounded"
             required
           >
-            {factories.map(f => (
+            {campuses.map(f => (
               <option key={f} value={f}>
                 {f}
               </option>
