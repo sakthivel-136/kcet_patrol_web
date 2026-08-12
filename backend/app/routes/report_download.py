@@ -13,6 +13,9 @@ router = APIRouter(prefix="/report", tags=["Report"])
 
 IST = pytz.timezone("Asia/Kolkata")
 
+from fastapi import Header, HTTPException
+import os
+
 
 @router.get("/download")
 def download_report(
@@ -186,4 +189,74 @@ def download_report(
             "success": False,
             "message": str(e)
         }
+
+@router.post("/cron/process-missed")
+def process_missed_scans(
+    x_cron_secret: str = Header(None),
+    db=Depends(get_db)
+):
+    """
+    Called by Supabase pg_cron to automatically insert MISSED records
+    for time slots that have already ended.
+    """
+    expected_secret = os.getenv("CRON_SECRET", "supersecretcron")
+    if x_cron_secret != expected_secret:
+        raise HTTPException(status_code=401, detail="Unauthorized cron request")
+
+    try:
+        from datetime import timedelta
+        now_ist = datetime.now(IST)
+        today_str = now_ist.strftime("%Y-%m-%d")
+        round_slots = generate_round_slots(today_str)
+        
+        # Only process slots that ended today and are fully in the past
+        past_slots = [slot for slot in round_slots if slot[2] <= now_ist]
+        
+        if not past_slots:
+            return {"message": "No completed slots for today yet."}
+
+        # Get all campuses
+        campuses = db.table("campuses").select("campus_code").execute().data or []
+        
+        inserted_count = 0
+
+        for campus in campuses:
+            c_code = campus.get("campus_code")
+            # Get active QRs for campus
+            qrs = db.table("qr").select("qr_id, qr_name").eq("campus_code", c_code).eq("status", "active").execute().data or []
+            
+            for qr in qrs:
+                qr_id_str = str(qr["qr_id"])
+                
+                # Get all scans for this QR today
+                start_of_day = f"{today_str}T00:00:00+05:30"
+                scans = db.table("scanning_details").select("round_slot").eq("qr_id", qr_id_str).gte("scan_time", start_of_day).execute().data or []
+                existing_slots = {s.get("round_slot") for s in scans if s.get("round_slot")}
+                
+                # Check against past slots
+                for round_no, start_dt, end_dt in past_slots:
+                    slot_iso = start_dt.isoformat()
+                    
+                    if slot_iso not in existing_slots:
+                        # Insert MISSED
+                        db.table("scanning_details").insert({
+                            "qr_id": qr_id_str,
+                            "qr_name": qr["qr_name"],
+                            "campus_code": c_code,
+                            "guard_name": "SYSTEM_CRON",
+                            "lat": 0,
+                            "log": 0,
+                            "status": "MISSED",
+                            "round_slot": slot_iso,
+                            "scan_time": end_dt.isoformat()
+                        }).execute()
+                        inserted_count += 1
+                        # Add to existing_slots so we don't insert again if we re-check
+                        existing_slots.add(slot_iso)
+                        
+        return {"success": True, "message": f"Inserted {inserted_count} MISSED records."}
+
+    except Exception as e:
+        print("CRON ERROR:", e)
+        return {"success": False, "message": str(e)}
 
