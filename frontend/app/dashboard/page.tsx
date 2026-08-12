@@ -347,7 +347,12 @@ function LeaderRow({ rank, name, scanned, missed, total }: {
 export default function DashboardPage() {
   const router = useRouter()
   const { authorized } = useAuthGuard({ allowedRoles: ['ADMIN'] });
-  const today  = useMemo(() => new Date().toISOString().slice(0, 10), [])
+  // Fix today to use local time properly instead of UTC
+  const today = useMemo(() => {
+    const d = new Date();
+    const offset = d.getTimezoneOffset() * 60000;
+    return new Date(d.getTime() - offset).toISOString().slice(0, 10);
+  }, [])
   const dashboardContentRef = useRef<HTMLDivElement>(null)
 
   const [adminName, setAdminName]             = useState('')
@@ -429,7 +434,7 @@ export default function DashboardPage() {
 
     /* ── base stats ── */
     const completed = effective.filter(r => r.status === 'SUCCESS').length
-    const missed    = nothingScannedToday ? 0 : effective.filter(r => r.status !== 'SUCCESS').length
+    const missed    = nothingScannedToday ? 0 : effective.filter(r => r.status === 'MISSED').length
     const total     = completed + missed
     const rate      = total ? Math.round((completed / total) * 100) : 0
 
