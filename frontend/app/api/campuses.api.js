@@ -1,21 +1,21 @@
 import axiosClient from "./axiosClient";
 
-/* GET all factories */
-export const getFactories = () =>
-  axiosClient.get("/factories");
+/* GET all campuses */
+export const getCampuses = () =>
+  axiosClient.get("/campuses");
 
-/* GET factory by ID */
-export const getFactoryById = (id) =>
-  axiosClient.get(`/factories/${id}`);
+/* GET campus by ID */
+export const getCampusById = (id) =>
+  axiosClient.get(`/campuses/${id}`);
 
-/* CREATE factory */
-export const createFactory = (data) =>
-  axiosClient.post("/factories", data);
+/* CREATE campus */
+export const createCampus = (data) =>
+  axiosClient.post("/campuses", data);
 
-/* UPDATE factory */
-export const updateFactory = (id, data) =>
-  axiosClient.put(`/factories/${id}`, data);
+/* UPDATE campus */
+export const updateCampus = (id, data) =>
+  axiosClient.put(`/campuses/${id}`, data);
 
-/* DELETE factory */
-export const deleteFactory = (id) =>
-  axiosClient.delete(`/factories/${id}`);
+/* DELETE campus */
+export const deleteCampus = (id) =>
+  axiosClient.delete(`/campuses/${id}`);

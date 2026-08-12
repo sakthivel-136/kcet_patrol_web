@@ -141,15 +141,13 @@ def download_report(
                     scan = scans_by_round_qr.get((start_slot_dt, qr_id))
 
                     # Fallback for older scans without round_slot
-                    # Allow 10-min grace before round start for guards who begin early
                     if not scan:
-                        grace = timedelta(minutes=10)
                         qr_scans = scans_by_qr.get(qr_id, [])
                         scan = next(
                             (
                                 s for s in qr_scans
                                 if s.get("scan_dt_ist")
-                                and (start_slot_dt - grace) <= s.get("scan_dt_ist") < end_slot_dt
+                                and start_slot_dt <= s.get("scan_dt_ist") < end_slot_dt
                             ),
                             None
                         )
