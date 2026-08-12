@@ -1,0 +1,21 @@
+# Virtual environment
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+venv/
+
+# Logs
+*.log
+
+# VS Code
+.vscode/
+
+node_modules/
+
+# Environment files
+.env
+.env.backup
+.env*

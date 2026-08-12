@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+/* ---------------------------------------- */
+/* ROOT DESIGN TOKENS                        */
+/* ---------------------------------------- */
+:root {
+  --background:       #f8fafc;
+  --surface:          #ffffff;
+  --surface-muted:    #f1f5f9;
+  --foreground:       #0f172a;
+  --foreground-muted: #475569;
+  --border:           #e2e8f0;
+  --ring:             #c7d2fe;
+  --primary:          #2563eb;
+  --primary-muted:    #dbeafe;
+  --success:          #16a34a;
+  --warning:          #d97706;
+  --danger:           #dc2626;
+}
+
+/* ---------------------------------------- */
+/* TAILWIND THEME MAPPING                    */
+/* ---------------------------------------- */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply antialiased bg-slate-50 text-slate-800 overflow-x-hidden min-h-screen;
+    background-image: radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.08), transparent 25%),
+                      radial-gradient(circle at 85% 30%, rgba(168, 85, 247, 0.08), transparent 25%);
+  }
+}
+
+@layer utilities {
+  .glass-panel {
+    @apply backdrop-blur-xl bg-white/60 border border-white/80 shadow-sm shadow-slate-200/50;
+  }
+  
+  .glass-button {
+    @apply relative overflow-hidden bg-white/80 hover:bg-white border border-white shadow-sm hover:shadow text-slate-800 transition-all backdrop-blur-md;
+  }
+
+  .text-gradient {
+    @apply text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.02);
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.25);
+  }
+}
+
+.raise-hover {
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.raise-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.01);
+}
+
+.avatar-big {
+  width: 50px;
+  height: 50px;
+  border-radius: 9999px;
+  object-fit: cover;
+}
