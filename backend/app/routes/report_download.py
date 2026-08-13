@@ -134,20 +134,22 @@ def download_report(
                 qr_id = str(qr["qr_id"])
 
                 for round_no, start_slot_dt, end_slot_dt in round_slots:
-                    # O(1) Lookup by round_dt and qr_id
-                    scan = scans_by_round_qr.get((start_slot_dt, qr_id))
-
-                    # Fallback for older scans without round_slot
-                    if not scan:
-                        qr_scans = scans_by_qr.get(qr_id, [])
-                        scan = next(
-                            (
-                                s for s in qr_scans
-                                if s.get("scan_dt_ist")
-                                and start_slot_dt <= s.get("scan_dt_ist") < end_slot_dt
-                            ),
-                            None
+                    qr_scans = scans_by_qr.get(qr_id, [])
+                    matching_scans = [
+                        s for s in qr_scans
+                        if s.get("round_dt") == start_slot_dt or (
+                            s.get("scan_dt_ist") and start_slot_dt <= s.get("scan_dt_ist") < end_slot_dt
                         )
+                    ]
+                    
+                    scan = None
+                    if matching_scans:
+                        # Prioritize successful scans (anything not 'MISSED')
+                        success_scans = [s for s in matching_scans if (s.get("status") or "").upper() != "MISSED"]
+                        if success_scans:
+                            scan = success_scans[0]
+                        else:
+                            scan = matching_scans[0]
 
                     # Normalize status
                     if scan:
