@@ -71,7 +71,12 @@ api.interceptors.request.use((config)=>{
         return [];
     } catch (err) {
         const error = err;
-        console.error("Error fetching patrol report:", error.response?.data || error.message);
+        console.error("Error fetching patrol report full details:", {
+            message: error.message,
+            status: error.response?.status,
+            data: error.response?.data,
+            url: error.config?.url
+        });
         throw new Error(error.response?.data?.message || "Unable to fetch patrol report");
     }
 }

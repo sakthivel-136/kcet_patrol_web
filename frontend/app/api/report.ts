@@ -92,8 +92,13 @@ async function fetchPatrolReportData(
     const error = err as AxiosError<any>;
 
     console.error(
-      "Error fetching patrol report:",
-      error.response?.data || error.message
+      "Error fetching patrol report full details:",
+      {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+        url: error.config?.url
+      }
     );
 
     throw new Error(
