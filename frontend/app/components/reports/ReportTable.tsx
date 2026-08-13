@@ -172,8 +172,8 @@ const ReportTable: React.FC<ReportTableProps> = ({ logs, loading }) => {
 
       if (sortConfig.key === "scan_time") {
 
-        const dateA = aValue ? new Date(aValue as string).getTime() : 0;
-        const dateB = bValue ? new Date(bValue as string).getTime() : 0;
+        const dateA = aValue ? new Date((aValue as string).replace(' ', 'T')).getTime() : 0;
+        const dateB = bValue ? new Date((bValue as string).replace(' ', 'T')).getTime() : 0;
 
         return sortConfig.direction === "asc"
           ? dateA - dateB
@@ -226,8 +226,11 @@ const ReportTable: React.FC<ReportTableProps> = ({ logs, loading }) => {
     if (key === "scan_time") {
 
       if (!value) return "—";
-
-      return new Date(value as string).toLocaleString();
+      
+      // Safari requires strict ISO8601 (replace space with T)
+      const safeValue = (value as string).replace(' ', 'T');
+      const d = new Date(safeValue);
+      return isNaN(d.getTime()) ? String(value) : d.toLocaleString();
     }
 
 

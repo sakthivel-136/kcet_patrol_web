@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 /**
  * ✅ DB ALIGNED ScanPoint
@@ -73,16 +74,26 @@ export const ScanPointForm = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center">
-      
-      {/* Glassmorphism Backdrop */}
-      <div 
-        className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-300"
-        onClick={onClose}
-      ></div>
-      
-      {/* Modal Card */}
-      <div className="bg-white w-full md:max-w-4xl h-[95vh] md:h-auto md:max-h-[90vh] md:rounded-2xl rounded-t-2xl flex flex-col shadow-2xl shadow-blue-900/10 relative z-10 transform transition-all">
+    <AnimatePresence>
+      <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-0 md:p-4">
+        
+        {/* Glassmorphism Backdrop */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm"
+          onClick={onClose}
+        />
+        
+        {/* Modal Card */}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: 20 }}
+          transition={{ type: "spring", damping: 25, stiffness: 300 }}
+          className="bg-white/95 backdrop-blur-xl w-full md:max-w-4xl h-[95vh] md:h-auto md:max-h-[90vh] md:rounded-3xl rounded-t-3xl flex flex-col shadow-2xl overflow-hidden relative z-[101]"
+        >
         
         {/* Header */}
         <div className="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-white/95 backdrop-blur">
@@ -212,8 +223,9 @@ export const ScanPointForm = ({
             </svg>
           </button>
         </div>
-      </div>
+      </motion.div>
     </div>
+    </AnimatePresence>
   );
 };
 

@@ -32,7 +32,11 @@ type DashboardStats = {
 ================================================================ */
 function fmtTime(t: string | null) {
   if (!t) return '—'
-  try { return new Date(t).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) }
+  try { 
+    const safeT = t.replace(' ', 'T')
+    const d = new Date(safeT)
+    return isNaN(d.getTime()) ? t : d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) 
+  }
   catch { return t }
 }
 
@@ -672,12 +676,18 @@ export default function DashboardPage() {
           </div>
         )}
         {stats.isPartialDay && (
-          <div className="mb-6 flex items-center gap-3 rounded-xl border border-indigo-200 bg-indigo-50 px-5 py-4">
-            <span className="text-2xl">📍</span>
+          <div className="mb-6 flex items-center gap-4 rounded-2xl border border-indigo-200 bg-indigo-50/80 backdrop-blur-md px-6 py-5 shadow-sm transition-all hover:shadow-md">
+            <div className="relative flex h-4 w-4 shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-4 w-4 bg-indigo-500 border-2 border-indigo-200"></span>
+            </div>
             <div>
-              <p className="font-semibold text-indigo-800">Patrol in progress — live view</p>
-              <p className="text-sm text-indigo-600">
-                Showing only rounds due so far. <strong>{stats.pending ?? 0}</strong> future rounds excluded from missed count.
+              <div className="flex items-center gap-2">
+                <p className="font-bold text-indigo-900 text-base tracking-tight">Active Patrol in Progress</p>
+                <span className="px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 text-xs font-bold uppercase tracking-wider">Live System Health: Online</span>
+              </div>
+              <p className="text-sm text-indigo-700/80 mt-0.5 font-medium">
+                Live monitoring rounds due so far. <strong className="text-indigo-900">{stats.pending ?? 0}</strong> future rounds excluded from missed count.
               </p>
             </div>
           </div>

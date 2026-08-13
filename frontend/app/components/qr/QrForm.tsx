@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { QRCode, Campus } from "@/app/dashboard/qr-crud/page";
 import { X, MapPin, Save, Loader2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface QrFormProps {
   qr: QRCode | null;
@@ -22,7 +23,7 @@ export default function QrForm({ qr, isEditMode, onSave, onClose }: QrFormProps)
     qr_name: "",
     lat: 0,
     lon: 0,
-    status: "inactive",
+    status: isEditMode ? "inactive" : "active",
     campus_code: FIXED_CAMPUS,
     waiting_time: 15,
   });
@@ -77,33 +78,42 @@ export default function QrForm({ qr, isEditMode, onSave, onClose }: QrFormProps)
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-300"
-        onClick={onClose}
-      ></div>
+    <AnimatePresence>
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        {/* Backdrop */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm"
+          onClick={onClose}
+        />
 
-      {/* Modal Card */}
-      <div className="relative bg-white w-full max-w-lg rounded-2xl shadow-2xl shadow-blue-900/10 z-10 transform transition-all">
-
-        {/* Header */}
-        <div className="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-white/95 backdrop-blur">
-          <div>
-            <h3 className="text-2xl font-bold text-slate-800">
-              {isEditMode ? "Edit QR Code" : "Add QR Code"}
-            </h3>
-            <p className="text-sm text-slate-500 mt-1">
-              {isEditMode ? "Update checkpoint details." : "Register a new checkpoint."}
-            </p>
+        {/* Modal Card */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: 20 }}
+          transition={{ type: "spring", damping: 25, stiffness: 300 }}
+          className="relative w-full max-w-lg bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden flex flex-col z-[101]"
+        >
+          {/* Header */}
+          <div className="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-white/50">
+            <div>
+              <h3 className="text-xl font-bold text-slate-800 tracking-tight">
+                {isEditMode ? "Edit QR Code" : "Add QR Code"}
+              </h3>
+              <p className="text-xs font-medium text-slate-500 mt-1">
+                {isEditMode ? "Update checkpoint details." : "Register a new checkpoint."}
+              </p>
+            </div>
+            <button
+              onClick={onClose}
+              className="h-9 w-9 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            className="h-10 w-10 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-all duration-200"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-8 space-y-6">
@@ -161,40 +171,42 @@ export default function QrForm({ qr, isEditMode, onSave, onClose }: QrFormProps)
             />
           </div>
 
-          {/* Status */}
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Status</label>
-            <div className="relative group">
-              <select
-                value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                className="w-full appearance-none bg-slate-50 border border-slate-200 text-slate-800 font-medium rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 hover:bg-white hover:border-slate-300 transition-all cursor-pointer"
-              >
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400 group-hover:text-blue-500 transition-colors duration-200">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                </svg>
+          {/* Status - Only show on edit */}
+          {isEditMode && (
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Status</label>
+              <div className="relative group">
+                <select
+                  value={formData.status}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+                  className="w-full appearance-none bg-slate-50 border border-slate-200 text-slate-800 font-medium rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 hover:bg-white transition-all cursor-pointer shadow-sm"
+                >
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400 group-hover:text-indigo-500 transition-colors">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Actions */}
-          <div className="flex justify-end gap-3 pt-2">
+          <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
             <button
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="px-6 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold text-sm hover:bg-white hover:shadow-sm hover:text-slate-900 transition-all duration-200 disabled:opacity-50"
+              className="px-5 py-2.5 rounded-xl text-slate-600 font-semibold text-sm hover:bg-slate-100 transition-colors disabled:opacity-50"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-8 py-2.5 rounded-xl bg-blue-600 text-white font-bold text-sm shadow-lg shadow-blue-500/30 hover:bg-blue-700 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-500/40 transition-all duration-200 flex items-center gap-2 disabled:opacity-70"
+              className="px-6 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-sm shadow-sm hover:bg-indigo-700 hover:shadow-md transition-all flex items-center gap-2 disabled:opacity-70"
             >
               {isSubmitting ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -205,7 +217,8 @@ export default function QrForm({ qr, isEditMode, onSave, onClose }: QrFormProps)
             </button>
           </div>
         </form>
+        </motion.div>
       </div>
-    </div>
+    </AnimatePresence>
   );
 }

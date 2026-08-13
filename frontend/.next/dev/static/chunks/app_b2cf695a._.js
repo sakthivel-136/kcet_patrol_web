@@ -629,8 +629,8 @@ const ReportTable = ({ logs, loading })=>{
                     const aValue = a[sortConfig.key];
                     const bValue = b[sortConfig.key];
                     if (sortConfig.key === "scan_time") {
-                        const dateA = aValue ? new Date(aValue).getTime() : 0;
-                        const dateB = bValue ? new Date(bValue).getTime() : 0;
+                        const dateA = aValue ? new Date(aValue.replace(' ', 'T')).getTime() : 0;
+                        const dateB = bValue ? new Date(bValue.replace(' ', 'T')).getTime() : 0;
                         return sortConfig.direction === "asc" ? dateA - dateB : dateB - dateA;
                     }
                     if (!aValue || !bValue) return 0;
@@ -670,7 +670,10 @@ const ReportTable = ({ logs, loading })=>{
         // Date
         if (key === "scan_time") {
             if (!value) return "—";
-            return new Date(value).toLocaleString();
+            // Safari requires strict ISO8601 (replace space with T)
+            const safeValue = value.replace(' ', 'T');
+            const d = new Date(safeValue);
+            return isNaN(d.getTime()) ? String(value) : d.toLocaleString();
         }
         // ================= Status (UPDATED) =================
         if (key === "status") {
@@ -693,7 +696,7 @@ const ReportTable = ({ logs, loading })=>{
                 children: finalStatus
             }, void 0, false, {
                 fileName: "[project]/app/components/reports/ReportTable.tsx",
-                lineNumber: 263,
+                lineNumber: 266,
                 columnNumber: 9
             }, ("TURBOPACK compile-time value", void 0));
         }
@@ -708,7 +711,7 @@ const ReportTable = ({ logs, loading })=>{
             children: "Loading scan logs..."
         }, void 0, false, {
             fileName: "[project]/app/components/reports/ReportTable.tsx",
-            lineNumber: 281,
+            lineNumber: 284,
             columnNumber: 7
         }, ("TURBOPACK compile-time value", void 0));
     }
@@ -718,7 +721,7 @@ const ReportTable = ({ logs, loading })=>{
             children: "No scan records found"
         }, void 0, false, {
             fileName: "[project]/app/components/reports/ReportTable.tsx",
-            lineNumber: 289,
+            lineNumber: 292,
             columnNumber: 7
         }, ("TURBOPACK compile-time value", void 0));
     }
@@ -756,7 +759,7 @@ const ReportTable = ({ logs, loading })=>{
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/components/reports/ReportTable.tsx",
-                        lineNumber: 344,
+                        lineNumber: 347,
                         columnNumber: 15
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("table", {
@@ -779,41 +782,41 @@ const ReportTable = ({ logs, loading })=>{
                                                         className: "w-3 h-3"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/components/reports/ReportTable.tsx",
-                                                        lineNumber: 381,
+                                                        lineNumber: 384,
                                                         columnNumber: 33
                                                     }, ("TURBOPACK compile-time value", void 0)) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$arrow$2d$down$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ArrowDown$3e$__["ArrowDown"], {
                                                         className: "w-3 h-3"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/components/reports/ReportTable.tsx",
-                                                        lineNumber: 383,
+                                                        lineNumber: 386,
                                                         columnNumber: 33
                                                     }, ("TURBOPACK compile-time value", void 0)) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$arrow$2d$up$2d$down$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ArrowUpDown$3e$__["ArrowUpDown"], {
                                                         className: "w-3 h-3 opacity-30"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/components/reports/ReportTable.tsx",
-                                                        lineNumber: 388,
+                                                        lineNumber: 391,
                                                         columnNumber: 31
                                                     }, ("TURBOPACK compile-time value", void 0))
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/components/reports/ReportTable.tsx",
-                                                lineNumber: 374,
+                                                lineNumber: 377,
                                                 columnNumber: 27
                                             }, ("TURBOPACK compile-time value", void 0))
                                         }, String(col.key), false, {
                                             fileName: "[project]/app/components/reports/ReportTable.tsx",
-                                            lineNumber: 363,
+                                            lineNumber: 366,
                                             columnNumber: 25
                                         }, ("TURBOPACK compile-time value", void 0));
                                     })
                                 }, void 0, false, {
                                     fileName: "[project]/app/components/reports/ReportTable.tsx",
-                                    lineNumber: 355,
+                                    lineNumber: 358,
                                     columnNumber: 19
                                 }, ("TURBOPACK compile-time value", void 0))
                             }, void 0, false, {
                                 fileName: "[project]/app/components/reports/ReportTable.tsx",
-                                lineNumber: 353,
+                                lineNumber: 356,
                                 columnNumber: 17
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tbody", {
@@ -825,23 +828,23 @@ const ReportTable = ({ logs, loading })=>{
                                                 children: renderCell(row, col.key)
                                             }, String(col.key), false, {
                                                 fileName: "[project]/app/components/reports/ReportTable.tsx",
-                                                lineNumber: 415,
+                                                lineNumber: 418,
                                                 columnNumber: 25
                                             }, ("TURBOPACK compile-time value", void 0)))
                                     }, `${row.qr_name}-${roundNumber}-${index}`, false, {
                                         fileName: "[project]/app/components/reports/ReportTable.tsx",
-                                        lineNumber: 408,
+                                        lineNumber: 411,
                                         columnNumber: 21
                                     }, ("TURBOPACK compile-time value", void 0)))
                             }, void 0, false, {
                                 fileName: "[project]/app/components/reports/ReportTable.tsx",
-                                lineNumber: 404,
+                                lineNumber: 407,
                                 columnNumber: 17
                             }, ("TURBOPACK compile-time value", void 0))
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/components/reports/ReportTable.tsx",
-                        lineNumber: 350,
+                        lineNumber: 353,
                         columnNumber: 15
                     }, ("TURBOPACK compile-time value", void 0)),
                     totalPages > 1 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -854,7 +857,7 @@ const ReportTable = ({ logs, loading })=>{
                                 children: "Previous"
                             }, void 0, false, {
                                 fileName: "[project]/app/components/reports/ReportTable.tsx",
-                                lineNumber: 438,
+                                lineNumber: 441,
                                 columnNumber: 19
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -867,7 +870,7 @@ const ReportTable = ({ logs, loading })=>{
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/components/reports/ReportTable.tsx",
-                                lineNumber: 451,
+                                lineNumber: 454,
                                 columnNumber: 19
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -877,25 +880,25 @@ const ReportTable = ({ logs, loading })=>{
                                 children: "Next"
                             }, void 0, false, {
                                 fileName: "[project]/app/components/reports/ReportTable.tsx",
-                                lineNumber: 456,
+                                lineNumber: 459,
                                 columnNumber: 19
                             }, ("TURBOPACK compile-time value", void 0))
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/components/reports/ReportTable.tsx",
-                        lineNumber: 436,
+                        lineNumber: 439,
                         columnNumber: 17
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
             }, roundKey, true, {
                 fileName: "[project]/app/components/reports/ReportTable.tsx",
-                lineNumber: 338,
+                lineNumber: 341,
                 columnNumber: 13
             }, ("TURBOPACK compile-time value", void 0));
         })
     }, void 0, false, {
         fileName: "[project]/app/components/reports/ReportTable.tsx",
-        lineNumber: 300,
+        lineNumber: 303,
         columnNumber: 5
     }, ("TURBOPACK compile-time value", void 0));
 };

@@ -6,6 +6,7 @@ import { getSecurityUsers } from '@/app/api/securityUsers.api'
 import { getAllocations, allocateGuards, ShiftAllocation } from '@/app/api/allocations.api'
 import { SecurityUser } from '@/app/types/securityUser'
 import { useAuthGuard } from '@/app/services/auth.guard'
+import { motion, AnimatePresence } from 'framer-motion'
 
 export default function ShiftsPage() {
   const { authorized } = useAuthGuard({ allowedRoles: ['ADMIN', 'SUPERVISOR'] })
@@ -224,10 +225,23 @@ export default function ShiftsPage() {
       </div>
 
       {/* Glassmorphic Edit Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/20 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
-          <div className="relative z-10 w-full max-w-2xl bg-white/95 backdrop-blur-2xl border border-white rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <AnimatePresence>
+        {isModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+              onClick={() => setIsModalOpen(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="relative z-[101] w-full max-w-2xl bg-white/95 backdrop-blur-2xl border border-white rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+            >
             
             <div className="p-6 border-b border-slate-100 bg-slate-50/50">
               <h2 className="text-2xl font-bold text-slate-800 tracking-tight">
@@ -341,10 +355,10 @@ export default function ShiftsPage() {
                 Save Changes
               </button>
             </div>
-            
-          </div>
+          </motion.div>
         </div>
-      )}
+        )}
+      </AnimatePresence>
 
       <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar {

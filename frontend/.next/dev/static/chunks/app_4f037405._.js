@@ -318,9 +318,12 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$api$2f$shifts$2e$api$
 var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$api$2f$securityUsers$2e$api$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/api/securityUsers.api.ts [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$api$2f$allocations$2e$api$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/api/allocations.api.ts [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$services$2f$auth$2e$guard$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/services/auth.guard.ts [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/framer-motion/dist/es/render/components/motion/proxy.mjs [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$components$2f$AnimatePresence$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/framer-motion/dist/es/components/AnimatePresence/index.mjs [app-client] (ecmascript)");
 ;
 var _s = __turbopack_context__.k.signature();
 'use client';
+;
 ;
 ;
 ;
@@ -463,7 +466,7 @@ function ShiftsPage() {
             children: "Checking access..."
         }, void 0, false, {
             fileName: "[project]/app/shifts/page.tsx",
-            lineNumber: 130,
+            lineNumber: 131,
             columnNumber: 7
         }, this);
     }
@@ -477,20 +480,20 @@ function ShiftsPage() {
                         className: "jsx-31db64735a1c94f2" + " " + "absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px] mix-blend-multiply opacity-70"
                     }, void 0, false, {
                         fileName: "[project]/app/shifts/page.tsx",
-                        lineNumber: 140,
+                        lineNumber: 141,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "jsx-31db64735a1c94f2" + " " + "absolute bottom-[-10%] right-[-5%] w-[400px] h-[400px] bg-purple-500/10 rounded-full blur-[100px] mix-blend-multiply opacity-70"
                     }, void 0, false, {
                         fileName: "[project]/app/shifts/page.tsx",
-                        lineNumber: 141,
+                        lineNumber: 142,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/shifts/page.tsx",
-                lineNumber: 139,
+                lineNumber: 140,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -507,7 +510,7 @@ function ShiftsPage() {
                                         children: "Shift Management"
                                     }, void 0, false, {
                                         fileName: "[project]/app/shifts/page.tsx",
-                                        lineNumber: 147,
+                                        lineNumber: 148,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -515,13 +518,13 @@ function ShiftsPage() {
                                         children: "Configure recurring shifts and assign guard rosters"
                                     }, void 0, false, {
                                         fileName: "[project]/app/shifts/page.tsx",
-                                        lineNumber: 148,
+                                        lineNumber: 149,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/shifts/page.tsx",
-                                lineNumber: 146,
+                                lineNumber: 147,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -535,25 +538,25 @@ function ShiftsPage() {
                                             children: "+"
                                         }, void 0, false, {
                                             fileName: "[project]/app/shifts/page.tsx",
-                                            lineNumber: 155,
+                                            lineNumber: 156,
                                             columnNumber: 15
                                         }, this),
                                         " Add Shift"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/shifts/page.tsx",
-                                    lineNumber: 154,
+                                    lineNumber: 155,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/shifts/page.tsx",
-                                lineNumber: 150,
+                                lineNumber: 151,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/shifts/page.tsx",
-                        lineNumber: 145,
+                        lineNumber: 146,
                         columnNumber: 9
                     }, this),
                     loading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -562,12 +565,12 @@ function ShiftsPage() {
                             className: "jsx-31db64735a1c94f2" + " " + "w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"
                         }, void 0, false, {
                             fileName: "[project]/app/shifts/page.tsx",
-                            lineNumber: 162,
+                            lineNumber: 163,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/shifts/page.tsx",
-                        lineNumber: 161,
+                        lineNumber: 162,
                         columnNumber: 11
                     }, this) : shifts.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "jsx-31db64735a1c94f2" + " " + "text-center py-16 backdrop-blur-xl bg-white/60 border border-white/80 rounded-3xl shadow-sm",
@@ -577,7 +580,7 @@ function ShiftsPage() {
                                 children: "No shifts configured yet"
                             }, void 0, false, {
                                 fileName: "[project]/app/shifts/page.tsx",
-                                lineNumber: 166,
+                                lineNumber: 167,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -585,13 +588,13 @@ function ShiftsPage() {
                                 children: "Create your first shift to start allocating guards"
                             }, void 0, false, {
                                 fileName: "[project]/app/shifts/page.tsx",
-                                lineNumber: 167,
+                                lineNumber: 168,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/shifts/page.tsx",
-                        lineNumber: 165,
+                        lineNumber: 166,
                         columnNumber: 11
                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "jsx-31db64735a1c94f2" + " " + "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6",
@@ -604,7 +607,7 @@ function ShiftsPage() {
                                         className: "jsx-31db64735a1c94f2" + " " + "absolute inset-0 bg-gradient-to-br from-indigo-50/50 to-purple-50/50 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity"
                                     }, void 0, false, {
                                         fileName: "[project]/app/shifts/page.tsx",
-                                        lineNumber: 179,
+                                        lineNumber: 180,
                                         columnNumber: 19
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -621,7 +624,7 @@ function ShiftsPage() {
                                                                 children: shift.shift_name
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/shifts/page.tsx",
-                                                                lineNumber: 184,
+                                                                lineNumber: 185,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -632,7 +635,7 @@ function ShiftsPage() {
                                                                         children: shift.start_time
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/shifts/page.tsx",
-                                                                        lineNumber: 186,
+                                                                        lineNumber: 187,
                                                                         columnNumber: 27
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -640,7 +643,7 @@ function ShiftsPage() {
                                                                         children: "to"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/shifts/page.tsx",
-                                                                        lineNumber: 187,
+                                                                        lineNumber: 188,
                                                                         columnNumber: 27
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -648,19 +651,19 @@ function ShiftsPage() {
                                                                         children: shift.end_time
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/shifts/page.tsx",
-                                                                        lineNumber: 188,
+                                                                        lineNumber: 189,
                                                                         columnNumber: 27
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/app/shifts/page.tsx",
-                                                                lineNumber: 185,
+                                                                lineNumber: 186,
                                                                 columnNumber: 25
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/shifts/page.tsx",
-                                                        lineNumber: 183,
+                                                        lineNumber: 184,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -672,7 +675,7 @@ function ShiftsPage() {
                                                                 children: "✎"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/shifts/page.tsx",
-                                                                lineNumber: 192,
+                                                                lineNumber: 193,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -681,19 +684,19 @@ function ShiftsPage() {
                                                                 children: "×"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/shifts/page.tsx",
-                                                                lineNumber: 195,
+                                                                lineNumber: 196,
                                                                 columnNumber: 25
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/shifts/page.tsx",
-                                                        lineNumber: 191,
+                                                        lineNumber: 192,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/shifts/page.tsx",
-                                                lineNumber: 182,
+                                                lineNumber: 183,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -708,7 +711,7 @@ function ShiftsPage() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/shifts/page.tsx",
-                                                        lineNumber: 202,
+                                                        lineNumber: 203,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -718,7 +721,7 @@ function ShiftsPage() {
                                                             children: "No guards assigned"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/shifts/page.tsx",
-                                                            lineNumber: 205,
+                                                            lineNumber: 206,
                                                             columnNumber: 27
                                                         }, this) : assignedGuards.map((g)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                                 className: "jsx-31db64735a1c94f2" + " " + "flex items-center gap-2 bg-white border border-slate-200 shadow-sm rounded-full pl-1.5 pr-3 py-1",
@@ -728,7 +731,7 @@ function ShiftsPage() {
                                                                         children: g.security_name.charAt(0).toUpperCase()
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/shifts/page.tsx",
-                                                                        lineNumber: 209,
+                                                                        lineNumber: 210,
                                                                         columnNumber: 31
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -736,394 +739,429 @@ function ShiftsPage() {
                                                                         children: g.security_name
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/shifts/page.tsx",
-                                                                        lineNumber: 212,
+                                                                        lineNumber: 213,
                                                                         columnNumber: 31
                                                                     }, this)
                                                                 ]
                                                             }, g.security_id, true, {
                                                                 fileName: "[project]/app/shifts/page.tsx",
-                                                                lineNumber: 208,
+                                                                lineNumber: 209,
                                                                 columnNumber: 29
                                                             }, this))
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/shifts/page.tsx",
-                                                        lineNumber: 203,
+                                                        lineNumber: 204,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/shifts/page.tsx",
-                                                lineNumber: 201,
+                                                lineNumber: 202,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/shifts/page.tsx",
-                                        lineNumber: 181,
+                                        lineNumber: 182,
                                         columnNumber: 19
                                     }, this)
                                 ]
                             }, shift.shift_id, true, {
                                 fileName: "[project]/app/shifts/page.tsx",
-                                lineNumber: 178,
+                                lineNumber: 179,
                                 columnNumber: 17
                             }, this);
                         })
                     }, void 0, false, {
                         fileName: "[project]/app/shifts/page.tsx",
-                        lineNumber: 170,
+                        lineNumber: 171,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/shifts/page.tsx",
-                lineNumber: 144,
+                lineNumber: 145,
                 columnNumber: 7
             }, this),
-            isModalOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "jsx-31db64735a1c94f2" + " " + "fixed inset-0 z-50 flex items-center justify-center p-4",
-                children: [
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        onClick: ()=>setIsModalOpen(false),
-                        className: "jsx-31db64735a1c94f2" + " " + "absolute inset-0 bg-slate-900/20 backdrop-blur-sm"
-                    }, void 0, false, {
-                        fileName: "[project]/app/shifts/page.tsx",
-                        lineNumber: 229,
-                        columnNumber: 11
-                    }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "jsx-31db64735a1c94f2" + " " + "relative z-10 w-full max-w-2xl bg-white/95 backdrop-blur-2xl border border-white rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]",
-                        children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "jsx-31db64735a1c94f2" + " " + "p-6 border-b border-slate-100 bg-slate-50/50",
-                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                                    className: "jsx-31db64735a1c94f2" + " " + "text-2xl font-bold text-slate-800 tracking-tight",
-                                    children: editingShift ? 'Edit Shift & Roster' : 'Create New Shift'
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$components$2f$AnimatePresence$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["AnimatePresence"], {
+                children: isModalOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "jsx-31db64735a1c94f2" + " " + "fixed inset-0 z-[100] flex items-center justify-center p-4",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
+                            initial: {
+                                opacity: 0
+                            },
+                            animate: {
+                                opacity: 1
+                            },
+                            exit: {
+                                opacity: 0
+                            },
+                            className: "absolute inset-0 bg-slate-900/40 backdrop-blur-sm",
+                            onClick: ()=>setIsModalOpen(false)
+                        }, void 0, false, {
+                            fileName: "[project]/app/shifts/page.tsx",
+                            lineNumber: 231,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
+                            initial: {
+                                opacity: 0,
+                                scale: 0.95,
+                                y: 20
+                            },
+                            animate: {
+                                opacity: 1,
+                                scale: 1,
+                                y: 0
+                            },
+                            exit: {
+                                opacity: 0,
+                                scale: 0.95,
+                                y: 20
+                            },
+                            transition: {
+                                type: "spring",
+                                damping: 25,
+                                stiffness: 300
+                            },
+                            className: "relative z-[101] w-full max-w-2xl bg-white/95 backdrop-blur-2xl border border-white rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "jsx-31db64735a1c94f2" + " " + "p-6 border-b border-slate-100 bg-slate-50/50",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                                        className: "jsx-31db64735a1c94f2" + " " + "text-2xl font-bold text-slate-800 tracking-tight",
+                                        children: editingShift ? 'Edit Shift & Roster' : 'Create New Shift'
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/shifts/page.tsx",
+                                        lineNumber: 247,
+                                        columnNumber: 15
+                                    }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/shifts/page.tsx",
-                                    lineNumber: 233,
-                                    columnNumber: 15
-                                }, this)
-                            }, void 0, false, {
-                                fileName: "[project]/app/shifts/page.tsx",
-                                lineNumber: 232,
-                                columnNumber: 13
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
-                                onSubmit: handleSave,
-                                className: "jsx-31db64735a1c94f2" + " " + "flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar",
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "jsx-31db64735a1c94f2" + " " + "space-y-4",
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                                className: "jsx-31db64735a1c94f2" + " " + "text-sm font-semibold text-indigo-600 uppercase tracking-widest",
-                                                children: "Shift Details"
-                                            }, void 0, false, {
-                                                fileName: "[project]/app/shifts/page.tsx",
-                                                lineNumber: 242,
-                                                columnNumber: 17
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "jsx-31db64735a1c94f2",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                        className: "jsx-31db64735a1c94f2" + " " + "block text-xs font-medium text-slate-500 mb-1.5",
-                                                        children: "Shift Name"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/app/shifts/page.tsx",
-                                                        lineNumber: 244,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                                        type: "text",
-                                                        required: true,
-                                                        value: shiftForm.shift_name,
-                                                        onChange: (e)=>setShiftForm({
-                                                                ...shiftForm,
-                                                                shift_name: e.target.value
-                                                            }),
-                                                        placeholder: "e.g., Morning Shift",
-                                                        className: "jsx-31db64735a1c94f2" + " " + "w-full bg-white border border-slate-200 text-slate-800 px-4 py-2.5 rounded-xl focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all shadow-sm"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/app/shifts/page.tsx",
-                                                        lineNumber: 245,
-                                                        columnNumber: 19
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/app/shifts/page.tsx",
-                                                lineNumber: 243,
-                                                columnNumber: 17
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "jsx-31db64735a1c94f2" + " " + "grid grid-cols-2 gap-4",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "jsx-31db64735a1c94f2",
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                                className: "jsx-31db64735a1c94f2" + " " + "block text-xs font-medium text-slate-500 mb-1.5",
-                                                                children: "Start Time"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/app/shifts/page.tsx",
-                                                                lineNumber: 254,
-                                                                columnNumber: 21
-                                                            }, this),
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                                                type: "time",
-                                                                required: true,
-                                                                value: shiftForm.start_time,
-                                                                onChange: (e)=>setShiftForm({
-                                                                        ...shiftForm,
-                                                                        start_time: e.target.value
-                                                                    }),
-                                                                className: "jsx-31db64735a1c94f2" + " " + "w-full bg-white border border-slate-200 text-slate-800 px-4 py-2.5 rounded-xl focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all shadow-sm"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/app/shifts/page.tsx",
-                                                                lineNumber: 255,
-                                                                columnNumber: 21
-                                                            }, this)
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/app/shifts/page.tsx",
-                                                        lineNumber: 253,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "jsx-31db64735a1c94f2",
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                                className: "jsx-31db64735a1c94f2" + " " + "block text-xs font-medium text-slate-500 mb-1.5",
-                                                                children: "End Time"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/app/shifts/page.tsx",
-                                                                lineNumber: 262,
-                                                                columnNumber: 21
-                                                            }, this),
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                                                type: "time",
-                                                                required: true,
-                                                                value: shiftForm.end_time,
-                                                                onChange: (e)=>setShiftForm({
-                                                                        ...shiftForm,
-                                                                        end_time: e.target.value
-                                                                    }),
-                                                                className: "jsx-31db64735a1c94f2" + " " + "w-full bg-white border border-slate-200 text-slate-800 px-4 py-2.5 rounded-xl focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all shadow-sm"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/app/shifts/page.tsx",
-                                                                lineNumber: 263,
-                                                                columnNumber: 21
-                                                            }, this)
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/app/shifts/page.tsx",
-                                                        lineNumber: 261,
-                                                        columnNumber: 19
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/app/shifts/page.tsx",
-                                                lineNumber: 252,
-                                                columnNumber: 17
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/app/shifts/page.tsx",
-                                        lineNumber: 241,
-                                        columnNumber: 15
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "jsx-31db64735a1c94f2" + " " + "space-y-4",
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                                className: "jsx-31db64735a1c94f2" + " " + "text-sm font-semibold text-indigo-600 uppercase tracking-widest flex justify-between items-center",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        className: "jsx-31db64735a1c94f2",
-                                                        children: "Assign Guards"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/app/shifts/page.tsx",
-                                                        lineNumber: 275,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        className: "jsx-31db64735a1c94f2" + " " + "text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-md font-bold",
-                                                        children: [
-                                                            Object.values(rosterSelection).filter(Boolean).length,
-                                                            " Selected"
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/app/shifts/page.tsx",
-                                                        lineNumber: 276,
-                                                        columnNumber: 19
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/app/shifts/page.tsx",
-                                                lineNumber: 274,
-                                                columnNumber: 17
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "jsx-31db64735a1c94f2" + " " + "grid grid-cols-1 sm:grid-cols-2 gap-3",
-                                                children: guards.map((guard)=>{
-                                                    const isSelected = rosterSelection[guard.security_id] || false;
-                                                    const activeShiftId = editingShift ? editingShift.shift_id : null;
-                                                    const otherAssignments = allocations.filter((a)=>a.guard_id === guard.security_id && a.shift_id !== activeShiftId && a.guard_id !== 'CLEAR');
-                                                    const otherShiftCount = otherAssignments.length;
-                                                    let highlightClass = 'bg-white border-slate-200 hover:border-indigo-200 hover:bg-slate-50';
-                                                    let textClass = 'text-slate-700';
-                                                    let badge = null;
-                                                    if (isSelected) {
-                                                        highlightClass = 'bg-indigo-50 border-indigo-300 shadow-indigo-100';
-                                                        textClass = 'text-indigo-900';
-                                                    } else if (otherShiftCount === 1) {
-                                                        highlightClass = 'bg-orange-50 border-orange-200 hover:border-orange-300';
-                                                        textClass = 'text-orange-900';
-                                                        badge = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                            className: "jsx-31db64735a1c94f2" + " " + "text-[10px] ml-auto bg-orange-100 text-orange-800 px-1.5 py-0.5 rounded font-bold",
-                                                            children: "1 Shift"
+                                    lineNumber: 246,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
+                                    onSubmit: handleSave,
+                                    className: "jsx-31db64735a1c94f2" + " " + "flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "jsx-31db64735a1c94f2" + " " + "space-y-4",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                                    className: "jsx-31db64735a1c94f2" + " " + "text-sm font-semibold text-indigo-600 uppercase tracking-widest",
+                                                    children: "Shift Details"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/shifts/page.tsx",
+                                                    lineNumber: 256,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "jsx-31db64735a1c94f2",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                            className: "jsx-31db64735a1c94f2" + " " + "block text-xs font-medium text-slate-500 mb-1.5",
+                                                            children: "Shift Name"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/shifts/page.tsx",
-                                                            lineNumber: 298,
-                                                            columnNumber: 31
-                                                        }, this);
-                                                    } else if (otherShiftCount >= 2) {
-                                                        highlightClass = 'bg-red-50 border-red-200 hover:border-red-300';
-                                                        textClass = 'text-red-900';
-                                                        badge = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                            className: "jsx-31db64735a1c94f2" + " " + "text-[10px] ml-auto bg-red-100 text-red-800 px-1.5 py-0.5 rounded font-bold",
+                                                            lineNumber: 258,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                            type: "text",
+                                                            required: true,
+                                                            value: shiftForm.shift_name,
+                                                            onChange: (e)=>setShiftForm({
+                                                                    ...shiftForm,
+                                                                    shift_name: e.target.value
+                                                                }),
+                                                            placeholder: "e.g., Morning Shift",
+                                                            className: "jsx-31db64735a1c94f2" + " " + "w-full bg-white border border-slate-200 text-slate-800 px-4 py-2.5 rounded-xl focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all shadow-sm"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/shifts/page.tsx",
+                                                            lineNumber: 259,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/app/shifts/page.tsx",
+                                                    lineNumber: 257,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "jsx-31db64735a1c94f2" + " " + "grid grid-cols-2 gap-4",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "jsx-31db64735a1c94f2",
                                                             children: [
-                                                                otherShiftCount,
-                                                                " Shifts"
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                    className: "jsx-31db64735a1c94f2" + " " + "block text-xs font-medium text-slate-500 mb-1.5",
+                                                                    children: "Start Time"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/shifts/page.tsx",
+                                                                    lineNumber: 268,
+                                                                    columnNumber: 21
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                    type: "time",
+                                                                    required: true,
+                                                                    value: shiftForm.start_time,
+                                                                    onChange: (e)=>setShiftForm({
+                                                                            ...shiftForm,
+                                                                            start_time: e.target.value
+                                                                        }),
+                                                                    className: "jsx-31db64735a1c94f2" + " " + "w-full bg-white border border-slate-200 text-slate-800 px-4 py-2.5 rounded-xl focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all shadow-sm"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/shifts/page.tsx",
+                                                                    lineNumber: 269,
+                                                                    columnNumber: 21
+                                                                }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/shifts/page.tsx",
-                                                            lineNumber: 302,
-                                                            columnNumber: 31
-                                                        }, this);
-                                                    }
-                                                    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        onClick: ()=>toggleGuard(guard.security_id),
-                                                        className: "jsx-31db64735a1c94f2" + " " + `flex items-center gap-3 p-3 rounded-xl cursor-pointer border transition-all duration-200 shadow-sm ${highlightClass}`,
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                className: "jsx-31db64735a1c94f2" + " " + `w-5 h-5 rounded flex items-center justify-center transition-colors ${isSelected ? 'bg-indigo-600' : 'border-2 border-slate-300 bg-white'}`,
-                                                                children: isSelected && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
-                                                                    fill: "none",
-                                                                    viewBox: "0 0 24 24",
-                                                                    stroke: "currentColor",
-                                                                    strokeWidth: 3,
-                                                                    className: "jsx-31db64735a1c94f2" + " " + "w-3.5 h-3.5 text-white",
-                                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
-                                                                        strokeLinecap: "round",
-                                                                        strokeLinejoin: "round",
-                                                                        d: "M5 13l4 4L19 7",
-                                                                        className: "jsx-31db64735a1c94f2"
-                                                                    }, void 0, false, {
-                                                                        fileName: "[project]/app/shifts/page.tsx",
-                                                                        lineNumber: 314,
-                                                                        columnNumber: 152
-                                                                    }, this)
+                                                            lineNumber: 267,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "jsx-31db64735a1c94f2",
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                    className: "jsx-31db64735a1c94f2" + " " + "block text-xs font-medium text-slate-500 mb-1.5",
+                                                                    children: "End Time"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/shifts/page.tsx",
-                                                                    lineNumber: 314,
-                                                                    columnNumber: 42
+                                                                    lineNumber: 276,
+                                                                    columnNumber: 21
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                    type: "time",
+                                                                    required: true,
+                                                                    value: shiftForm.end_time,
+                                                                    onChange: (e)=>setShiftForm({
+                                                                            ...shiftForm,
+                                                                            end_time: e.target.value
+                                                                        }),
+                                                                    className: "jsx-31db64735a1c94f2" + " " + "w-full bg-white border border-slate-200 text-slate-800 px-4 py-2.5 rounded-xl focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all shadow-sm"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/shifts/page.tsx",
+                                                                    lineNumber: 277,
+                                                                    columnNumber: 21
                                                                 }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/app/shifts/page.tsx",
+                                                            lineNumber: 275,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/app/shifts/page.tsx",
+                                                    lineNumber: 266,
+                                                    columnNumber: 17
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/app/shifts/page.tsx",
+                                            lineNumber: 255,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "jsx-31db64735a1c94f2" + " " + "space-y-4",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                                    className: "jsx-31db64735a1c94f2" + " " + "text-sm font-semibold text-indigo-600 uppercase tracking-widest flex justify-between items-center",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                            className: "jsx-31db64735a1c94f2",
+                                                            children: "Assign Guards"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/shifts/page.tsx",
+                                                            lineNumber: 289,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                            className: "jsx-31db64735a1c94f2" + " " + "text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-md font-bold",
+                                                            children: [
+                                                                Object.values(rosterSelection).filter(Boolean).length,
+                                                                " Selected"
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/app/shifts/page.tsx",
+                                                            lineNumber: 290,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/app/shifts/page.tsx",
+                                                    lineNumber: 288,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "jsx-31db64735a1c94f2" + " " + "grid grid-cols-1 sm:grid-cols-2 gap-3",
+                                                    children: guards.map((guard)=>{
+                                                        const isSelected = rosterSelection[guard.security_id] || false;
+                                                        const activeShiftId = editingShift ? editingShift.shift_id : null;
+                                                        const otherAssignments = allocations.filter((a)=>a.guard_id === guard.security_id && a.shift_id !== activeShiftId && a.guard_id !== 'CLEAR');
+                                                        const otherShiftCount = otherAssignments.length;
+                                                        let highlightClass = 'bg-white border-slate-200 hover:border-indigo-200 hover:bg-slate-50';
+                                                        let textClass = 'text-slate-700';
+                                                        let badge = null;
+                                                        if (isSelected) {
+                                                            highlightClass = 'bg-indigo-50 border-indigo-300 shadow-indigo-100';
+                                                            textClass = 'text-indigo-900';
+                                                        } else if (otherShiftCount === 1) {
+                                                            highlightClass = 'bg-orange-50 border-orange-200 hover:border-orange-300';
+                                                            textClass = 'text-orange-900';
+                                                            badge = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                className: "jsx-31db64735a1c94f2" + " " + "text-[10px] ml-auto bg-orange-100 text-orange-800 px-1.5 py-0.5 rounded font-bold",
+                                                                children: "1 Shift"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/shifts/page.tsx",
-                                                                lineNumber: 311,
-                                                                columnNumber: 25
-                                                            }, this),
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                className: "jsx-31db64735a1c94f2" + " " + "flex flex-col",
+                                                                lineNumber: 312,
+                                                                columnNumber: 31
+                                                            }, this);
+                                                        } else if (otherShiftCount >= 2) {
+                                                            highlightClass = 'bg-red-50 border-red-200 hover:border-red-300';
+                                                            textClass = 'text-red-900';
+                                                            badge = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                className: "jsx-31db64735a1c94f2" + " " + "text-[10px] ml-auto bg-red-100 text-red-800 px-1.5 py-0.5 rounded font-bold",
                                                                 children: [
-                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                        className: "jsx-31db64735a1c94f2" + " " + `text-sm font-semibold ${textClass}`,
-                                                                        children: guard.security_name
-                                                                    }, void 0, false, {
-                                                                        fileName: "[project]/app/shifts/page.tsx",
-                                                                        lineNumber: 317,
-                                                                        columnNumber: 27
-                                                                    }, this),
-                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                        className: "jsx-31db64735a1c94f2" + " " + "text-[10px] text-slate-400 uppercase",
-                                                                        children: guard.security_id
-                                                                    }, void 0, false, {
-                                                                        fileName: "[project]/app/shifts/page.tsx",
-                                                                        lineNumber: 318,
-                                                                        columnNumber: 27
-                                                                    }, this)
+                                                                    otherShiftCount,
+                                                                    " Shifts"
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/app/shifts/page.tsx",
                                                                 lineNumber: 316,
-                                                                columnNumber: 25
-                                                            }, this),
-                                                            badge
-                                                        ]
-                                                    }, guard.security_id, true, {
-                                                        fileName: "[project]/app/shifts/page.tsx",
-                                                        lineNumber: 306,
-                                                        columnNumber: 23
-                                                    }, this);
-                                                })
-                                            }, void 0, false, {
-                                                fileName: "[project]/app/shifts/page.tsx",
-                                                lineNumber: 280,
-                                                columnNumber: 17
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/app/shifts/page.tsx",
-                                        lineNumber: 273,
-                                        columnNumber: 15
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/app/shifts/page.tsx",
-                                lineNumber: 238,
-                                columnNumber: 13
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "jsx-31db64735a1c94f2" + " " + "p-5 border-t border-slate-100 bg-slate-50/50 flex justify-end gap-3",
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                        type: "button",
-                                        onClick: ()=>setIsModalOpen(false),
-                                        className: "jsx-31db64735a1c94f2" + " " + "px-5 py-2.5 text-sm font-semibold text-slate-600 hover:text-slate-800 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl transition-all shadow-sm",
-                                        children: "Cancel"
-                                    }, void 0, false, {
-                                        fileName: "[project]/app/shifts/page.tsx",
-                                        lineNumber: 330,
-                                        columnNumber: 15
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                        onClick: handleSave,
-                                        className: "jsx-31db64735a1c94f2" + " " + "px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all",
-                                        children: "Save Changes"
-                                    }, void 0, false, {
-                                        fileName: "[project]/app/shifts/page.tsx",
-                                        lineNumber: 337,
-                                        columnNumber: 15
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/app/shifts/page.tsx",
-                                lineNumber: 329,
-                                columnNumber: 13
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "[project]/app/shifts/page.tsx",
-                        lineNumber: 230,
-                        columnNumber: 11
-                    }, this)
-                ]
-            }, void 0, true, {
+                                                                columnNumber: 31
+                                                            }, this);
+                                                        }
+                                                        return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            onClick: ()=>toggleGuard(guard.security_id),
+                                                            className: "jsx-31db64735a1c94f2" + " " + `flex items-center gap-3 p-3 rounded-xl cursor-pointer border transition-all duration-200 shadow-sm ${highlightClass}`,
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "jsx-31db64735a1c94f2" + " " + `w-5 h-5 rounded flex items-center justify-center transition-colors ${isSelected ? 'bg-indigo-600' : 'border-2 border-slate-300 bg-white'}`,
+                                                                    children: isSelected && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                                                                        fill: "none",
+                                                                        viewBox: "0 0 24 24",
+                                                                        stroke: "currentColor",
+                                                                        strokeWidth: 3,
+                                                                        className: "jsx-31db64735a1c94f2" + " " + "w-3.5 h-3.5 text-white",
+                                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                                                            strokeLinecap: "round",
+                                                                            strokeLinejoin: "round",
+                                                                            d: "M5 13l4 4L19 7",
+                                                                            className: "jsx-31db64735a1c94f2"
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/app/shifts/page.tsx",
+                                                                            lineNumber: 328,
+                                                                            columnNumber: 152
+                                                                        }, this)
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/app/shifts/page.tsx",
+                                                                        lineNumber: 328,
+                                                                        columnNumber: 42
+                                                                    }, this)
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/shifts/page.tsx",
+                                                                    lineNumber: 325,
+                                                                    columnNumber: 25
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "jsx-31db64735a1c94f2" + " " + "flex flex-col",
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                            className: "jsx-31db64735a1c94f2" + " " + `text-sm font-semibold ${textClass}`,
+                                                                            children: guard.security_name
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/app/shifts/page.tsx",
+                                                                            lineNumber: 331,
+                                                                            columnNumber: 27
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                            className: "jsx-31db64735a1c94f2" + " " + "text-[10px] text-slate-400 uppercase",
+                                                                            children: guard.security_id
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/app/shifts/page.tsx",
+                                                                            lineNumber: 332,
+                                                                            columnNumber: 27
+                                                                        }, this)
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/app/shifts/page.tsx",
+                                                                    lineNumber: 330,
+                                                                    columnNumber: 25
+                                                                }, this),
+                                                                badge
+                                                            ]
+                                                        }, guard.security_id, true, {
+                                                            fileName: "[project]/app/shifts/page.tsx",
+                                                            lineNumber: 320,
+                                                            columnNumber: 23
+                                                        }, this);
+                                                    })
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/shifts/page.tsx",
+                                                    lineNumber: 294,
+                                                    columnNumber: 17
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/app/shifts/page.tsx",
+                                            lineNumber: 287,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/shifts/page.tsx",
+                                    lineNumber: 252,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "jsx-31db64735a1c94f2" + " " + "p-5 border-t border-slate-100 bg-slate-50/50 flex justify-end gap-3",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                            type: "button",
+                                            onClick: ()=>setIsModalOpen(false),
+                                            className: "jsx-31db64735a1c94f2" + " " + "px-5 py-2.5 text-sm font-semibold text-slate-600 hover:text-slate-800 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl transition-all shadow-sm",
+                                            children: "Cancel"
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/shifts/page.tsx",
+                                            lineNumber: 344,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                            onClick: handleSave,
+                                            className: "jsx-31db64735a1c94f2" + " " + "px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all",
+                                            children: "Save Changes"
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/shifts/page.tsx",
+                                            lineNumber: 351,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/shifts/page.tsx",
+                                    lineNumber: 343,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/shifts/page.tsx",
+                            lineNumber: 238,
+                            columnNumber: 13
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/shifts/page.tsx",
+                    lineNumber: 230,
+                    columnNumber: 11
+                }, this)
+            }, void 0, false, {
                 fileName: "[project]/app/shifts/page.tsx",
                 lineNumber: 228,
-                columnNumber: 9
+                columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$styled$2d$jsx$2f$style$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                 id: "31db64735a1c94f2",
@@ -1132,7 +1170,7 @@ function ShiftsPage() {
         ]
     }, void 0, true, {
         fileName: "[project]/app/shifts/page.tsx",
-        lineNumber: 137,
+        lineNumber: 138,
         columnNumber: 5
     }, this);
 }

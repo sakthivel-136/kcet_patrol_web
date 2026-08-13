@@ -7,12 +7,14 @@ import { usePathname, useRouter } from 'next/navigation'
 import { Menu, X, User } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { clearAuth } from '@/app/services/token.service'
+import InteractiveTutorial from '../tutorial/InteractiveTutorial'
 
 const Navbar = () => {
   const pathname = usePathname()
   const router = useRouter()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  const [isTutorialOpen, setIsTutorialOpen] = useState(false)
   const [userRole, setUserRole] = useState<string>('')
   const userMenuRef = useRef<HTMLDivElement>(null)
 
@@ -47,6 +49,7 @@ const Navbar = () => {
   }, [])
 
   return (
+    <>
     <header className="sticky top-0 z-50 w-full glass-panel border-x-0 border-t-0 rounded-none bg-white/60">
       <div className="container mx-auto flex h-20 items-center justify-between px-4 md:px-6">
         
@@ -85,9 +88,10 @@ const Navbar = () => {
             <AnimatePresence>
               {isUserMenuOpen && (
                 <motion.div initial={{ opacity: 0, scale: 0.95, y: -5 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: -5 }} className="absolute right-0 mt-3 w-44 rounded-2xl glass-panel p-2 shadow-lg border-slate-200">
-                  <button onClick={handleLogout} className="block w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors">Log out</button>
+                  <button onClick={() => { setIsTutorialOpen(true); setIsUserMenuOpen(false); }} className="block w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors">App Guide</button>
                   <button onClick={() => router.push('/login')} className="block w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors">Switch User</button>
-                  <a href="https://docs.google.com/uc?export=download&id=14R6VexC8HZ02_GyVLZO97AdmWgOmFAFv" target="_blank" rel="noopener noreferrer" className="block w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 transition-colors mt-1 border-t border-slate-100">Download App</a>
+                  <button onClick={handleLogout} className="block w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors">Log out</button>
+                  <a href="https://drive.google.com/uc?export=download&id=1rrWO82bIRMvD3H1euaC1e9wMptplt9JR" target="_blank" rel="noopener noreferrer" className="block w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 transition-colors mt-1 border-t border-slate-100">Download App</a>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -106,8 +110,9 @@ const Navbar = () => {
                 </Link>
               ))}
               <div className="border-t border-slate-100 mt-4 pt-4 space-y-2">
-                <button onClick={() => router.push('/login')} className="block w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">Login</button>
-                <a href="https://docs.google.com/uc?export=download&id=14R6VexC8HZ02_GyVLZO97AdmWgOmFAFv" target="_blank" rel="noopener noreferrer" className="block w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50">Download App</a>
+                <button onClick={() => { setIsTutorialOpen(true); setIsMobileMenuOpen(false); }} className="block w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">App Guide</button>
+                <button onClick={() => router.push('/login')} className="block w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">Switch User</button>
+                <a href="https://drive.google.com/uc?export=download&id=1rrWO82bIRMvD3H1euaC1e9wMptplt9JR" target="_blank" rel="noopener noreferrer" className="block w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50">Download App</a>
                 <button onClick={handleLogout} className="block w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50">Log out</button>
               </div>
             </div>
@@ -115,6 +120,8 @@ const Navbar = () => {
         )}
       </AnimatePresence>
     </header>
+    <InteractiveTutorial isOpen={isTutorialOpen} onClose={() => setIsTutorialOpen(false)} />
+    </>
   )
 }
 

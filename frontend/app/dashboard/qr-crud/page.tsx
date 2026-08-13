@@ -166,51 +166,57 @@ export default function QrCrudPage() {
   // ----------------- RENDER -----------------
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4 sm:mb-0">
-            QR Codes
-          </h1>
+    <div className="min-h-screen relative font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+        <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">QR Codes</h1>
+            <p className="mt-1 text-slate-500 text-sm font-medium">Manage and generate QR checkpoints</p>
+          </div>
           <button
             onClick={handleAddQr}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            className="px-6 py-2.5 bg-indigo-600 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-500/30 hover:bg-indigo-700 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-indigo-500/40 transition-all duration-200 flex items-center gap-2"
           >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+            </svg>
             Add QR
           </button>
         </div>
 
-        <div className="mb-4">
-          <QrFilters
-            value={searchQuery}
-            onChange={setSearchQuery}
+        <div className="glass-panel rounded-3xl p-6 sm:p-8">
+          <div className="mb-6">
+            <QrFilters
+              value={searchQuery}
+              onChange={setSearchQuery}
+            />
+          </div>
+
+          <QrTable
+            qrCodes={filteredQrCodes}
+            onEdit={handleEditQr}
+            onView={handleViewQr}
+            onToggleStatus={handleToggleStatus}
+            onDelete={handleDeleteQr}
           />
         </div>
-
-        <QrTable
-          qrCodes={filteredQrCodes}
-          onEdit={handleEditQr}
-          onView={handleViewQr}
-          onToggleStatus={handleToggleStatus}
-          onDelete={handleDeleteQr}
-        />
-
-        {isFormOpen && (
-          <QrForm
-            qr={currentQr}
-            isEditMode={isEditMode}
-            onSave={handleSaveQr}
-            onClose={() => setIsFormOpen(false)}
-          />
-        )}
-
-        {isPreviewOpen && currentQr && (
-          <QrPreview
-            qr={currentQr}
-            onClose={() => setIsPreviewOpen(false)}
-          />
-        )}
       </div>
+
+      {isFormOpen && (
+        <QrForm
+          qr={currentQr}
+          isEditMode={isEditMode}
+          onSave={handleSaveQr}
+          onClose={() => setIsFormOpen(false)}
+        />
+      )}
+
+      {isPreviewOpen && currentQr && (
+        <QrPreview
+          qr={currentQr}
+          onClose={() => setIsPreviewOpen(false)}
+        />
+      )}
     </div>
   );
 }

@@ -2,6 +2,7 @@
   "/dashboard/page": "app/dashboard/page.js",
   "/dashboard/qr-crud/page": "app/dashboard/qr-crud/page.js",
   "/login/page": "app/login/page.js",
+  "/page": "app/page.js",
   "/report-download/page": "app/report-download/page.js",
   "/shifts/page": "app/shifts/page.js",
   "/user-crud/page": "app/user-crud/page.js"

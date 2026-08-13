@@ -14,17 +14,19 @@ export default function CampusPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 p-8 font-sans selection:bg-blue-100 selection:text-blue-900">
-      {/* HEADER SECTION */}
-      <div className="max-w-7xl mx-auto mb-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">Campuses</h1>
-          <p className="text-slate-500 mt-1 font-medium">Create, edit, and manage campus locations</p>
+    <div className="min-h-screen relative font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+        {/* HEADER SECTION */}
+        <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">Campuses</h1>
+            <p className="mt-1 text-slate-500 text-sm font-medium">Create, edit, and manage campus locations</p>
+          </div>
         </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto">
-        <CampusesTable />
+        <div className="glass-panel rounded-3xl p-6 sm:p-8">
+          <CampusesTable />
+        </div>
       </div>
     </div>
   );
