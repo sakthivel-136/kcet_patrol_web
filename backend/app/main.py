@@ -37,11 +37,7 @@ app = FastAPI(
 # CORS CONFIGURATION
 # -----------------------------
 origins = [
-    "http://localhost:3000",
-    "http://localhost:3001",
-    "http://172.16.16.100:3000",
-    "http://10.10.3.2:3000",
-    "https://apps.pentagontextiles.com"
+    "*"
 ]
 
 app.add_middleware(
