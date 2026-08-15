@@ -11,7 +11,7 @@ export default function RoleBadge({ role }: RoleBadgeProps) {
   const getBadgeClasses = (role: UserRole): string => {
     switch (role) {
       case 'Admin':
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-fuchsia-100 text-fuchsia-800';
       case 'Supervisor':
         return 'bg-blue-100 text-blue-800';
       case 'Guard':

@@ -72,7 +72,7 @@ export default function InteractiveTutorial({ isOpen, onClose }: InteractiveTuto
                     exit={{ opacity: 0, x: -20 }}
                     className="space-y-6"
                   >
-                    <div className="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 mb-4 mx-auto">
+                    <div className="w-16 h-16 rounded-2xl bg-purple-50 flex items-center justify-center text-purple-600 mb-4 mx-auto">
                       <Map size={32} />
                     </div>
                     <div className="text-center">
@@ -84,11 +84,11 @@ export default function InteractiveTutorial({ isOpen, onClose }: InteractiveTuto
                     
                     <div className="space-y-3 mt-6">
                       <div className="flex items-start gap-3 p-4 rounded-xl bg-slate-50 border border-slate-100">
-                        <div className="w-2 h-2 mt-2 rounded-full bg-indigo-500 shrink-0"></div>
+                        <div className="w-2 h-2 mt-2 rounded-full bg-purple-500 shrink-0"></div>
                         <p className="text-sm text-slate-700"><strong>Live Tracking:</strong> Monitor scan logs as they happen directly on the Dashboard.</p>
                       </div>
                       <div className="flex items-start gap-3 p-4 rounded-xl bg-slate-50 border border-slate-100">
-                        <div className="w-2 h-2 mt-2 rounded-full bg-emerald-500 shrink-0"></div>
+                        <div className="w-2 h-2 mt-2 rounded-full bg-amber-500 shrink-0"></div>
                         <p className="text-sm text-slate-700"><strong>Automated Accountability:</strong> Missed rounds are automatically logged with the specific guards assigned to that shift.</p>
                       </div>
                     </div>
@@ -104,7 +104,7 @@ export default function InteractiveTutorial({ isOpen, onClose }: InteractiveTuto
                     exit={{ opacity: 0, x: -20 }}
                     className="space-y-6"
                   >
-                    <div className="w-16 h-16 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 mb-4 mx-auto">
+                    <div className="w-16 h-16 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600 mb-4 mx-auto">
                       <ShieldCheck size={32} />
                     </div>
                     <div className="text-center">
@@ -165,10 +165,10 @@ export default function InteractiveTutorial({ isOpen, onClose }: InteractiveTuto
                         <h4 className="font-bold text-slate-800">C. Sakthivel</h4>
                         <p className="text-xs text-slate-500 font-medium mb-3">Lead Developer</p>
                         <div className="flex gap-2">
-                          <a href="mailto:C.SAKTHIVEL1.3.2006@GMAIL.COM" className="flex-1 flex items-center justify-center gap-2 py-2 bg-slate-50 hover:bg-indigo-50 text-indigo-600 text-xs font-semibold rounded-lg border border-slate-100 transition-colors">
+                          <a href="mailto:C.SAKTHIVEL1.3.2006@GMAIL.COM" className="flex-1 flex items-center justify-center gap-2 py-2 bg-slate-50 hover:bg-purple-50 text-purple-600 text-xs font-semibold rounded-lg border border-slate-100 transition-colors">
                             <Mail size={14} /> Email
                           </a>
-                          <a href="tel:+916374052055" className="flex-1 flex items-center justify-center gap-2 py-2 bg-slate-50 hover:bg-emerald-50 text-emerald-600 text-xs font-semibold rounded-lg border border-slate-100 transition-colors">
+                          <a href="tel:+916374052055" className="flex-1 flex items-center justify-center gap-2 py-2 bg-slate-50 hover:bg-amber-50 text-amber-600 text-xs font-semibold rounded-lg border border-slate-100 transition-colors">
                             <Phone size={14} /> Call
                           </a>
                         </div>
@@ -179,10 +179,10 @@ export default function InteractiveTutorial({ isOpen, onClose }: InteractiveTuto
                         <h4 className="font-bold text-slate-800">Godwin Samraj</h4>
                         <p className="text-xs text-slate-500 font-medium mb-3">Lead Developer</p>
                         <div className="flex gap-2">
-                          <a href="mailto:23UCS008@KAMARAJENGG.EDU.IN" className="flex-1 flex items-center justify-center gap-2 py-2 bg-slate-50 hover:bg-indigo-50 text-indigo-600 text-xs font-semibold rounded-lg border border-slate-100 transition-colors">
+                          <a href="mailto:23UCS008@KAMARAJENGG.EDU.IN" className="flex-1 flex items-center justify-center gap-2 py-2 bg-slate-50 hover:bg-purple-50 text-purple-600 text-xs font-semibold rounded-lg border border-slate-100 transition-colors">
                             <Mail size={14} /> Email
                           </a>
-                          <a href="tel:+916379244349" className="flex-1 flex items-center justify-center gap-2 py-2 bg-slate-50 hover:bg-emerald-50 text-emerald-600 text-xs font-semibold rounded-lg border border-slate-100 transition-colors">
+                          <a href="tel:+916379244349" className="flex-1 flex items-center justify-center gap-2 py-2 bg-slate-50 hover:bg-amber-50 text-amber-600 text-xs font-semibold rounded-lg border border-slate-100 transition-colors">
                             <Phone size={14} /> Call
                           </a>
                         </div>
@@ -202,7 +202,7 @@ export default function InteractiveTutorial({ isOpen, onClose }: InteractiveTuto
                 {[1, 2, 3].map((i) => (
                   <div 
                     key={i} 
-                    className={`h-2 rounded-full transition-all duration-300 ${step === i ? 'w-6 bg-indigo-600' : 'w-2 bg-slate-200'}`}
+                    className={`h-2 rounded-full transition-all duration-300 ${step === i ? 'w-6 bg-purple-600' : 'w-2 bg-slate-200'}`}
                   />
                 ))}
               </div>
@@ -221,7 +221,7 @@ export default function InteractiveTutorial({ isOpen, onClose }: InteractiveTuto
                 {step < totalSteps ? (
                   <button 
                     onClick={nextStep}
-                    className="px-6 py-2 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-sm transition-colors flex items-center gap-1"
+                    className="px-6 py-2 text-sm font-bold text-white bg-purple-600 hover:bg-purple-700 rounded-xl shadow-sm transition-colors flex items-center gap-1"
                   >
                     Next <ChevronRight size={16} />
                   </button>

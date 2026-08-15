@@ -1,0 +1,140 @@
+{
+  "version": 3,
+  "pages404": true,
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "priority": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [],
+  "rewrites": {
+    "beforeFiles": [],
+    "afterFiles": [],
+    "fallback": []
+  },
+  "dynamicRoutes": [],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_global-error",
+      "regex": "^/_global\\-error(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_global\\-error(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/analytics/security_analytics",
+      "regex": "^/analytics/security_analytics(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/analytics/security_analytics(?:/)?$"
+    },
+    {
+      "page": "/campus",
+      "regex": "^/campus(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/campus(?:/)?$"
+    },
+    {
+      "page": "/components/analytics/qr",
+      "regex": "^/components/analytics/qr(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/components/analytics/qr(?:/)?$"
+    },
+    {
+      "page": "/components/navbar",
+      "regex": "^/components/navbar(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/components/navbar(?:/)?$"
+    },
+    {
+      "page": "/dashboard",
+      "regex": "^/dashboard(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard(?:/)?$"
+    },
+    {
+      "page": "/dashboard/qr-crud",
+      "regex": "^/dashboard/qr\\-crud(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/qr\\-crud(?:/)?$"
+    },
+    {
+      "page": "/login",
+      "regex": "^/login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/login(?:/)?$"
+    },
+    {
+      "page": "/report-download",
+      "regex": "^/report\\-download(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/report\\-download(?:/)?$"
+    },
+    {
+      "page": "/scan-points",
+      "regex": "^/scan\\-points(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/scan\\-points(?:/)?$"
+    },
+    {
+      "page": "/security-activity",
+      "regex": "^/security\\-activity(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/security\\-activity(?:/)?$"
+    },
+    {
+      "page": "/security-info",
+      "regex": "^/security\\-info(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/security\\-info(?:/)?$"
+    },
+    {
+      "page": "/shifts",
+      "regex": "^/shifts(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/shifts(?:/)?$"
+    },
+    {
+      "page": "/user-crud",
+      "regex": "^/user\\-crud(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/user\\-crud(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "rsc",
+    "varyHeader": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "prefetchHeader": "next-router-prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSuffix": ".prefetch.rsc",
+    "prefetchSegmentHeader": "next-router-segment-prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments",
+    "clientParamParsing": false,
+    "dynamicRSCPrerender": false
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  }
+}

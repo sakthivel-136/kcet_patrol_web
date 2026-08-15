@@ -6,6 +6,7 @@ import { ShieldCheck, Eye, EyeOff, ArrowRight } from 'lucide-react'
 import { sanitize, fullValidate } from '@/app/lib/sanitize'
 import { getApiUrl } from '@/app/utils/apiUrl'
 import { tokenService } from '@/app/services/token.service'
+import { motion } from 'framer-motion'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -64,35 +65,42 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-950 text-white selection:bg-white/30 px-4">
-      
-      {/* Background pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] z-0"></div>
-
-      <div className="relative z-10 w-full max-w-[380px]">
-        {/* Header */}
+    <div className="min-h-screen flex items-center justify-center bg-transparent text-slate-900 px-4">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+        className="relative z-10 w-full max-w-[380px]"
+      >
         <div className="flex flex-col items-center mb-8 space-y-3">
-          <div className="w-12 h-12 rounded-2xl bg-white text-black flex items-center justify-center shadow-[0_0_40px_rgba(255,255,255,0.3)]">
-            <ShieldCheck size={28} strokeWidth={2.5} />
-          </div>
+          <motion.div 
+            whileHover={{ scale: 1.1, rotate: 5 }}
+            className="w-14 h-14 rounded-2xl bg-purple-600 text-white flex items-center justify-center shadow-lg shadow-purple-500/30"
+          >
+            <ShieldCheck size={32} strokeWidth={2.5} />
+          </motion.div>
           <div className="text-center">
-            <h1 className="text-2xl font-bold tracking-tight">Admin Portal</h1>
-            <p className="text-neutral-400 text-sm mt-1">Sign in to manage security rounds</p>
+            <h1 className="text-3xl font-extrabold tracking-tight text-purple-900">Admin Portal</h1>
+            <p className="text-purple-600/80 font-medium text-sm mt-1">Sign in to manage security rounds</p>
           </div>
         </div>
 
         {/* Card */}
-        <div className="bg-neutral-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-2xl">
+        <div className="glass-panel border border-white/60 rounded-3xl p-8 shadow-2xl">
           {success ? (
-            <div className="flex flex-col items-center py-12 space-y-4">
-              <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center animate-bounce">
+            <motion.div 
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="flex flex-col items-center py-12 space-y-4"
+            >
+              <div className="w-16 h-16 rounded-full bg-amber-500/20 text-amber-500 flex items-center justify-center animate-bounce">
                 <ShieldCheck size={32} />
               </div>
               <div className="text-center">
-                <p className="text-white font-medium text-lg">Authentication Successful</p>
-                <p className="text-neutral-400 text-sm mt-1">Preparing your dashboard...</p>
+                <p className="text-purple-900 font-bold text-lg">Authentication Successful</p>
+                <p className="text-purple-600 text-sm mt-1">Preparing your dashboard...</p>
               </div>
-            </div>
+            </motion.div>
           ) : (
             <form onSubmit={handleLogin} className="space-y-5">
               <div className="space-y-4">
@@ -145,18 +153,23 @@ export default function LoginPage() {
               )}
 
               {/* Submit Button */}
-              <button 
-                type="submit" 
-                disabled={loading || !userId || !password}
-                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-white text-black font-semibold hover:bg-neutral-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-              >
-                {loading ? (
-                  <span className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-                ) : (
-                  <>Sign In <ArrowRight size={18} /></>
-                )}
-              </button>
-            </form>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  type="submit"
+                  disabled={loading}
+                  className="w-full flex justify-center items-center py-2.5 px-4 rounded-xl text-sm font-semibold text-white bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-[0_4px_14px_0_rgba(147,51,234,0.39)] hover:shadow-[0_6px_20px_rgba(147,51,234,0.23)]"
+                >
+                  {loading ? (
+                    <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                  ) : (
+                    <>
+                      Sign In
+                      <ArrowRight size={18} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                    </>
+                  )}
+                </motion.button>
+              </form>
           )}
         </div>
 
@@ -164,7 +177,7 @@ export default function LoginPage() {
         <p className="text-center text-xs text-neutral-600 mt-8">
           © {new Date().getFullYear()} KCET Security Rounds Management
         </p>
-      </div>
+      </motion.div>
     </div>
   )
 }

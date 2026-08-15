@@ -34,23 +34,33 @@
 
 @layer base {
   body {
-    @apply antialiased bg-slate-50 text-slate-800 overflow-x-hidden min-h-screen;
-    background-image: radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.08), transparent 25%),
-                      radial-gradient(circle at 85% 30%, rgba(168, 85, 247, 0.08), transparent 25%);
+    @apply antialiased bg-white text-slate-900 overflow-x-hidden min-h-screen;
+    background: 
+      radial-gradient(circle at 10% 20%, rgba(88, 28, 135, 0.15) 0%, transparent 40%),
+      radial-gradient(circle at 90% 80%, rgba(245, 158, 11, 0.15) 0%, transparent 40%),
+      radial-gradient(circle at 50% 50%, rgba(124, 58, 237, 0.1) 0%, transparent 60%);
+    background-size: 200% 200%;
+    animation: royalMesh 15s ease infinite alternate;
   }
+}
+
+@keyframes royalMesh {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 100%; }
 }
 
 @layer utilities {
   .glass-panel {
-    @apply backdrop-blur-xl bg-white/60 border border-white/80 shadow-sm shadow-slate-200/50;
+    @apply backdrop-blur-2xl bg-white/70 border border-white/60 shadow-lg shadow-purple-900/5;
   }
   
   .glass-button {
-    @apply relative overflow-hidden bg-white/80 hover:bg-white border border-white shadow-sm hover:shadow text-slate-800 transition-all backdrop-blur-md;
+    @apply relative overflow-hidden bg-white/80 hover:bg-white border border-white shadow hover:shadow-md text-purple-900 transition-all backdrop-blur-md;
   }
 
   .text-gradient {
-    @apply text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600;
+    @apply text-transparent bg-clip-text bg-gradient-to-r from-purple-800 to-amber-600;
   }
   
   .custom-scrollbar::-webkit-scrollbar {

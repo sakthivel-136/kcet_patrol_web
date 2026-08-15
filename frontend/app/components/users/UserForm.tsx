@@ -147,7 +147,7 @@ export default function UserForm({
           <div className="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-white/50">
             <div>
               <h3 className="text-xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
-                {user ? <UserCog className="w-6 h-6 text-indigo-500" /> : <UserPlus className="w-6 h-6 text-indigo-500" />}
+                {user ? <UserCog className="w-6 h-6 text-purple-500" /> : <UserPlus className="w-6 h-6 text-purple-500" />}
                 {user ? 'Edit Security User' : 'Add Security User'}
               </h3>
               <p className="text-xs font-medium text-slate-500 mt-1">
@@ -169,7 +169,7 @@ export default function UserForm({
                 name="security_id"
                 value={formData.security_id}
                 onChange={handleChange}
-                className="w-full bg-slate-50 border border-slate-200 text-slate-800 font-medium rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 hover:bg-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-slate-50 border border-slate-200 text-slate-800 font-medium rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 hover:bg-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 placeholder="e.g. 0001"
                 required
                 disabled={!!user}
@@ -182,7 +182,7 @@ export default function UserForm({
                 name="security_name"
                 value={formData.security_name}
                 onChange={handleChange}
-                className="w-full bg-slate-50 border border-slate-200 text-slate-800 font-medium rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 hover:bg-white transition-all"
+                className="w-full bg-slate-50 border border-slate-200 text-slate-800 font-medium rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 hover:bg-white transition-all"
                 placeholder="e.g. John Doe"
                 required
               />
@@ -195,7 +195,7 @@ export default function UserForm({
                 name="security_password"
                 value={formData.security_password ?? ''}
                 onChange={handleChange}
-                className="w-full bg-slate-50 border border-slate-200 text-slate-800 font-medium rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 hover:bg-white transition-all"
+                className="w-full bg-slate-50 border border-slate-200 text-slate-800 font-medium rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 hover:bg-white transition-all"
                 placeholder={user ? 'Leave blank to keep current' : 'Enter strong password'}
                 required={!user}
               />
@@ -208,14 +208,14 @@ export default function UserForm({
                   name="role"
                   value={formData.role}
                   onChange={handleChange}
-                  className="w-full appearance-none bg-slate-50 border border-slate-200 text-slate-800 font-medium rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 hover:bg-white transition-all cursor-pointer shadow-sm"
+                  className="w-full appearance-none bg-slate-50 border border-slate-200 text-slate-800 font-medium rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 hover:bg-white transition-all cursor-pointer shadow-sm"
                   required
                 >
                   <option value="Guard">Guard</option>
                   <option value="Supervisor">Supervisor</option>
                   <option value="ADMIN">Administrator</option>
                 </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400 group-hover:text-indigo-500 transition-colors">
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400 group-hover:text-purple-500 transition-colors">
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                   </svg>
@@ -235,7 +235,7 @@ export default function UserForm({
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-6 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-sm shadow-sm hover:bg-indigo-700 hover:shadow-md transition-all flex items-center gap-2 disabled:opacity-70"
+                className="px-6 py-2.5 rounded-xl bg-purple-600 text-white font-bold text-sm shadow-sm hover:bg-purple-700 hover:shadow-md transition-all flex items-center gap-2 disabled:opacity-70"
               >
                 {isSubmitting ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

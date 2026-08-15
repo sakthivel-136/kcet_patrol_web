@@ -110,7 +110,7 @@ export default function ScanPointsPage() {
             setEditingScanPoint(null)
             setIsFormOpen(true)
           }}
-          className="group relative overflow-hidden bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-md hover:shadow-lg flex items-center gap-2"
+          className="group relative overflow-hidden bg-purple-600 hover:bg-purple-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-md hover:shadow-lg flex items-center gap-2"
         >
           <span>Add Scan Point</span>
           <svg className="w-4 h-4 transition-transform group-hover:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">

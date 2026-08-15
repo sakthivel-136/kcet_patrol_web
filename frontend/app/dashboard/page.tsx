@@ -2,11 +2,13 @@
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import { motion } from 'framer-motion'
 import {
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend,
   BarChart, Bar, XAxis, YAxis, CartesianGrid, LineChart, Line, Area, AreaChart,
 } from 'recharts'
 import { getPatrolReport, PatrolReportItem } from '../api/report'
+import { getShifts } from '../api/shifts.api'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import { useAuthGuard } from '@/app/services/auth.guard'
@@ -22,6 +24,11 @@ type DashboardStats = {
   total: number; completed: number; missed: number; pending: number; rate: number
   lastScan: string | null
   roundSummary: { round: string; completed: number; missed: number }[]
+  shiftLeaderboards: {
+    shiftName: string;
+    totalExpectedScans: number;
+    guards: { name: string; scanned: number; missed: number; total: number }[];
+  }[]
   guardLeaderboard: { name: string; scanned: number; missed: number; total: number }[]
   coverageByPoint: { name: string; done: number; total: number }[]
   recentActivity: PatrolReportItem[]
@@ -288,7 +295,10 @@ function StatCard({ label, value, sub, color, bg, icon }: {
   color: string; bg: string; icon?: string
 }) {
   return (
-    <div className="glass-panel rounded-3xl p-5 relative overflow-hidden group hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+    <motion.div 
+      whileHover={{ y: -5, scale: 1.02 }}
+      className="glass-panel rounded-3xl p-5 relative overflow-hidden group hover:shadow-lg transition-all duration-300"
+    >
       <div className={`absolute left-0 top-0 h-full w-1.5 ${bg}`} />
       <div className="pl-3 relative z-10">
         <p className="text-xs font-semibold uppercase tracking-widest text-slate-500">{label}</p>
@@ -296,7 +306,7 @@ function StatCard({ label, value, sub, color, bg, icon }: {
         {sub && <p className="mt-0.5 text-xs font-medium text-slate-400">{sub}</p>}
       </div>
       {icon && <div className="absolute right-[-10%] top-[-10%] opacity-[0.03] text-8xl group-hover:scale-110 transition-transform duration-500 pointer-events-none select-none">{icon}</div>}
-    </div>
+    </motion.div>
   )
 }
 
@@ -305,12 +315,12 @@ function StatCard({ label, value, sub, color, bg, icon }: {
 ================================================================ */
 function CoverageBar({ name, done, total }: { name: string; done: number; total: number }) {
   const pct = total ? Math.round((done / total) * 100) : 0
-  const color = pct === 100 ? 'bg-emerald-500' : pct >= 50 ? 'bg-amber-400' : 'bg-rose-500'
+  const color = pct === 100 ? 'bg-amber-500' : pct >= 50 ? 'bg-amber-400' : 'bg-rose-500'
   return (
     <div className="mb-3">
       <div className="flex items-center justify-between mb-1">
         <span className="text-xs font-medium text-slate-600 truncate max-w-[180px]">{name}</span>
-        <span className={`text-xs font-bold ${pct === 100 ? 'text-emerald-600' : pct >= 50 ? 'text-amber-600' : 'text-rose-600'}`}>{pct}%</span>
+        <span className={`text-xs font-bold ${pct === 100 ? 'text-amber-600' : pct >= 50 ? 'text-amber-600' : 'text-rose-600'}`}>{pct}%</span>
       </div>
       <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
         <div className={`h-full rounded-full ${color} transition-all duration-700`} style={{ width: `${pct}%` }} />
@@ -327,7 +337,7 @@ function LeaderRow({ rank, name, scanned, missed, total }: {
 }) {
   const pct = total ? Math.round((scanned / total) * 100) : 0
   const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`
-  const color = pct >= 90 ? 'text-emerald-600 bg-emerald-50' : pct >= 70 ? 'text-amber-600 bg-amber-50' : 'text-rose-600 bg-rose-50'
+  const color = pct >= 90 ? 'text-amber-600 bg-amber-50' : pct >= 70 ? 'text-amber-600 bg-amber-50' : 'text-rose-600 bg-rose-50'
   return (
     <div className="flex items-center gap-3 py-2.5 border-b border-slate-50 last:border-0">
       <div className="w-8 text-center text-lg">{medal}</div>
@@ -338,7 +348,7 @@ function LeaderRow({ rank, name, scanned, missed, total }: {
         </div>
         <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
           <div
-            className={`h-full rounded-full transition-all duration-700 ${pct >= 90 ? 'bg-emerald-500' : pct >= 70 ? 'bg-amber-400' : 'bg-rose-500'}`}
+            className={`h-full rounded-full transition-all duration-700 ${pct >= 90 ? 'bg-amber-500' : pct >= 70 ? 'bg-amber-400' : 'bg-rose-500'}`}
             style={{ width: `${pct}%` }}
           />
         </div>
@@ -366,6 +376,8 @@ export default function DashboardPage() {
   const [loading, setLoading]                 = useState(false)
   const [lastUpdated, setLastUpdated]         = useState('')
 
+  const [shifts, setShifts]                   = useState<any[]>([])
+
   /* auth check */
   useEffect(() => {
     if (authorized) {
@@ -374,19 +386,26 @@ export default function DashboardPage() {
     }
   }, [authorized])
 
-  const fetchReport = useCallback(() => {
+  const fetchReportAndShifts = useCallback(() => {
     if (!authorized || !selectedDate) return
     setLoading(true)
-    getPatrolReport(FIXED_CAMPUS, selectedDate)
-      .then(data => { setReport(data); setLastUpdated(new Date().toLocaleTimeString()) })
-      .catch(() => setReport([]))
+    Promise.all([
+      getPatrolReport(FIXED_CAMPUS, selectedDate),
+      getShifts()
+    ])
+      .then(([reportData, shiftsData]) => {
+        setReport(reportData)
+        setShifts(shiftsData)
+        setLastUpdated(new Date().toLocaleTimeString())
+      })
+      .catch(() => { setReport([]); setShifts([]) })
       .finally(() => setLoading(false))
   }, [selectedDate, authorized])
 
   /* auto-fetch when campus/date changes */
   useEffect(() => {
-    fetchReport()
-  }, [fetchReport])
+    fetchReportAndShifts()
+  }, [fetchReportAndShifts])
 
   /* ================================================================
      COMPUTED STATS (time-aware)
@@ -394,7 +413,7 @@ export default function DashboardPage() {
   const stats = useMemo(() => {
     const empty = {
       total: 0, completed: 0, missed: 0, pending: 0, rate: 0, lastScan: null as string | null,
-      pie: [], roundSummary: [], guardLeaderboard: [], coverageByPoint: [],
+      pie: [], roundSummary: [], shiftLeaderboards: [], guardLeaderboard: [], coverageByPoint: [],
       hourlyActivity: [], recentActivity: [], isPartialDay: false, nothingScannedToday: false
     }
     if (!report.length) return empty
@@ -464,27 +483,68 @@ export default function DashboardPage() {
       }
     })
 
-    /* ── guard leaderboard with smart missed-scan assignment ── */
-    const guardMap: Record<string, { scanned: number; missed: number }> = {}
-    roundNums.forEach(rnd => {
-      const roundScans = effective.filter(r => r.round === rnd)
-      const guardsInRound = [...new Set(roundScans.filter(r => r.status === 'SUCCESS' && r.guard_name).map(r => r.guard_name as string))]
-      const assignedGuard = guardsInRound.length > 0 ? guardsInRound[0] : null
+    /* ── shift leaderboards ── */
+    const isTimeInShift = (time: string, start: string, end: string) => {
+      if (!time || !start || !end) return false;
+      const t = time.substring(0, 5);
+      const s = start.substring(0, 5);
+      const e = end.substring(0, 5);
+      if (s <= e) return t >= s && t < e;
+      return t >= s || t < e;
+    };
 
-      roundScans.forEach(r => {
-        if (r.status === 'SUCCESS') {
-          const g = r.guard_name || 'Unknown'
-          if (!guardMap[g]) guardMap[g] = { scanned: 0, missed: 0 }
-          guardMap[g].scanned++
-        } else if (!nothingScannedToday) {
-          const g = assignedGuard || 'Unknown'
-          if (!guardMap[g]) guardMap[g] = { scanned: 0, missed: 0 }
-          guardMap[g].missed++
+    const shiftLeaderboards = shifts.map(shift => {
+      // Find all report items (PENDING, MISSED, SUCCESS) for this shift
+      // using ROUND_TIMES mapping
+      const shiftItems = report.filter(r => {
+        const roundTime = ROUND_TIMES[r.round - 1];
+        return isTimeInShift(roundTime, shift.start_time, shift.end_time);
+      });
+
+      const totalExpectedScans = shiftItems.length;
+
+      // Calculate guard performance for this shift using only effective scans
+      const guardMap: Record<string, { scanned: number; missed: number }> = {};
+      shiftItems.forEach(r => {
+        // Only count effective scans for the leaderboard stats
+        const isEffective = isToday ? (r.round <= dueRoundsCount || r.status === 'SUCCESS') : true;
+        if (!isEffective) return;
+
+        if (r.status === 'SUCCESS' || (!nothingScannedToday && r.status === 'MISSED')) {
+          const guardsList = (r.guard_name || 'Unknown').split(',').map(name => name.trim()).filter(Boolean);
+          guardsList.forEach(g => {
+            if (!guardMap[g]) guardMap[g] = { scanned: 0, missed: 0 };
+            if (r.status === 'SUCCESS') guardMap[g].scanned++;
+            else guardMap[g].missed++;
+          });
         }
-      })
-    })
+      });
 
-    const guardLeaderboard = Object.entries(guardMap)
+      const guards = Object.entries(guardMap)
+        .filter(([n, d]) => n !== 'Unknown' || d.scanned > 0)
+        .map(([name, d]) => ({ name, ...d, total: d.scanned + d.missed }))
+        .sort((a, b) => b.scanned / (b.total || 1) - a.scanned / (a.total || 1));
+
+      return {
+        shiftName: shift.shift_name,
+        totalExpectedScans,
+        guards
+      };
+    });
+
+    /* ── overall guard leaderboard (for charts) ── */
+    const overallGuardMap: Record<string, { scanned: number; missed: number }> = {}
+    effective.forEach(r => {
+      if (r.status === 'SUCCESS' || (!nothingScannedToday && r.status === 'MISSED')) {
+        const guardsList = (r.guard_name || 'Unknown').split(',').map(name => name.trim()).filter(Boolean);
+        guardsList.forEach(g => {
+          if (!overallGuardMap[g]) overallGuardMap[g] = { scanned: 0, missed: 0 };
+          if (r.status === 'SUCCESS') overallGuardMap[g].scanned++;
+          else overallGuardMap[g].missed++;
+        });
+      }
+    })
+    const guardLeaderboard = Object.entries(overallGuardMap)
       .filter(([n, d]) => n !== 'Unknown' || d.scanned > 0)
       .map(([name, d]) => ({ name, ...d, total: d.scanned + d.missed }))
       .sort((a, b) => b.scanned / (b.total || 1) - a.scanned / (a.total || 1))
@@ -528,7 +588,7 @@ export default function DashboardPage() {
 
     return {
       total, completed, missed, pending, rate, lastScan, pie, roundSummary,
-      guardLeaderboard, coverageByPoint, hourlyActivity, recentActivity,
+      shiftLeaderboards, guardLeaderboard, coverageByPoint, hourlyActivity, recentActivity,
       isPartialDay, nothingScannedToday,
     }
   }, [report, selectedDate, today])
@@ -541,27 +601,37 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen relative font-sans text-slate-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10"
+      >
 
         {/* ── HEADER ── */}
         <div className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-slate-900">Analytics Dashboard</h1>
             <p className="mt-1 text-slate-500 text-sm">
-              <span className="font-medium text-indigo-600">{selectedCampusName}</span>
+              <span className="font-medium text-purple-600">{selectedCampusName}</span>
               {' · '}
               Patrol performance overview
-              {lastUpdated && <span className="ml-2 text-emerald-600 font-medium">· Updated {lastUpdated}</span>}
+              {lastUpdated && <span className="ml-2 text-amber-600 font-medium">· Updated {lastUpdated}</span>}
             </p>
           </div>
           <div className="flex items-center gap-2 text-sm text-slate-500">
-            <div className="w-2 h-2 rounded-full bg-emerald-500" />
+            <div className="w-2 h-2 rounded-full bg-amber-500" />
             {adminName}
           </div>
         </div>
 
         {/* ── CONTROLS BAR ── */}
-        <div className="glass-panel rounded-3xl p-5 mb-6">
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="glass-panel rounded-3xl p-5 mb-6"
+        >
           <div className="flex flex-wrap items-end gap-4">
 
 
@@ -571,51 +641,57 @@ export default function DashboardPage() {
               <input
                 type="date" value={selectedDate}
                 onChange={e => setSelectedDate(e.target.value)}
-                className="w-full mt-2 pl-3 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full mt-2 pl-3 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
 
-            <button
-              onClick={fetchReport} disabled={loading}
-              className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-semibold px-5 py-2.5 rounded-lg flex items-center gap-2 text-sm transition-colors"
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={fetchReportAndShifts} disabled={loading}
+              className="bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-semibold px-5 py-2.5 rounded-lg flex items-center gap-2 text-sm transition-colors"
             >
               {loading
                 ? <><span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />Loading…</>
                 : '📊 Load'}
-            </button>
+            </motion.button>
 
 
 
             {/* Export Analytics PDF */}
             {report.length > 0 && (
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 id="pdf-export-btn"
                 onClick={() => exportDashboardPDF(stats, FIXED_CAMPUS, selectedCampusName, selectedDate, adminName)}
                 className="border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 text-sm transition-colors"
               >
                 📊 Export PDF
-              </button>
+              </motion.button>
             )}
 
             {/* Go to full report */}
             {report.length > 0 && (
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => router.push('/report-download')}
-                className="border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 text-sm transition-colors"
+                className="border border-purple-200 bg-purple-50 hover:bg-purple-100 text-purple-700 font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 text-sm transition-colors"
               >
                 📄 Full Report
-              </button>
+              </motion.button>
             )}
           </div>
-        </div>
+        </motion.div>
 
         {/* ── DASHBOARD CONTENT (captured for PDF) ── */}
         <div ref={dashboardContentRef}>
 
         {/* ── STAT CARDS ── */}
         <div className="grid grid-cols-2 xl:grid-cols-5 gap-4 mb-6">
-          <StatCard label="Effective Scans"  value={stats.total}           sub="Rounds due so far"  color="text-indigo-600"  bg="bg-indigo-500"  icon="📋" />
-          <StatCard label="Completed"        value={stats.completed}       sub={`${stats.rate}% rate`} color="text-emerald-600" bg="bg-emerald-500" icon="✅" />
+          <StatCard label="Effective Scans"  value={stats.total}           sub="Rounds due so far"  color="text-purple-600"  bg="bg-purple-500"  icon="📋" />
+          <StatCard label="Completed"        value={stats.completed}       sub={`${stats.rate}% rate`} color="text-amber-600" bg="bg-amber-500" icon="✅" />
           <StatCard label="Missed"           value={stats.missed}          sub="Truly skipped"      color="text-rose-600"    bg="bg-rose-500"    icon="⚠️" />
           <StatCard label="Not Due Yet"      value={stats.pending ?? 0}    sub="Future rounds"      color="text-slate-500"   bg="bg-slate-400"   icon="🕐" />
           <StatCard
@@ -636,14 +712,14 @@ export default function DashboardPage() {
                   {stats.completed} of {stats.total + (stats.pending ?? 0)} total expected scans completed
                 </p>
               </div>
-              <span className={`text-2xl font-extrabold ${stats.rate >= 90 ? 'text-emerald-600' : stats.rate >= 60 ? 'text-amber-500' : 'text-rose-600'}`}>
+              <span className={`text-2xl font-extrabold ${stats.rate >= 90 ? 'text-amber-600' : stats.rate >= 60 ? 'text-amber-500' : 'text-rose-600'}`}>
                 {stats.rate}%
               </span>
             </div>
             <div className="h-4 bg-slate-100 rounded-full overflow-hidden flex">
               {/* completed */}
               <div
-                className="h-full bg-indigo-500 transition-all duration-700 flex items-center justify-center"
+                className="h-full bg-purple-500 transition-all duration-700 flex items-center justify-center"
                 style={{ width: `${(stats.completed / (report.length || 1)) * 100}%` }}
               />
               {/* missed */}
@@ -658,7 +734,7 @@ export default function DashboardPage() {
               />
             </div>
             <div className="flex items-center gap-5 mt-2 text-xs text-slate-400">
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-indigo-500 inline-block" />Completed</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-purple-500 inline-block" />Completed</span>
               <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-rose-400 inline-block" />Missed</span>
               <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-slate-200 inline-block" />Not due yet</span>
             </div>
@@ -676,18 +752,18 @@ export default function DashboardPage() {
           </div>
         )}
         {stats.isPartialDay && (
-          <div className="mb-6 flex items-center gap-4 rounded-2xl border border-indigo-200 bg-indigo-50/80 backdrop-blur-md px-6 py-5 shadow-sm transition-all hover:shadow-md">
+          <div className="mb-6 flex items-center gap-4 rounded-2xl border border-purple-200 bg-purple-50/80 backdrop-blur-md px-6 py-5 shadow-sm transition-all hover:shadow-md">
             <div className="relative flex h-4 w-4 shrink-0">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-4 w-4 bg-indigo-500 border-2 border-indigo-200"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-4 w-4 bg-purple-500 border-2 border-purple-200"></span>
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <p className="font-bold text-indigo-900 text-base tracking-tight">Active Patrol in Progress</p>
-                <span className="px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 text-xs font-bold uppercase tracking-wider">Live System Health: Online</span>
+                <p className="font-bold text-purple-900 text-base tracking-tight">Active Patrol in Progress</p>
+                <span className="px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 text-xs font-bold uppercase tracking-wider">Live System Health: Online</span>
               </div>
-              <p className="text-sm text-indigo-700/80 mt-0.5 font-medium">
-                Live monitoring rounds due so far. <strong className="text-indigo-900">{stats.pending ?? 0}</strong> future rounds excluded from missed count.
+              <p className="text-sm text-purple-700/80 mt-0.5 font-medium">
+                Live monitoring rounds due so far. <strong className="text-purple-900">{stats.pending ?? 0}</strong> future rounds excluded from missed count.
               </p>
             </div>
           </div>
@@ -696,13 +772,14 @@ export default function DashboardPage() {
         {/* ── CHARTS ── */}
         {report.length > 0 && !stats.nothingScannedToday ? (
           <>
-            {/* ROW 1: Pie + Guard Leaderboard */}
+            {/* ROW 1: Pie + Round-by-Round bar */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-
               {/* Pie */}
-              <div className="glass-panel rounded-3xl p-6">
-                <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-1">Completion Overview</h2>
-                <p className="text-xs text-slate-400 mb-4">Completed · Missed · Not Due</p>
+              <div className="glass-panel rounded-3xl p-6 flex flex-col justify-between">
+                <div>
+                  <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-1">Completion Overview</h2>
+                  <p className="text-xs text-slate-400 mb-4">Completed · Missed · Not Due</p>
+                </div>
                 <ResponsiveContainer width="100%" height={240}>
                   <PieChart>
                     <Pie data={stats.pie} cx="50%" cy="50%" innerRadius={65} outerRadius={105} paddingAngle={4} dataKey="value">
@@ -713,25 +790,6 @@ export default function DashboardPage() {
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-
-              {/* Guard Leaderboard */}
-              <div className="glass-panel rounded-3xl p-6">
-                <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-1">🏆 Guard Leaderboard</h2>
-                <p className="text-xs text-slate-400 mb-4">Ranked by completion rate</p>
-                <div className="overflow-y-auto max-h-64 pr-1">
-                  {stats.guardLeaderboard.length > 0
-                    ? stats.guardLeaderboard.map((g, i) => (
-                      <LeaderRow key={g.name} rank={i + 1} name={g.name}
-                        scanned={g.scanned} missed={g.missed} total={g.total} />
-                    ))
-                    : <p className="text-sm text-slate-400 text-center mt-10">No guard data</p>
-                  }
-                </div>
-              </div>
-            </div>
-
-            {/* ROW 2: Round-by-Round bar + Hourly activity */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
 
               {/* Round bar */}
               <div className="glass-panel rounded-3xl p-6">
@@ -744,11 +802,47 @@ export default function DashboardPage() {
                     <YAxis tick={{ fill: '#94a3b8', fontSize: 11 }} axisLine={false} tickLine={false} />
                     <Tooltip contentStyle={{ borderRadius: 10, fontSize: 12, border: 'none', boxShadow: '0 4px 16px rgba(0,0,0,.1)' }} />
                     <Legend iconType="circle" wrapperStyle={{ fontSize: 12 }} />
-                    <Bar dataKey="completed" fill="#6366f1" radius={[4, 4, 0, 0]} name="Completed" />
+                    <Bar dataKey="completed" fill="#06b6d4" radius={[4, 4, 0, 0]} name="Completed" />
                     <Bar dataKey="missed"    fill="#f43f5e" radius={[4, 4, 0, 0]} name="Missed" />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
+            </div>
+
+            {/* ROW 1.5: Guard Leaderboard by Shift */}
+            {stats.shiftLeaderboards.length > 0 && (
+              <div className="mb-6">
+                <div className="flex items-center gap-3 mb-4 px-2">
+                  <h2 className="text-xl font-bold text-slate-800 tracking-tight">🏆 Guard Leaderboard by Shift</h2>
+                  <span className="text-sm text-slate-500 font-medium bg-slate-100 px-3 py-1 rounded-full">Scans Expected & Performance</span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {stats.shiftLeaderboards.map(shift => (
+                    <div key={shift.shiftName} className="glass-panel rounded-3xl p-6 flex flex-col h-[320px]">
+                      <div className="flex justify-between items-start mb-1">
+                        <h2 className="text-sm font-bold text-purple-700 uppercase tracking-widest">{shift.shiftName}</h2>
+                        <span className="text-xs font-bold bg-purple-50 text-purple-600 px-2.5 py-1 rounded-lg">
+                          {shift.totalExpectedScans} Scans
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-400 mb-4">Ranked by completion rate</p>
+                      <div className="overflow-y-auto flex-1 pr-1">
+                        {shift.guards.length > 0
+                          ? shift.guards.map((g, i) => (
+                            <LeaderRow key={g.name} rank={i + 1} name={g.name}
+                              scanned={g.scanned} missed={g.missed} total={g.total} />
+                          ))
+                          : <div className="h-full flex items-center justify-center"><p className="text-sm text-slate-400">No guard data</p></div>
+                        }
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* ROW 2: Hourly activity + Scan Point Coverage */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
 
               {/* Hourly Activity */}
               <div className="glass-panel rounded-3xl p-6">
@@ -826,7 +920,7 @@ export default function DashboardPage() {
                   <div className="space-y-2">
                     {stats.recentActivity.map((r, i) => (
                       <div key={i} className="flex items-center gap-3 py-2 border-b border-slate-50 last:border-0">
-                        <div className="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0" />
+                        <div className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0" />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between">
                             <span className="text-sm font-medium text-slate-700 truncate">{r.qr_name}</span>
@@ -854,7 +948,7 @@ export default function DashboardPage() {
                       <thead>
                         <tr className="border-b border-slate-100">
                           <th className="text-left py-2 px-2 text-xs font-semibold text-slate-500 uppercase">Point</th>
-                          <th className="text-center py-2 px-2 text-xs font-semibold text-emerald-600 uppercase">Done</th>
+                          <th className="text-center py-2 px-2 text-xs font-semibold text-amber-600 uppercase">Done</th>
                           <th className="text-center py-2 px-2 text-xs font-semibold text-rose-600 uppercase">Missed</th>
                           <th className="text-center py-2 px-2 text-xs font-semibold text-slate-400 uppercase">Rate</th>
                         </tr>
@@ -868,13 +962,13 @@ export default function DashboardPage() {
                               <tr key={i} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
                                 <td className="py-2 px-2 font-medium text-slate-700 text-xs">{p.name}</td>
                                 <td className="py-2 px-2 text-center">
-                                  <span className="text-xs font-bold text-emerald-600">✓ {p.done}</span>
+                                  <span className="text-xs font-bold text-amber-600">✓ {p.done}</span>
                                 </td>
                                 <td className="py-2 px-2 text-center">
                                   <span className="text-xs font-bold text-rose-600">✗ {p.total - p.done}</span>
                                 </td>
                                 <td className="py-2 px-2 text-center">
-                                  <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${pct >= 80 ? 'bg-emerald-50 text-emerald-600' : pct >= 50 ? 'bg-amber-50 text-amber-600' : 'bg-rose-50 text-rose-600'}`}>
+                                  <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${pct >= 80 ? 'bg-amber-50 text-amber-600' : pct >= 50 ? 'bg-amber-50 text-amber-600' : 'bg-rose-50 text-rose-600'}`}>
                                     {pct}%
                                   </span>
                                 </td>
@@ -886,7 +980,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
               ) : stats.completed > 0 ? (
-                <div className="glass-panel rounded-3xl p-6 flex flex-col items-center justify-center gap-3 text-emerald-600">
+                <div className="glass-panel rounded-3xl p-6 flex flex-col items-center justify-center gap-3 text-amber-600">
                   <span className="text-5xl">🎉</span>
                   <p className="font-bold text-lg">All checkpoints covered!</p>
                   <p className="text-sm text-slate-400">Every scan point has 100% coverage</p>
@@ -903,7 +997,7 @@ export default function DashboardPage() {
         ) : loading ? (
           <div className="glass-panel rounded-3xl min-h-[300px] flex items-center justify-center">
             <div className="flex flex-col items-center gap-3 text-slate-400">
-              <div className="h-12 w-12 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent" />
+              <div className="h-12 w-12 animate-spin rounded-full border-4 border-purple-500 border-t-transparent" />
               <p className="text-sm">Loading report data…</p>
             </div>
           </div>
@@ -912,7 +1006,7 @@ export default function DashboardPage() {
         </div>{/* end dashboardContentRef */}
 
         <p className="mt-8 text-center text-xs text-slate-400">© {new Date().getFullYear()} KCET Security Rounds — Dashboard</p>
-      </div>
+      </motion.div>
     </div>
   )
 }

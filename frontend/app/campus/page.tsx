@@ -14,7 +14,7 @@ export default function CampusPage() {
   }
 
   return (
-    <div className="min-h-screen relative font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-900">
+    <div className="min-h-screen relative font-sans text-slate-900 selection:bg-purple-100 selection:text-purple-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
         {/* HEADER SECTION */}
         <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">

@@ -1,0 +1,965 @@
+(globalThis.TURBOPACK || (globalThis.TURBOPACK = [])).push([typeof document === "object" ? document.currentScript : undefined,
+"[project]/app/utils/apiUrl.ts [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "getApiUrl",
+    ()=>getApiUrl
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = /*#__PURE__*/ __turbopack_context__.i("[project]/node_modules/next/dist/build/polyfills/process.js [app-client] (ecmascript)");
+const getApiUrl = ()=>{
+    const envUrl = ("TURBOPACK compile-time value", "http://127.0.0.1:8000");
+    if ("TURBOPACK compile-time truthy", 1) {
+        return envUrl;
+    }
+    //TURBOPACK unreachable
+    ;
+};
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/app/api/report.ts [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "getPatrolReport",
+    ()=>getPatrolReport,
+    "getPatrolReportPDF",
+    ()=>getPatrolReportPDF
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/axios/lib/axios.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$utils$2f$apiUrl$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/utils/apiUrl.ts [app-client] (ecmascript)");
+;
+;
+/* =====================================================
+   API CONFIG
+===================================================== */ const BASE_URL = (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$utils$2f$apiUrl$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])();
+const api = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].create({
+    baseURL: BASE_URL,
+    timeout: 15000
+});
+// Attach JWT on every request
+api.interceptors.request.use((config)=>{
+    if ("TURBOPACK compile-time truthy", 1) {
+        const token = localStorage.getItem("access_token");
+        if (token) config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+/* =====================================================
+   CORE FETCH FUNCTION
+===================================================== */ async function fetchPatrolReportData(campusCode, reportDate, endDate) {
+    try {
+        const response = await api.get("/report/download", {
+            params: {
+                campus_code: campusCode,
+                report_date: reportDate,
+                ...endDate ? {
+                    end_date: endDate
+                } : {}
+            }
+        });
+        const result = response.data;
+        if (Array.isArray(result)) {
+            return result;
+        }
+        if (result?.data && Array.isArray(result.data)) {
+            return result.data;
+        }
+        console.error("Unexpected patrol report response:", result);
+        return [];
+    } catch (err) {
+        const error = err;
+        console.error("Error fetching patrol report full details:", {
+            message: error.message,
+            status: error.response?.status,
+            data: error.response?.data,
+            url: error.config?.url
+        });
+        throw new Error(error.response?.data?.message || "Unable to fetch patrol report");
+    }
+}
+async function getPatrolReport(campusCode, reportDate, endDate) {
+    return fetchPatrolReportData(campusCode, reportDate, endDate);
+}
+async function getPatrolReportPDF(campusCode, reportDate, endDate) {
+    const items = await fetchPatrolReportData(campusCode, reportDate, endDate);
+    return {
+        campus_code: campusCode,
+        report_date: reportDate,
+        items
+    };
+}
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/app/api/axiosClient.js [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>__TURBOPACK__default__export__
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/axios/lib/axios.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$utils$2f$apiUrl$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/utils/apiUrl.ts [app-client] (ecmascript)");
+;
+;
+/* ================= CONFIG ================= */ const BASE_URL = (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$utils$2f$apiUrl$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])();
+/* ================= CLIENT ================= */ const axiosClient = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].create({
+    baseURL: BASE_URL,
+    timeout: 15000,
+    headers: {
+        "Content-Type": "application/json"
+    }
+});
+/* ================= REQUEST INTERCEPTOR ================= */ axiosClient.interceptors.request.use((config)=>{
+    const token = localStorage.getItem("access_token");
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+}, (error)=>Promise.reject(error));
+/* ================= RESPONSE INTERCEPTOR ================= */ axiosClient.interceptors.response.use((response)=>response, (error)=>{
+    if (error.response?.status === 401) {
+        console.warn("Unauthorized - redirecting to login");
+        localStorage.removeItem("access_token");
+        if ("TURBOPACK compile-time truthy", 1) {
+            window.location.href = "/login";
+        }
+    }
+    return Promise.reject(error);
+});
+const __TURBOPACK__default__export__ = axiosClient;
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/app/api/shifts.api.ts [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "createShift",
+    ()=>createShift,
+    "deleteShift",
+    ()=>deleteShift,
+    "getShifts",
+    ()=>getShifts,
+    "updateShift",
+    ()=>updateShift
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$api$2f$axiosClient$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/api/axiosClient.js [app-client] (ecmascript)");
+;
+const getShifts = async ()=>{
+    const response = await __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$api$2f$axiosClient$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].get('/shifts');
+    return response.data;
+};
+const createShift = async (data)=>{
+    const response = await __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$api$2f$axiosClient$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].post('/shifts', data);
+    return response.data;
+};
+const updateShift = async (id, data)=>{
+    const response = await __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$api$2f$axiosClient$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].put(`/shifts/${id}`, data);
+    return response.data;
+};
+const deleteShift = async (id)=>{
+    await __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$api$2f$axiosClient$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].delete(`/shifts/${id}`);
+};
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/app/services/token.service.ts [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+// app/services/token.service.ts
+__turbopack_context__.s([
+    "clearAuth",
+    ()=>clearAuth,
+    "getTokenFromCookie",
+    ()=>getTokenFromCookie,
+    "getUser",
+    ()=>getUser,
+    "isAuthenticated",
+    ()=>isAuthenticated,
+    "setUser",
+    ()=>setUser,
+    "tokenService",
+    ()=>tokenService
+]);
+const TOKEN_KEY = "access_token";
+const tokenService = {
+    get () {
+        if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
+        ;
+        return localStorage.getItem(TOKEN_KEY);
+    },
+    set (token) {
+        if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
+        ;
+        localStorage.setItem(TOKEN_KEY, token);
+        // 🔥 IMPORTANT: middleware can read cookies, not localStorage
+        // Using the secure check from your original code for best practice
+        const isSecure = window.location.protocol === "https:";
+        document.cookie = `${TOKEN_KEY}=${token}; path=/; Max-Age=${60 * 60 * 24 * 7}; SameSite=Lax; ${isSecure ? "Secure;" : ""}`;
+    },
+    remove () {
+        if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
+        ;
+        localStorage.removeItem(TOKEN_KEY);
+        localStorage.removeItem("role");
+        localStorage.removeItem("name");
+        localStorage.removeItem("adminName");
+        // Clear cookie
+        document.cookie = `${TOKEN_KEY}=; path=/; Max-Age=0; SameSite=Lax;`;
+    }
+};
+const setUser = (user)=>{
+    if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
+    ;
+    localStorage.setItem("role", user.role);
+    localStorage.setItem("adminName", user.username);
+    localStorage.setItem("name", user.username);
+};
+const getUser = ()=>{
+    if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
+    ;
+    const role = localStorage.getItem("role");
+    const adminName = localStorage.getItem("adminName") || localStorage.getItem("name");
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (!token || !role || !adminName) return null;
+    return {
+        user_id: "",
+        username: adminName,
+        role: role
+    };
+};
+const isAuthenticated = ()=>{
+    return !!tokenService.get() && !!getUser();
+};
+const getTokenFromCookie = (cookieString)=>{
+    if (!cookieString) return null;
+    const match = cookieString.match(new RegExp(`${TOKEN_KEY}=([^;]+)`));
+    return match ? match[1] : null;
+};
+const clearAuth = ()=>{
+    tokenService.remove();
+};
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/app/services/auth.guard.ts [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+// app/services/auth.guard.ts
+__turbopack_context__.s([
+    "useAuthGuard",
+    ()=>useAuthGuard
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/navigation.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$services$2f$token$2e$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/services/token.service.ts [app-client] (ecmascript)");
+var _s = __turbopack_context__.k.signature();
+"use client";
+;
+;
+;
+const useAuthGuard = (options)=>{
+    _s();
+    const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"])();
+    const [authorized, setAuthorized] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const checkAuth = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
+        "useAuthGuard.useCallback[checkAuth]": ()=>{
+            const authenticated = (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$services$2f$token$2e$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["isAuthenticated"])();
+            // 🔒 1. If not authenticated → redirect to login
+            if (!authenticated) {
+                setAuthorized(false);
+                router.replace("/login");
+                return;
+            }
+            // 🔐 2. If role-based access is required
+            if (options?.allowedRoles) {
+                const user = (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$services$2f$token$2e$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getUser"])();
+                const userRole = user?.role?.toUpperCase() || "";
+                if (!user || !options.allowedRoles.includes(userRole)) {
+                    setAuthorized(false);
+                    // Redirect to a safe default page if they have a session but wrong role
+                    if (userRole === "SUPERVISOR") {
+                        router.replace("/report-download");
+                    } else {
+                        router.replace("/login");
+                    }
+                    return;
+                }
+            }
+            setAuthorized(true);
+        }
+    }["useAuthGuard.useCallback[checkAuth]"], [
+        router,
+        options
+    ]);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "useAuthGuard.useEffect": ()=>{
+            checkAuth();
+        }
+    }["useAuthGuard.useEffect"], [
+        checkAuth
+    ]);
+    return {
+        authorized
+    };
+};
+_s(useAuthGuard, "gCyWVxUCYTTGvzbvLIOxcERgcdU=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"]
+    ];
+});
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/app/report-download/page.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>ReportDownloadPage
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$api$2f$report$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/api/report.ts [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$reports$2f$ReportTable$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/components/reports/ReportTable.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$reports$2f$PatrolReportPDF$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/components/reports/PatrolReportPDF.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$services$2f$auth$2e$guard$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/services/auth.guard.ts [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/framer-motion/dist/es/render/components/motion/proxy.mjs [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$api$2f$shifts$2e$api$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/api/shifts.api.ts [app-client] (ecmascript)");
+;
+var _s = __turbopack_context__.k.signature();
+"use client";
+;
+;
+;
+;
+;
+;
+;
+// ================= ICONS (SVG) =================
+const IconCampus = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+        className: "w-4 h-4 text-slate-400",
+        fill: "none",
+        stroke: "currentColor",
+        viewBox: "0 0 24 24",
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+            strokeLinecap: "round",
+            strokeLinejoin: "round",
+            strokeWidth: "2",
+            d: "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+        }, void 0, false, {
+            fileName: "[project]/app/report-download/page.tsx",
+            lineNumber: 23,
+            columnNumber: 5
+        }, ("TURBOPACK compile-time value", void 0))
+    }, void 0, false, {
+        fileName: "[project]/app/report-download/page.tsx",
+        lineNumber: 22,
+        columnNumber: 3
+    }, ("TURBOPACK compile-time value", void 0));
+_c = IconCampus;
+const IconCalendar = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+        className: "w-4 h-4 text-slate-400",
+        fill: "none",
+        stroke: "currentColor",
+        viewBox: "0 0 24 24",
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+            strokeLinecap: "round",
+            strokeLinejoin: "round",
+            strokeWidth: "2",
+            d: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+        }, void 0, false, {
+            fileName: "[project]/app/report-download/page.tsx",
+            lineNumber: 30,
+            columnNumber: 5
+        }, ("TURBOPACK compile-time value", void 0))
+    }, void 0, false, {
+        fileName: "[project]/app/report-download/page.tsx",
+        lineNumber: 29,
+        columnNumber: 3
+    }, ("TURBOPACK compile-time value", void 0));
+_c1 = IconCalendar;
+const IconDownload = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+        className: "w-4 h-4",
+        fill: "none",
+        stroke: "currentColor",
+        viewBox: "0 0 24 24",
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+            strokeLinecap: "round",
+            strokeLinejoin: "round",
+            strokeWidth: "2",
+            d: "M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+        }, void 0, false, {
+            fileName: "[project]/app/report-download/page.tsx",
+            lineNumber: 37,
+            columnNumber: 5
+        }, ("TURBOPACK compile-time value", void 0))
+    }, void 0, false, {
+        fileName: "[project]/app/report-download/page.tsx",
+        lineNumber: 36,
+        columnNumber: 3
+    }, ("TURBOPACK compile-time value", void 0));
+_c2 = IconDownload;
+const IconSpinner = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+        className: "animate-spin h-5 w-5 text-white",
+        xmlns: "http://www.w3.org/2000/svg",
+        fill: "none",
+        viewBox: "0 0 24 24",
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("circle", {
+                className: "opacity-25",
+                cx: "12",
+                cy: "12",
+                r: "10",
+                stroke: "currentColor",
+                strokeWidth: "4"
+            }, void 0, false, {
+                fileName: "[project]/app/report-download/page.tsx",
+                lineNumber: 44,
+                columnNumber: 5
+            }, ("TURBOPACK compile-time value", void 0)),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                className: "opacity-75",
+                fill: "currentColor",
+                d: "M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            }, void 0, false, {
+                fileName: "[project]/app/report-download/page.tsx",
+                lineNumber: 45,
+                columnNumber: 5
+            }, ("TURBOPACK compile-time value", void 0))
+        ]
+    }, void 0, true, {
+        fileName: "[project]/app/report-download/page.tsx",
+        lineNumber: 43,
+        columnNumber: 3
+    }, ("TURBOPACK compile-time value", void 0));
+_c3 = IconSpinner;
+function ReportDownloadPage() {
+    _s();
+    const { authorized } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$services$2f$auth$2e$guard$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useAuthGuard"])({
+        allowedRoles: [
+            'ADMIN',
+            'SUPERVISOR'
+        ]
+    });
+    const [adminName, setAdminName] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
+    const FIXED_CAMPUS = "KCET01";
+    const [reportDate, setReportDate] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(new Date().toISOString().slice(0, 10));
+    const [endDate, setEndDate] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(new Date().toISOString().slice(0, 10));
+    const [selectedMonth, setSelectedMonth] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(new Date().toISOString().slice(0, 7)); // YYYY-MM
+    const [reportType, setReportType] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("single");
+    const [report, setReport] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
+    const [shifts, setShifts] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
+    const [loading, setLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [pdfLoading, setPdfLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [pdfTrigger, setPdfTrigger] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const printRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
+    // ================= INITIAL LOAD =================
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "ReportDownloadPage.useEffect": ()=>{
+            if (authorized) {
+                fetchReport();
+            }
+        }
+    }["ReportDownloadPage.useEffect"], [
+        reportDate,
+        endDate,
+        selectedMonth,
+        reportType,
+        authorized
+    ]);
+    // ================= LOAD ADMIN =================
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "ReportDownloadPage.useEffect": ()=>{
+            if (authorized) {
+                const name = localStorage.getItem("adminName");
+                if (name && name.trim() !== "") {
+                    setAdminName(name);
+                }
+            }
+        }
+    }["ReportDownloadPage.useEffect"], [
+        authorized
+    ]);
+    // ================= FETCH =================
+    const fetchReport = async ()=>{
+        if (!authorized) return;
+        setLoading(true);
+        setError(null);
+        setPdfTrigger(null);
+        let start = reportDate;
+        let end = reportDate;
+        if (reportType === "range") {
+            start = reportDate;
+            end = endDate;
+        } else if (reportType === "month") {
+            const [year, month] = selectedMonth.split("-").map(Number);
+            const lastDay = new Date(year, month, 0); // last day of current month
+            const pad = (n)=>String(n).padStart(2, "0");
+            start = `${year}-${pad(month)}-01`;
+            end = `${year}-${pad(month)}-${pad(lastDay.getDate())}`;
+        }
+        try {
+            const [data, shiftsData] = await Promise.all([
+                (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$api$2f$report$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getPatrolReport"])(FIXED_CAMPUS, start, end),
+                (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$api$2f$shifts$2e$api$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getShifts"])()
+            ]);
+            setReport(data);
+            setShifts(shiftsData);
+            if (data.length === 0) setError("No patrol records found for this timeframe.");
+        } catch (err) {
+            setError("Failed to fetch report data. Please try again.");
+            console.error(err);
+        } finally{
+            setLoading(false);
+        }
+    };
+    // ================= PDF =================
+    const handleDownloadPdf = ()=>{
+        if (!report.length) return;
+        setPdfLoading(true);
+        setPdfTrigger(Date.now());
+        setTimeout(()=>setPdfLoading(false), 800);
+    };
+    // ================= CLEAN =================
+    const cleanLogs = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
+        "ReportDownloadPage.useMemo[cleanLogs]": ()=>{
+            return report.map({
+                "ReportDownloadPage.useMemo[cleanLogs]": (i)=>({
+                        ...i,
+                        lat: i.lat ?? undefined,
+                        lon: i.lon ?? undefined,
+                        guard_name: i.guard_name ?? undefined
+                    })
+            }["ReportDownloadPage.useMemo[cleanLogs]"]);
+        }
+    }["ReportDownloadPage.useMemo[cleanLogs]"], [
+        report
+    ]);
+    if (!authorized) {
+        return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "p-6 text-slate-500 min-h-screen flex items-center justify-center",
+            children: "Checking access..."
+        }, void 0, false, {
+            fileName: "[project]/app/report-download/page.tsx",
+            lineNumber: 144,
+            columnNumber: 12
+        }, this);
+    }
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+        className: "min-h-screen relative font-sans text-slate-900",
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
+            initial: {
+                opacity: 0,
+                y: 20
+            },
+            animate: {
+                opacity: 1,
+                y: 0
+            },
+            transition: {
+                duration: 0.5
+            },
+            className: "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10",
+            children: [
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
+                                    className: "text-3xl font-bold tracking-tight text-slate-900",
+                                    children: "Patrol Reports"
+                                }, void 0, false, {
+                                    fileName: "[project]/app/report-download/page.tsx",
+                                    lineNumber: 159,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                    className: "mt-2 text-slate-500",
+                                    children: "View logs and generate official patrol documentation."
+                                }, void 0, false, {
+                                    fileName: "[project]/app/report-download/page.tsx",
+                                    lineNumber: 160,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/report-download/page.tsx",
+                            lineNumber: 158,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "flex items-center gap-3 px-4 py-2 glass-panel rounded-xl",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "w-2 h-2 rounded-full bg-amber-500"
+                                }, void 0, false, {
+                                    fileName: "[project]/app/report-download/page.tsx",
+                                    lineNumber: 166,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                    className: "text-sm font-medium text-slate-600",
+                                    children: [
+                                        "Admin: ",
+                                        adminName || "Loading..."
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/report-download/page.tsx",
+                                    lineNumber: 167,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/report-download/page.tsx",
+                            lineNumber: 165,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/report-download/page.tsx",
+                    lineNumber: 157,
+                    columnNumber: 9
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "glass-panel rounded-3xl p-6 mb-6",
+                    children: [
+                        error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "mb-4 p-4 rounded-lg bg-red-50 border border-red-100 text-red-600 text-sm",
+                            children: error
+                        }, void 0, false, {
+                            fileName: "[project]/app/report-download/page.tsx",
+                            lineNumber: 176,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "flex gap-2 mb-6 border-b pb-4",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                    onClick: ()=>setReportType("single"),
+                                    className: `px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${reportType === "single" ? "bg-purple-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`,
+                                    children: "One Day Report"
+                                }, void 0, false, {
+                                    fileName: "[project]/app/report-download/page.tsx",
+                                    lineNumber: 183,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                    onClick: ()=>setReportType("range"),
+                                    className: `px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${reportType === "range" ? "bg-purple-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`,
+                                    children: "Date Range Report"
+                                }, void 0, false, {
+                                    fileName: "[project]/app/report-download/page.tsx",
+                                    lineNumber: 193,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                    onClick: ()=>setReportType("month"),
+                                    className: `px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${reportType === "month" ? "bg-purple-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`,
+                                    children: "Month-wise Report"
+                                }, void 0, false, {
+                                    fileName: "[project]/app/report-download/page.tsx",
+                                    lineNumber: 203,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/report-download/page.tsx",
+                            lineNumber: 182,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "grid grid-cols-1 md:grid-cols-12 gap-6 items-end",
+                            children: [
+                                reportType === "single" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "md:col-span-4",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                            className: "text-xs font-semibold text-slate-500 uppercase tracking-wider",
+                                            children: "Patrol Date"
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/report-download/page.tsx",
+                                            lineNumber: 220,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                            type: "date",
+                                            className: "w-full mt-2 pl-3 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg",
+                                            value: reportDate,
+                                            onChange: (e)=>setReportDate(e.target.value)
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/report-download/page.tsx",
+                                            lineNumber: 223,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/report-download/page.tsx",
+                                    lineNumber: 219,
+                                    columnNumber: 15
+                                }, this),
+                                reportType === "range" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "md:col-span-3",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                    className: "text-xs font-semibold text-slate-500 uppercase tracking-wider",
+                                                    children: "From Date"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/report-download/page.tsx",
+                                                    lineNumber: 235,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                    type: "date",
+                                                    className: "w-full mt-2 pl-3 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg",
+                                                    value: reportDate,
+                                                    onChange: (e)=>setReportDate(e.target.value)
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/report-download/page.tsx",
+                                                    lineNumber: 238,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/app/report-download/page.tsx",
+                                            lineNumber: 234,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "md:col-span-3",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                    className: "text-xs font-semibold text-slate-500 uppercase tracking-wider",
+                                                    children: "To Date"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/report-download/page.tsx",
+                                                    lineNumber: 246,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                    type: "date",
+                                                    className: "w-full mt-2 pl-3 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg",
+                                                    value: endDate,
+                                                    onChange: (e)=>setEndDate(e.target.value)
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/report-download/page.tsx",
+                                                    lineNumber: 249,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/app/report-download/page.tsx",
+                                            lineNumber: 245,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true),
+                                reportType === "month" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "md:col-span-4",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                            className: "text-xs font-semibold text-slate-500 uppercase tracking-wider",
+                                            children: "Select Month"
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/report-download/page.tsx",
+                                            lineNumber: 261,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                            type: "month",
+                                            className: "w-full mt-2 pl-3 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg",
+                                            value: selectedMonth,
+                                            onChange: (e)=>setSelectedMonth(e.target.value)
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/report-download/page.tsx",
+                                            lineNumber: 264,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/report-download/page.tsx",
+                                    lineNumber: 260,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "md:col-span-3 flex gap-3",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].button, {
+                                            whileHover: {
+                                                scale: 1.05
+                                            },
+                                            whileTap: {
+                                                scale: 0.95
+                                            },
+                                            onClick: fetchReport,
+                                            disabled: loading,
+                                            className: "flex-1 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-semibold py-2.5 rounded-lg flex items-center justify-center",
+                                            children: loading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(IconSpinner, {}, void 0, false, {
+                                                fileName: "[project]/app/report-download/page.tsx",
+                                                lineNumber: 282,
+                                                columnNumber: 28
+                                            }, this) : "View Report"
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/report-download/page.tsx",
+                                            lineNumber: 275,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].button, {
+                                            whileHover: {
+                                                scale: 1.05
+                                            },
+                                            whileTap: {
+                                                scale: 0.95
+                                            },
+                                            onClick: handleDownloadPdf,
+                                            disabled: !report.length || pdfLoading || loading,
+                                            className: "flex-1 bg-amber-600 hover:bg-amber-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold py-2.5 px-3 rounded-lg flex items-center justify-center gap-2 transition-colors",
+                                            children: pdfLoading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(IconSpinner, {}, void 0, false, {
+                                                fileName: "[project]/app/report-download/page.tsx",
+                                                lineNumber: 292,
+                                                columnNumber: 31
+                                            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(IconDownload, {}, void 0, false, {
+                                                        fileName: "[project]/app/report-download/page.tsx",
+                                                        lineNumber: 292,
+                                                        columnNumber: 51
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                        children: "Download PDF"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/report-download/page.tsx",
+                                                        lineNumber: 292,
+                                                        columnNumber: 67
+                                                    }, this)
+                                                ]
+                                            }, void 0, true)
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/report-download/page.tsx",
+                                            lineNumber: 285,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/report-download/page.tsx",
+                                    lineNumber: 274,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/report-download/page.tsx",
+                            lineNumber: 215,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/report-download/page.tsx",
+                    lineNumber: 174,
+                    columnNumber: 9
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "glass-panel rounded-3xl overflow-hidden min-h-[400px]",
+                    children: !loading && cleanLogs.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        ref: printRef,
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "border-b border-slate-100 px-6 py-4 bg-slate-50/50",
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                    className: "font-semibold text-slate-800",
+                                    children: "Report Data"
+                                }, void 0, false, {
+                                    fileName: "[project]/app/report-download/page.tsx",
+                                    lineNumber: 303,
+                                    columnNumber: 17
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "[project]/app/report-download/page.tsx",
+                                lineNumber: 302,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$reports$2f$ReportTable$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                logs: cleanLogs,
+                                loading: loading
+                            }, void 0, false, {
+                                fileName: "[project]/app/report-download/page.tsx",
+                                lineNumber: 305,
+                                columnNumber: 15
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/app/report-download/page.tsx",
+                        lineNumber: 301,
+                        columnNumber: 13
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/app/report-download/page.tsx",
+                    lineNumber: 299,
+                    columnNumber: 9
+                }, this),
+                pdfTrigger && cleanLogs.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "hidden",
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$reports$2f$PatrolReportPDF$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                        logs: cleanLogs,
+                        campusCode: FIXED_CAMPUS,
+                        campusName: "KCET Main Campus",
+                        campusAddress: "Virudhunagar",
+                        reportDate: reportType === "single" ? reportDate : reportType === "range" ? `${reportDate} to ${endDate}` : `${new Date(selectedMonth + "-02").toLocaleDateString("en-IN", {
+                            month: "long",
+                            year: "numeric"
+                        })}`,
+                        generatedBy: adminName,
+                        shifts: shifts
+                    }, pdfTrigger, false, {
+                        fileName: "[project]/app/report-download/page.tsx",
+                        lineNumber: 313,
+                        columnNumber: 13
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/app/report-download/page.tsx",
+                    lineNumber: 312,
+                    columnNumber: 11
+                }, this)
+            ]
+        }, void 0, true, {
+            fileName: "[project]/app/report-download/page.tsx",
+            lineNumber: 149,
+            columnNumber: 7
+        }, this)
+    }, void 0, false, {
+        fileName: "[project]/app/report-download/page.tsx",
+        lineNumber: 148,
+        columnNumber: 5
+    }, this);
+}
+_s(ReportDownloadPage, "6A4uPkiq7mIizzci0NSwxxhvC/4=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$services$2f$auth$2e$guard$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useAuthGuard"]
+    ];
+});
+_c4 = ReportDownloadPage;
+var _c, _c1, _c2, _c3, _c4;
+__turbopack_context__.k.register(_c, "IconCampus");
+__turbopack_context__.k.register(_c1, "IconCalendar");
+__turbopack_context__.k.register(_c2, "IconDownload");
+__turbopack_context__.k.register(_c3, "IconSpinner");
+__turbopack_context__.k.register(_c4, "ReportDownloadPage");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+]);
+
+//# sourceMappingURL=app_3cc23fea._.js.map

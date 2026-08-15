@@ -32,7 +32,7 @@ export function RecentActivity({ activities }: RecentActivityProps) {
         );
       case 'Alert Resolved':
         return (
-          <div className="flex-shrink-0 h-9 w-9 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center ring-1 ring-indigo-100">
+          <div className="flex-shrink-0 h-9 w-9 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center ring-1 ring-purple-100">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>

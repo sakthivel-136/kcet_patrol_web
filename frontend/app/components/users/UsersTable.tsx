@@ -110,7 +110,7 @@ export default function UsersTable({
 
                 {/* Role */}
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
-                  <span className="bg-indigo-50 text-indigo-700 font-bold px-2.5 py-0.5 rounded text-xs">
+                  <span className="bg-purple-50 text-purple-700 font-bold px-2.5 py-0.5 rounded text-xs">
                     {user.role || 'Guard'}
                   </span>
                 </td>

@@ -522,14 +522,14 @@ function ShiftsPage() {
                 className: "jsx-31db64735a1c94f2" + " " + "fixed inset-0 z-0 pointer-events-none",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "jsx-31db64735a1c94f2" + " " + "absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px] mix-blend-multiply opacity-70"
+                        className: "jsx-31db64735a1c94f2" + " " + "absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[120px] mix-blend-multiply opacity-70"
                     }, void 0, false, {
                         fileName: "[project]/app/shifts/page.tsx",
                         lineNumber: 141,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "jsx-31db64735a1c94f2" + " " + "absolute bottom-[-10%] right-[-5%] w-[400px] h-[400px] bg-purple-500/10 rounded-full blur-[100px] mix-blend-multiply opacity-70"
+                        className: "jsx-31db64735a1c94f2" + " " + "absolute bottom-[-10%] right-[-5%] w-[400px] h-[400px] bg-sky-500/10 rounded-full blur-[100px] mix-blend-multiply opacity-70"
                     }, void 0, false, {
                         fileName: "[project]/app/shifts/page.tsx",
                         lineNumber: 142,
@@ -574,7 +574,7 @@ function ShiftsPage() {
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                 onClick: ()=>openModal(),
-                                className: "jsx-31db64735a1c94f2" + " " + "group relative overflow-hidden bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-md hover:shadow-lg",
+                                className: "jsx-31db64735a1c94f2" + " " + "group relative overflow-hidden bg-cyan-600 hover:bg-cyan-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-md hover:shadow-lg",
                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                     className: "jsx-31db64735a1c94f2" + " " + "relative z-10 flex items-center gap-2",
                                     children: [
@@ -607,7 +607,7 @@ function ShiftsPage() {
                     loading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "jsx-31db64735a1c94f2" + " " + "flex items-center justify-center py-20",
                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "jsx-31db64735a1c94f2" + " " + "w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"
+                            className: "jsx-31db64735a1c94f2" + " " + "w-8 h-8 border-4 border-cyan-200 border-t-cyan-600 rounded-full animate-spin"
                         }, void 0, false, {
                             fileName: "[project]/app/shifts/page.tsx",
                             lineNumber: 163,
@@ -646,10 +646,10 @@ function ShiftsPage() {
                         children: shifts.map((shift)=>{
                             const assignedGuards = allocations.filter((a)=>a.shift_id === shift.shift_id && a.guard_id !== 'CLEAR').map((a)=>guards.find((g)=>g.security_id === a.guard_id)).filter(Boolean);
                             return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "jsx-31db64735a1c94f2" + " " + "relative group backdrop-blur-xl bg-white/80 border border-white rounded-3xl p-6 shadow-sm hover:shadow-md hover:border-indigo-200 transition-all duration-300",
+                                className: "jsx-31db64735a1c94f2" + " " + "relative group backdrop-blur-xl bg-white/80 border border-white rounded-3xl p-6 shadow-sm hover:shadow-md hover:border-cyan-200 transition-all duration-300",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "jsx-31db64735a1c94f2" + " " + "absolute inset-0 bg-gradient-to-br from-indigo-50/50 to-purple-50/50 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity"
+                                        className: "jsx-31db64735a1c94f2" + " " + "absolute inset-0 bg-gradient-to-br from-cyan-50/50 to-sky-50/50 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity"
                                     }, void 0, false, {
                                         fileName: "[project]/app/shifts/page.tsx",
                                         lineNumber: 180,
@@ -673,7 +673,7 @@ function ShiftsPage() {
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                className: "jsx-31db64735a1c94f2" + " " + "inline-flex items-center gap-2 text-xs font-medium text-indigo-700 bg-indigo-50 border border-indigo-100 px-2.5 py-1 rounded-lg",
+                                                                className: "jsx-31db64735a1c94f2" + " " + "inline-flex items-center gap-2 text-xs font-medium text-cyan-700 bg-cyan-50 border border-cyan-100 px-2.5 py-1 rounded-lg",
                                                                 children: [
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                         className: "jsx-31db64735a1c94f2",
@@ -684,7 +684,7 @@ function ShiftsPage() {
                                                                         columnNumber: 27
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                        className: "jsx-31db64735a1c94f2" + " " + "text-indigo-300",
+                                                                        className: "jsx-31db64735a1c94f2" + " " + "text-cyan-300",
                                                                         children: "to"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/shifts/page.tsx",
@@ -716,7 +716,7 @@ function ShiftsPage() {
                                                         children: [
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                                                 onClick: ()=>openModal(shift),
-                                                                className: "jsx-31db64735a1c94f2" + " " + "w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 border border-slate-100 transition-all shadow-sm",
+                                                                className: "jsx-31db64735a1c94f2" + " " + "w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 hover:bg-cyan-50 text-slate-400 hover:text-cyan-600 border border-slate-100 transition-all shadow-sm",
                                                                 children: "✎"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/shifts/page.tsx",
@@ -772,7 +772,7 @@ function ShiftsPage() {
                                                                 className: "jsx-31db64735a1c94f2" + " " + "flex items-center gap-2 bg-white border border-slate-200 shadow-sm rounded-full pl-1.5 pr-3 py-1",
                                                                 children: [
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                        className: "jsx-31db64735a1c94f2" + " " + "w-5 h-5 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-[10px] font-bold text-white",
+                                                                        className: "jsx-31db64735a1c94f2" + " " + "w-5 h-5 rounded-full bg-gradient-to-tr from-cyan-500 to-sky-500 flex items-center justify-center text-[10px] font-bold text-white",
                                                                         children: g.security_name.charAt(0).toUpperCase()
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/shifts/page.tsx",
@@ -895,7 +895,7 @@ function ShiftsPage() {
                                             className: "jsx-31db64735a1c94f2" + " " + "space-y-4",
                                             children: [
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                                    className: "jsx-31db64735a1c94f2" + " " + "text-sm font-semibold text-indigo-600 uppercase tracking-widest",
+                                                    className: "jsx-31db64735a1c94f2" + " " + "text-sm font-semibold text-cyan-600 uppercase tracking-widest",
                                                     children: "Shift Details"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/shifts/page.tsx",
@@ -922,7 +922,7 @@ function ShiftsPage() {
                                                                     shift_name: e.target.value
                                                                 }),
                                                             placeholder: "e.g., Morning Shift",
-                                                            className: "jsx-31db64735a1c94f2" + " " + "w-full bg-white border border-slate-200 text-slate-800 px-4 py-2.5 rounded-xl focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all shadow-sm"
+                                                            className: "jsx-31db64735a1c94f2" + " " + "w-full bg-white border border-slate-200 text-slate-800 px-4 py-2.5 rounded-xl focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100 transition-all shadow-sm"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/shifts/page.tsx",
                                                             lineNumber: 259,
@@ -956,7 +956,7 @@ function ShiftsPage() {
                                                                             ...shiftForm,
                                                                             start_time: e.target.value
                                                                         }),
-                                                                    className: "jsx-31db64735a1c94f2" + " " + "w-full bg-white border border-slate-200 text-slate-800 px-4 py-2.5 rounded-xl focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all shadow-sm"
+                                                                    className: "jsx-31db64735a1c94f2" + " " + "w-full bg-white border border-slate-200 text-slate-800 px-4 py-2.5 rounded-xl focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100 transition-all shadow-sm"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/shifts/page.tsx",
                                                                     lineNumber: 269,
@@ -987,7 +987,7 @@ function ShiftsPage() {
                                                                             ...shiftForm,
                                                                             end_time: e.target.value
                                                                         }),
-                                                                    className: "jsx-31db64735a1c94f2" + " " + "w-full bg-white border border-slate-200 text-slate-800 px-4 py-2.5 rounded-xl focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all shadow-sm"
+                                                                    className: "jsx-31db64735a1c94f2" + " " + "w-full bg-white border border-slate-200 text-slate-800 px-4 py-2.5 rounded-xl focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100 transition-all shadow-sm"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/shifts/page.tsx",
                                                                     lineNumber: 277,
@@ -1015,7 +1015,7 @@ function ShiftsPage() {
                                             className: "jsx-31db64735a1c94f2" + " " + "space-y-4",
                                             children: [
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                                    className: "jsx-31db64735a1c94f2" + " " + "text-sm font-semibold text-indigo-600 uppercase tracking-widest flex justify-between items-center",
+                                                    className: "jsx-31db64735a1c94f2" + " " + "text-sm font-semibold text-cyan-600 uppercase tracking-widest flex justify-between items-center",
                                                     children: [
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                             className: "jsx-31db64735a1c94f2",
@@ -1026,7 +1026,7 @@ function ShiftsPage() {
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                            className: "jsx-31db64735a1c94f2" + " " + "text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-md font-bold",
+                                                            className: "jsx-31db64735a1c94f2" + " " + "text-xs bg-cyan-100 text-cyan-700 px-2 py-0.5 rounded-md font-bold",
                                                             children: [
                                                                 Object.values(rosterSelection).filter(Boolean).length,
                                                                 " Selected"
@@ -1049,12 +1049,12 @@ function ShiftsPage() {
                                                         const activeShiftId = editingShift ? editingShift.shift_id : null;
                                                         const otherAssignments = allocations.filter((a)=>a.guard_id === guard.security_id && a.shift_id !== activeShiftId && a.guard_id !== 'CLEAR');
                                                         const otherShiftCount = otherAssignments.length;
-                                                        let highlightClass = 'bg-white border-slate-200 hover:border-indigo-200 hover:bg-slate-50';
+                                                        let highlightClass = 'bg-white border-slate-200 hover:border-cyan-200 hover:bg-slate-50';
                                                         let textClass = 'text-slate-700';
                                                         let badge = null;
                                                         if (isSelected) {
-                                                            highlightClass = 'bg-indigo-50 border-indigo-300 shadow-indigo-100';
-                                                            textClass = 'text-indigo-900';
+                                                            highlightClass = 'bg-cyan-50 border-cyan-300 shadow-cyan-100';
+                                                            textClass = 'text-cyan-900';
                                                         } else if (otherShiftCount === 1) {
                                                             highlightClass = 'bg-orange-50 border-orange-200 hover:border-orange-300';
                                                             textClass = 'text-orange-900';
@@ -1086,7 +1086,7 @@ function ShiftsPage() {
                                                             className: "jsx-31db64735a1c94f2" + " " + `flex items-center gap-3 p-3 rounded-xl cursor-pointer border transition-all duration-200 shadow-sm ${highlightClass}`,
                                                             children: [
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                    className: "jsx-31db64735a1c94f2" + " " + `w-5 h-5 rounded flex items-center justify-center transition-colors ${isSelected ? 'bg-indigo-600' : 'border-2 border-slate-300 bg-white'}`,
+                                                                    className: "jsx-31db64735a1c94f2" + " " + `w-5 h-5 rounded flex items-center justify-center transition-colors ${isSelected ? 'bg-cyan-600' : 'border-2 border-slate-300 bg-white'}`,
                                                                     children: isSelected && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
                                                                         fill: "none",
                                                                         viewBox: "0 0 24 24",
@@ -1178,7 +1178,7 @@ function ShiftsPage() {
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                             onClick: handleSave,
-                                            className: "jsx-31db64735a1c94f2" + " " + "px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all",
+                                            className: "jsx-31db64735a1c94f2" + " " + "px-6 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all",
                                             children: "Save Changes"
                                         }, void 0, false, {
                                             fileName: "[project]/app/shifts/page.tsx",

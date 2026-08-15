@@ -138,29 +138,36 @@ export default function ShiftsPage() {
     <div className="min-h-screen relative font-sans overflow-hidden">
       {/* Abstract Background Elements */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px] mix-blend-multiply opacity-70" />
-        <div className="absolute bottom-[-10%] right-[-5%] w-[400px] h-[400px] bg-purple-500/10 rounded-full blur-[100px] mix-blend-multiply opacity-70" />
+        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-[120px] mix-blend-multiply opacity-70" />
+        <div className="absolute bottom-[-10%] right-[-5%] w-[400px] h-[400px] bg-fuchsia-500/10 rounded-full blur-[100px] mix-blend-multiply opacity-70" />
       </div>
 
-      <div className="relative z-10 p-8 max-w-7xl mx-auto">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="relative z-10 p-8 max-w-7xl mx-auto"
+      >
         <div className="flex justify-between items-center mb-10">
           <div>
             <h1 className="text-4xl font-extrabold text-slate-800 tracking-tight drop-shadow-sm">Shift Management</h1>
             <p className="text-slate-500 mt-2 font-medium tracking-wide">Configure recurring shifts and assign guard rosters</p>
           </div>
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => openModal()}
-            className="group relative overflow-hidden bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-md hover:shadow-lg"
+            className="group relative overflow-hidden bg-purple-600 hover:bg-purple-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-md hover:shadow-lg"
           >
             <span className="relative z-10 flex items-center gap-2">
               <span className="text-lg leading-none">+</span> Add Shift
             </span>
-          </button>
+          </motion.button>
         </div>
 
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
+            <div className="w-8 h-8 border-4 border-purple-200 border-t-cyan-600 rounded-full animate-spin" />
           </div>
         ) : shifts.length === 0 ? (
           <div className="text-center py-16 backdrop-blur-xl bg-white/60 border border-white/80 rounded-3xl shadow-sm">
@@ -176,26 +183,26 @@ export default function ShiftsPage() {
                 .filter(Boolean) as SecurityUser[]
 
               return (
-                <div key={shift.shift_id} className="relative group backdrop-blur-xl bg-white/80 border border-white rounded-3xl p-6 shadow-sm hover:shadow-md hover:border-indigo-200 transition-all duration-300">
-                  <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/50 to-purple-50/50 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div key={shift.shift_id} className="relative group backdrop-blur-xl bg-white/80 border border-white rounded-3xl p-6 shadow-sm hover:shadow-md hover:border-purple-200 transition-all duration-300">
+                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-50/50 to-sky-50/50 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
                   
                   <div className="relative z-10">
                     <div className="flex justify-between items-start mb-6">
                       <div>
                         <h3 className="font-bold text-slate-800 text-xl tracking-tight mb-1">{shift.shift_name}</h3>
-                        <div className="inline-flex items-center gap-2 text-xs font-medium text-indigo-700 bg-indigo-50 border border-indigo-100 px-2.5 py-1 rounded-lg">
+                        <div className="inline-flex items-center gap-2 text-xs font-medium text-purple-700 bg-purple-50 border border-purple-100 px-2.5 py-1 rounded-lg">
                           <span>{shift.start_time}</span>
-                          <span className="text-indigo-300">to</span>
+                          <span className="text-purple-300">to</span>
                           <span>{shift.end_time}</span>
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <button onClick={() => openModal(shift)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 border border-slate-100 transition-all shadow-sm">
+                        <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => openModal(shift)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 hover:bg-purple-50 text-slate-400 hover:text-purple-600 border border-slate-100 transition-all shadow-sm">
                           ✎
-                        </button>
-                        <button onClick={() => handleDeleteShift(shift.shift_id)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 hover:bg-rose-50 text-slate-400 hover:text-rose-600 border border-slate-100 transition-all shadow-sm">
+                        </motion.button>
+                        <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => handleDeleteShift(shift.shift_id)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 hover:bg-rose-50 text-slate-400 hover:text-rose-600 border border-slate-100 transition-all shadow-sm">
                           ×
-                        </button>
+                        </motion.button>
                       </div>
                     </div>
 
@@ -207,7 +214,7 @@ export default function ShiftsPage() {
                         ) : (
                           assignedGuards.map(g => (
                             <div key={g.security_id} className="flex items-center gap-2 bg-white border border-slate-200 shadow-sm rounded-full pl-1.5 pr-3 py-1">
-                              <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-[10px] font-bold text-white">
+                              <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-cyan-500 to-sky-500 flex items-center justify-center text-[10px] font-bold text-white">
                                 {g.security_name.charAt(0).toUpperCase()}
                               </div>
                               <span className="text-xs font-medium text-slate-700">{g.security_name}</span>
@@ -222,7 +229,7 @@ export default function ShiftsPage() {
             })}
           </div>
         )}
-      </div>
+      </motion.div>
 
       {/* Glassmorphic Edit Modal */}
       <AnimatePresence>
@@ -253,13 +260,13 @@ export default function ShiftsPage() {
               
               {/* Shift Configuration Section */}
               <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-indigo-600 uppercase tracking-widest">Shift Details</h3>
+                <h3 className="text-sm font-semibold text-purple-600 uppercase tracking-widest">Shift Details</h3>
                 <div>
                   <label className="block text-xs font-medium text-slate-500 mb-1.5">Shift Name</label>
                   <input
                     type="text" required value={shiftForm.shift_name}
                     onChange={e => setShiftForm({...shiftForm, shift_name: e.target.value})}
-                    className="w-full bg-white border border-slate-200 text-slate-800 px-4 py-2.5 rounded-xl focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all shadow-sm"
+                    className="w-full bg-white border border-slate-200 text-slate-800 px-4 py-2.5 rounded-xl focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition-all shadow-sm"
                     placeholder="e.g., Morning Shift"
                   />
                 </div>
@@ -269,7 +276,7 @@ export default function ShiftsPage() {
                     <input
                       type="time" required value={shiftForm.start_time}
                       onChange={e => setShiftForm({...shiftForm, start_time: e.target.value})}
-                      className="w-full bg-white border border-slate-200 text-slate-800 px-4 py-2.5 rounded-xl focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all shadow-sm"
+                      className="w-full bg-white border border-slate-200 text-slate-800 px-4 py-2.5 rounded-xl focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition-all shadow-sm"
                     />
                   </div>
                   <div>
@@ -277,7 +284,7 @@ export default function ShiftsPage() {
                     <input
                       type="time" required value={shiftForm.end_time}
                       onChange={e => setShiftForm({...shiftForm, end_time: e.target.value})}
-                      className="w-full bg-white border border-slate-200 text-slate-800 px-4 py-2.5 rounded-xl focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all shadow-sm"
+                      className="w-full bg-white border border-slate-200 text-slate-800 px-4 py-2.5 rounded-xl focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition-all shadow-sm"
                     />
                   </div>
                 </div>
@@ -285,9 +292,9 @@ export default function ShiftsPage() {
 
               {/* Roster Configuration Section */}
               <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-indigo-600 uppercase tracking-widest flex justify-between items-center">
+                <h3 className="text-sm font-semibold text-purple-600 uppercase tracking-widest flex justify-between items-center">
                   <span>Assign Guards</span>
-                  <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-md font-bold">
+                  <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-md font-bold">
                     {Object.values(rosterSelection).filter(Boolean).length} Selected
                   </span>
                 </h3>
@@ -299,13 +306,13 @@ export default function ShiftsPage() {
                     const otherAssignments = allocations.filter(a => a.guard_id === guard.security_id && a.shift_id !== activeShiftId && a.guard_id !== 'CLEAR');
                     const otherShiftCount = otherAssignments.length;
 
-                    let highlightClass = 'bg-white border-slate-200 hover:border-indigo-200 hover:bg-slate-50';
+                    let highlightClass = 'bg-white border-slate-200 hover:border-purple-200 hover:bg-slate-50';
                     let textClass = 'text-slate-700';
                     let badge = null;
 
                     if (isSelected) {
-                      highlightClass = 'bg-indigo-50 border-indigo-300 shadow-indigo-100';
-                      textClass = 'text-indigo-900';
+                      highlightClass = 'bg-purple-50 border-purple-300 shadow-purple-100';
+                      textClass = 'text-purple-900';
                     } else if (otherShiftCount === 1) {
                       highlightClass = 'bg-orange-50 border-orange-200 hover:border-orange-300';
                       textClass = 'text-orange-900';
@@ -323,7 +330,7 @@ export default function ShiftsPage() {
                         className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer border transition-all duration-200 shadow-sm ${highlightClass}`}
                       >
                         <div className={`w-5 h-5 rounded flex items-center justify-center transition-colors ${
-                          isSelected ? 'bg-indigo-600' : 'border-2 border-slate-300 bg-white'
+                          isSelected ? 'bg-purple-600' : 'border-2 border-slate-300 bg-white'
                         }`}>
                           {isSelected && <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
                         </div>
@@ -350,7 +357,7 @@ export default function ShiftsPage() {
               </button>
               <button
                 onClick={handleSave}
-                className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all"
+                className="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all"
               >
                 Save Changes
               </button>

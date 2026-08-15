@@ -23,7 +23,7 @@ export function LivePatrolStatus({ patrols }: LivePatrolStatusProps) {
   */
   const getProgressStyle = (progress: number) => {
     if (progress >= 75) return 'bg-blue-600';
-    if (progress >= 50) return 'bg-indigo-500';
+    if (progress >= 50) return 'bg-purple-500';
     if (progress >= 25) return 'bg-slate-400';
     return 'bg-red-500';
   };
@@ -32,8 +32,8 @@ export function LivePatrolStatus({ patrols }: LivePatrolStatusProps) {
     // Simple hash to pick a color from a blue-ish palette
     const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     const colors = [
-      'bg-blue-600', 'bg-blue-700', 'bg-indigo-600', 
-      'bg-cyan-600', 'bg-sky-600', 'bg-teal-600'
+      'bg-blue-600', 'bg-blue-700', 'bg-purple-600', 
+      'bg-purple-600', 'bg-fuchsia-600', 'bg-amber-600'
     ];
     return colors[hash % colors.length];
   };

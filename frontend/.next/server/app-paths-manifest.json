@@ -1,0 +1,18 @@
+{
+  "/_global-error/page": "app/_global-error/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/analytics/security_analytics/page": "app/analytics/security_analytics/page.js",
+  "/campus/page": "app/campus/page.js",
+  "/components/analytics/qr/page": "app/components/analytics/qr/page.js",
+  "/components/navbar/page": "app/components/navbar/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/dashboard/qr-crud/page": "app/dashboard/qr-crud/page.js",
+  "/login/page": "app/login/page.js",
+  "/page": "app/page.js",
+  "/report-download/page": "app/report-download/page.js",
+  "/scan-points/page": "app/scan-points/page.js",
+  "/security-activity/page": "app/security-activity/page.js",
+  "/security-info/page": "app/security-info/page.js",
+  "/shifts/page": "app/shifts/page.js",
+  "/user-crud/page": "app/user-crud/page.js"
+}

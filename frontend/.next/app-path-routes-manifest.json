@@ -1,0 +1,18 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/analytics/security_analytics/page": "/analytics/security_analytics",
+  "/campus/page": "/campus",
+  "/components/analytics/qr/page": "/components/analytics/qr",
+  "/components/navbar/page": "/components/navbar",
+  "/dashboard/page": "/dashboard",
+  "/dashboard/qr-crud/page": "/dashboard/qr-crud",
+  "/login/page": "/login",
+  "/page": "/",
+  "/report-download/page": "/report-download",
+  "/scan-points/page": "/scan-points",
+  "/security-activity/page": "/security-activity",
+  "/security-info/page": "/security-info",
+  "/shifts/page": "/shifts",
+  "/user-crud/page": "/user-crud"
+}

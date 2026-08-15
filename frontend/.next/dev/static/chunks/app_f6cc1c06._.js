@@ -216,7 +216,7 @@ function InteractiveTutorial({ isOpen, onClose }) {
                                             className: "space-y-6",
                                             children: [
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 mb-4 mx-auto",
+                                                    className: "w-16 h-16 rounded-2xl bg-purple-50 flex items-center justify-center text-purple-600 mb-4 mx-auto",
                                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$map$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Map$3e$__["Map"], {
                                                         size: 32
                                                     }, void 0, false, {
@@ -261,7 +261,7 @@ function InteractiveTutorial({ isOpen, onClose }) {
                                                             className: "flex items-start gap-3 p-4 rounded-xl bg-slate-50 border border-slate-100",
                                                             children: [
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                    className: "w-2 h-2 mt-2 rounded-full bg-indigo-500 shrink-0"
+                                                                    className: "w-2 h-2 mt-2 rounded-full bg-purple-500 shrink-0"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/components/tutorial/InteractiveTutorial.tsx",
                                                                     lineNumber: 87,
@@ -294,7 +294,7 @@ function InteractiveTutorial({ isOpen, onClose }) {
                                                             className: "flex items-start gap-3 p-4 rounded-xl bg-slate-50 border border-slate-100",
                                                             children: [
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                    className: "w-2 h-2 mt-2 rounded-full bg-emerald-500 shrink-0"
+                                                                    className: "w-2 h-2 mt-2 rounded-full bg-amber-500 shrink-0"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/components/tutorial/InteractiveTutorial.tsx",
                                                                     lineNumber: 91,
@@ -351,7 +351,7 @@ function InteractiveTutorial({ isOpen, onClose }) {
                                             className: "space-y-6",
                                             children: [
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "w-16 h-16 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 mb-4 mx-auto",
+                                                    className: "w-16 h-16 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600 mb-4 mx-auto",
                                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$shield$2d$check$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ShieldCheck$3e$__["ShieldCheck"], {
                                                         size: 32
                                                     }, void 0, false, {
@@ -608,7 +608,7 @@ function InteractiveTutorial({ isOpen, onClose }) {
                                                                     children: [
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
                                                                             href: "mailto:C.SAKTHIVEL1.3.2006@GMAIL.COM",
-                                                                            className: "flex-1 flex items-center justify-center gap-2 py-2 bg-slate-50 hover:bg-indigo-50 text-indigo-600 text-xs font-semibold rounded-lg border border-slate-100 transition-colors",
+                                                                            className: "flex-1 flex items-center justify-center gap-2 py-2 bg-slate-50 hover:bg-purple-50 text-purple-600 text-xs font-semibold rounded-lg border border-slate-100 transition-colors",
                                                                             children: [
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$mail$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Mail$3e$__["Mail"], {
                                                                                     size: 14
@@ -626,7 +626,7 @@ function InteractiveTutorial({ isOpen, onClose }) {
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
                                                                             href: "tel:+916374052055",
-                                                                            className: "flex-1 flex items-center justify-center gap-2 py-2 bg-slate-50 hover:bg-emerald-50 text-emerald-600 text-xs font-semibold rounded-lg border border-slate-100 transition-colors",
+                                                                            className: "flex-1 flex items-center justify-center gap-2 py-2 bg-slate-50 hover:bg-amber-50 text-amber-600 text-xs font-semibold rounded-lg border border-slate-100 transition-colors",
                                                                             children: [
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$phone$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Phone$3e$__["Phone"], {
                                                                                     size: 14
@@ -678,7 +678,7 @@ function InteractiveTutorial({ isOpen, onClose }) {
                                                                     children: [
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
                                                                             href: "mailto:23UCS008@KAMARAJENGG.EDU.IN",
-                                                                            className: "flex-1 flex items-center justify-center gap-2 py-2 bg-slate-50 hover:bg-indigo-50 text-indigo-600 text-xs font-semibold rounded-lg border border-slate-100 transition-colors",
+                                                                            className: "flex-1 flex items-center justify-center gap-2 py-2 bg-slate-50 hover:bg-purple-50 text-purple-600 text-xs font-semibold rounded-lg border border-slate-100 transition-colors",
                                                                             children: [
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$mail$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Mail$3e$__["Mail"], {
                                                                                     size: 14
@@ -696,7 +696,7 @@ function InteractiveTutorial({ isOpen, onClose }) {
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
                                                                             href: "tel:+916379244349",
-                                                                            className: "flex-1 flex items-center justify-center gap-2 py-2 bg-slate-50 hover:bg-emerald-50 text-emerald-600 text-xs font-semibold rounded-lg border border-slate-100 transition-colors",
+                                                                            className: "flex-1 flex items-center justify-center gap-2 py-2 bg-slate-50 hover:bg-amber-50 text-amber-600 text-xs font-semibold rounded-lg border border-slate-100 transition-colors",
                                                                             children: [
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$phone$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Phone$3e$__["Phone"], {
                                                                                     size: 14
@@ -757,7 +757,7 @@ function InteractiveTutorial({ isOpen, onClose }) {
                                             2,
                                             3
                                         ].map((i)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: `h-2 rounded-full transition-all duration-300 ${step === i ? 'w-6 bg-indigo-600' : 'w-2 bg-slate-200'}`
+                                                className: `h-2 rounded-full transition-all duration-300 ${step === i ? 'w-6 bg-purple-600' : 'w-2 bg-slate-200'}`
                                             }, i, false, {
                                                 fileName: "[project]/app/components/tutorial/InteractiveTutorial.tsx",
                                                 lineNumber: 203,
@@ -791,7 +791,7 @@ function InteractiveTutorial({ isOpen, onClose }) {
                                             }, this),
                                             step < totalSteps ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                                 onClick: nextStep,
-                                                className: "px-6 py-2 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-sm transition-colors flex items-center gap-1",
+                                                className: "px-6 py-2 text-sm font-bold text-white bg-purple-600 hover:bg-purple-700 rounded-xl shadow-sm transition-colors flex items-center gap-1",
                                                 children: [
                                                     "Next ",
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$right$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronRight$3e$__["ChevronRight"], {
@@ -1031,7 +1031,7 @@ const Navbar = ()=>{
                                                 children: [
                                                     isActive(item.href) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
                                                         layoutId: "nav-pill",
-                                                        className: "absolute inset-0 bg-indigo-100 border border-indigo-200 rounded-full shadow-sm",
+                                                        className: "absolute inset-0 bg-purple-100 border border-purple-200 rounded-full shadow-sm",
                                                         transition: {
                                                             type: "spring",
                                                             stiffness: 380,
@@ -1043,7 +1043,7 @@ const Navbar = ()=>{
                                                         columnNumber: 19
                                                     }, ("TURBOPACK compile-time value", void 0)),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        className: `px-4 py-2 text-sm font-semibold rounded-full z-10 transition-colors ${isActive(item.href) ? 'text-indigo-700' : 'text-slate-600 hover:text-indigo-600'}`,
+                                                        className: `px-4 py-2 text-sm font-semibold rounded-full z-10 transition-colors ${isActive(item.href) ? 'text-purple-700' : 'text-slate-600 hover:text-purple-600'}`,
                                                         children: item.name
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/components/navbar/page.tsx",
@@ -1073,9 +1073,9 @@ const Navbar = ()=>{
                                                     scale: 0.95
                                                 },
                                                 onClick: ()=>setIsUserMenuOpen(!isUserMenuOpen),
-                                                className: "flex h-10 w-10 items-center justify-center rounded-full bg-indigo-50 border border-indigo-100 hover:bg-indigo-100 hover:shadow-sm transition-all",
+                                                className: "flex h-10 w-10 items-center justify-center rounded-full bg-purple-50 border border-purple-100 hover:bg-purple-100 hover:shadow-sm transition-all",
                                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$user$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__User$3e$__["User"], {
-                                                    className: "h-5 w-5 text-indigo-600"
+                                                    className: "h-5 w-5 text-purple-600"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/components/navbar/page.tsx",
                                                     lineNumber: 86,
@@ -1139,7 +1139,7 @@ const Navbar = ()=>{
                                                             href: "https://drive.google.com/uc?export=download&id=1rrWO82bIRMvD3H1euaC1e9wMptplt9JR",
                                                             target: "_blank",
                                                             rel: "noopener noreferrer",
-                                                            className: "block w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 transition-colors mt-1 border-t border-slate-100",
+                                                            className: "block w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium text-purple-600 hover:text-purple-700 hover:bg-purple-50 transition-colors mt-1 border-t border-slate-100",
                                                             children: "Download App"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/components/navbar/page.tsx",
@@ -1196,7 +1196,7 @@ const Navbar = ()=>{
                                     navItems.map((item)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                             href: item.href,
                                             onClick: ()=>setIsMobileMenuOpen(false),
-                                            className: `block rounded-xl px-4 py-3 text-sm font-semibold transition-colors ${isActive(item.href) ? 'bg-indigo-50 border border-indigo-100 text-indigo-700 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`,
+                                            className: `block rounded-xl px-4 py-3 text-sm font-semibold transition-colors ${isActive(item.href) ? 'bg-purple-50 border border-purple-100 text-purple-700 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`,
                                             children: item.name
                                         }, item.name, false, {
                                             fileName: "[project]/app/components/navbar/page.tsx",
@@ -1231,7 +1231,7 @@ const Navbar = ()=>{
                                                 href: "https://drive.google.com/uc?export=download&id=1rrWO82bIRMvD3H1euaC1e9wMptplt9JR",
                                                 target: "_blank",
                                                 rel: "noopener noreferrer",
-                                                className: "block w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50",
+                                                className: "block w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-purple-600 hover:text-purple-700 hover:bg-purple-50",
                                                 children: "Download App"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/components/navbar/page.tsx",

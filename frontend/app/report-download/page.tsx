@@ -3,9 +3,12 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { getPatrolReport, PatrolReportItem } from "../api/report";
 import { getCampuses } from "../api/campuses.api";
-import PatrolReportPDF from "../components/reports/PatrolReportPDF";
 import ReportTable from "../components/reports/ReportTable";
+import PatrolReportPDF from "../components/reports/PatrolReportPDF";
 import { useAuthGuard } from "@/app/services/auth.guard";
+import { motion } from "framer-motion";
+
+import { getShifts } from "../api/shifts.api";
 
 // ================= TYPES =================
 type Campus = {
@@ -56,6 +59,7 @@ export default function ReportDownloadPage() {
   const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7)); // YYYY-MM
   const [reportType, setReportType] = useState<"single" | "range" | "month">("single");
   const [report, setReport] = useState<PatrolReportItem[]>([]);
+  const [shifts, setShifts] = useState<any[]>([]);
 
   const [loading, setLoading] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
@@ -103,8 +107,12 @@ export default function ReportDownloadPage() {
     }
 
     try {
-      const data = await getPatrolReport(FIXED_CAMPUS, start, end);
+      const [data, shiftsData] = await Promise.all([
+        getPatrolReport(FIXED_CAMPUS, start, end),
+        getShifts()
+      ]);
       setReport(data);
+      setShifts(shiftsData);
       if (data.length === 0) setError("No patrol records found for this timeframe.");
     } catch (err) {
       setError("Failed to fetch report data. Please try again.");
@@ -138,7 +146,12 @@ export default function ReportDownloadPage() {
 
   return (
     <div className="min-h-screen relative font-sans text-slate-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10"
+      >
 
         {/* HEADER */}
         <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -150,7 +163,7 @@ export default function ReportDownloadPage() {
           </div>
 
           <div className="flex items-center gap-3 px-4 py-2 glass-panel rounded-xl">
-            <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+            <div className="w-2 h-2 rounded-full bg-amber-500"></div>
             <span className="text-sm font-medium text-slate-600">
               Admin: {adminName || "Loading..."}
             </span>
@@ -171,7 +184,7 @@ export default function ReportDownloadPage() {
               onClick={() => setReportType("single")}
               className={`px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${
                 reportType === "single"
-                  ? "bg-indigo-600 text-white"
+                  ? "bg-purple-600 text-white"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
               }`}
             >
@@ -181,7 +194,7 @@ export default function ReportDownloadPage() {
               onClick={() => setReportType("range")}
               className={`px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${
                 reportType === "range"
-                  ? "bg-indigo-600 text-white"
+                  ? "bg-purple-600 text-white"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
               }`}
             >
@@ -191,7 +204,7 @@ export default function ReportDownloadPage() {
               onClick={() => setReportType("month")}
               className={`px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${
                 reportType === "month"
-                  ? "bg-indigo-600 text-white"
+                  ? "bg-purple-600 text-white"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
               }`}
             >
@@ -259,21 +272,25 @@ export default function ReportDownloadPage() {
 
             {/* BUTTONS */}
             <div className="md:col-span-3 flex gap-3">
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={fetchReport}
                 disabled={loading}
-                className="flex-1 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-semibold py-2.5 rounded-lg flex items-center justify-center"
+                className="flex-1 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-semibold py-2.5 rounded-lg flex items-center justify-center"
               >
                 {loading ? <IconSpinner /> : "View Report"}
-              </button>
+              </motion.button>
 
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={handleDownloadPdf}
                 disabled={!report.length || pdfLoading || loading}
-                className="flex-1 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold py-2.5 px-3 rounded-lg flex items-center justify-center gap-2 transition-colors"
+                className="flex-1 bg-amber-600 hover:bg-amber-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold py-2.5 px-3 rounded-lg flex items-center justify-center gap-2 transition-colors"
               >
                 {pdfLoading ? <IconSpinner /> : <><IconDownload /><span>Download PDF</span></>}
-              </button>
+              </motion.button>
             </div>
           </div>
         </div>
@@ -307,10 +324,11 @@ export default function ReportDownloadPage() {
                   : `${new Date(selectedMonth + "-02").toLocaleDateString("en-IN", { month: "long", year: "numeric" })}`
               }
               generatedBy={adminName}
+              shifts={shifts}
             />
           </div>
         )}
-      </div>
+      </motion.div>
     </div>
   );
 }

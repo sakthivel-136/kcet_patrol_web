@@ -8,6 +8,7 @@ import { Menu, X, User } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { clearAuth } from '@/app/services/token.service'
 import InteractiveTutorial from '../tutorial/InteractiveTutorial'
+import AppDownloadModal from './AppDownloadModal'
 
 const Navbar = () => {
   const pathname = usePathname()
@@ -15,6 +16,7 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const [isTutorialOpen, setIsTutorialOpen] = useState(false)
+  const [isAppDownloadOpen, setIsAppDownloadOpen] = useState(false)
   const [userRole, setUserRole] = useState<string>('')
   const userMenuRef = useRef<HTMLDivElement>(null)
 
@@ -71,9 +73,9 @@ const Navbar = () => {
             <Link key={item.name} href={item.href} className="relative z-10">
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="flex items-center">
                 {isActive(item.href) && (
-                  <motion.div layoutId="nav-pill" className="absolute inset-0 bg-indigo-100 border border-indigo-200 rounded-full shadow-sm" transition={{ type: "spring", stiffness: 380, damping: 30 }} />
+                  <motion.div layoutId="nav-pill" className="absolute inset-0 bg-purple-100 border border-purple-200 rounded-full shadow-sm" transition={{ type: "spring", stiffness: 380, damping: 30 }} />
                 )}
-                <span className={`px-4 py-2 text-sm font-semibold rounded-full z-10 transition-colors ${isActive(item.href) ? 'text-indigo-700' : 'text-slate-600 hover:text-indigo-600'}`}>
+                <span className={`px-4 py-2 text-sm font-semibold rounded-full z-10 transition-colors ${isActive(item.href) ? 'text-purple-700' : 'text-slate-600 hover:text-purple-600'}`}>
                   {item.name}
                 </span>
               </motion.div>
@@ -82,8 +84,8 @@ const Navbar = () => {
 
           {/* USER AVATAR */}
           <div className="relative ml-2 z-50" ref={userMenuRef}>
-            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => setIsUserMenuOpen(!isUserMenuOpen)} className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-50 border border-indigo-100 hover:bg-indigo-100 hover:shadow-sm transition-all">
-              <User className="h-5 w-5 text-indigo-600" />
+            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => setIsUserMenuOpen(!isUserMenuOpen)} className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-50 border border-purple-100 hover:bg-purple-100 hover:shadow-sm transition-all">
+              <User className="h-5 w-5 text-purple-600" />
             </motion.button>
             <AnimatePresence>
               {isUserMenuOpen && (
@@ -91,7 +93,7 @@ const Navbar = () => {
                   <button onClick={() => { setIsTutorialOpen(true); setIsUserMenuOpen(false); }} className="block w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors">App Guide</button>
                   <button onClick={() => router.push('/login')} className="block w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors">Switch User</button>
                   <button onClick={handleLogout} className="block w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors">Log out</button>
-                  <a href="https://drive.google.com/uc?export=download&id=1rrWO82bIRMvD3H1euaC1e9wMptplt9JR" target="_blank" rel="noopener noreferrer" className="block w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 transition-colors mt-1 border-t border-slate-100">Download App</a>
+                  <button onClick={() => { setIsAppDownloadOpen(true); setIsUserMenuOpen(false); }} className="block w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium text-purple-600 hover:text-purple-700 hover:bg-purple-50 transition-colors mt-1 border-t border-slate-100">Download App</button>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -105,14 +107,14 @@ const Navbar = () => {
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="max-[1050px]:block hidden border-t border-slate-100 bg-white/95 backdrop-blur-xl overflow-hidden">
             <div className="px-4 py-4 space-y-2">
               {navItems.map((item) => (
-                <Link key={item.name} href={item.href} onClick={() => setIsMobileMenuOpen(false)} className={`block rounded-xl px-4 py-3 text-sm font-semibold transition-colors ${isActive(item.href) ? 'bg-indigo-50 border border-indigo-100 text-indigo-700 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}>
+                <Link key={item.name} href={item.href} onClick={() => setIsMobileMenuOpen(false)} className={`block rounded-xl px-4 py-3 text-sm font-semibold transition-colors ${isActive(item.href) ? 'bg-purple-50 border border-purple-100 text-purple-700 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}>
                   {item.name}
                 </Link>
               ))}
               <div className="border-t border-slate-100 mt-4 pt-4 space-y-2">
                 <button onClick={() => { setIsTutorialOpen(true); setIsMobileMenuOpen(false); }} className="block w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">App Guide</button>
                 <button onClick={() => router.push('/login')} className="block w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">Switch User</button>
-                <a href="https://drive.google.com/uc?export=download&id=1rrWO82bIRMvD3H1euaC1e9wMptplt9JR" target="_blank" rel="noopener noreferrer" className="block w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50">Download App</a>
+                <button onClick={() => { setIsAppDownloadOpen(true); setIsMobileMenuOpen(false); }} className="block w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-purple-600 hover:text-purple-700 hover:bg-purple-50">Download App</button>
                 <button onClick={handleLogout} className="block w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50">Log out</button>
               </div>
             </div>
@@ -121,6 +123,7 @@ const Navbar = () => {
       </AnimatePresence>
     </header>
     <InteractiveTutorial isOpen={isTutorialOpen} onClose={() => setIsTutorialOpen(false)} />
+    <AppDownloadModal isOpen={isAppDownloadOpen} onClose={() => setIsAppDownloadOpen(false)} />
     </>
   )
 }

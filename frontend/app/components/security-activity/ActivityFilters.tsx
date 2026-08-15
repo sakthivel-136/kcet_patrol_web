@@ -140,7 +140,7 @@ export default function ActivityFilters({
         </div>
 
         <button
-          className="px-4 py-2 bg-indigo-600 text-white rounded-md"
+          className="px-4 py-2 bg-purple-600 text-white rounded-md"
           onClick={handleExport}
         >
           Export

@@ -63,7 +63,7 @@ export default function SecurityAnalyticsPage() {
         {/* HEADER */}
         <div className="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-md">
           <div>
-            <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
+            <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-600">
               Security Analytics
             </h1>
             <p className="text-gray-500 mt-1">Real-time security monitoring dashboard</p>

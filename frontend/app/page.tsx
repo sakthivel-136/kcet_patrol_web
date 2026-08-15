@@ -21,7 +21,7 @@ export default function Hero() {
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] z-0 [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_70%,transparent_100%)]"></div>
       
       {/* Spotlight effect */}
-      <div className="absolute top-0 w-full h-[500px] bg-indigo-500/10 blur-[120px] rounded-[100%] pointer-events-none z-0"></div>
+      <div className="absolute top-0 w-full h-[500px] bg-purple-500/10 blur-[120px] rounded-[100%] pointer-events-none z-0"></div>
 
       <div className="relative z-10 flex flex-col items-center max-w-4xl mx-auto px-6 text-center">
         

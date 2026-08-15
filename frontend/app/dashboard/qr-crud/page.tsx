@@ -14,6 +14,7 @@ import {
   QRData,
 } from "@/app/api/qr.api";
 import { useAuthGuard } from "@/app/services/auth.guard";
+import { motion } from "framer-motion";
 
 // ----------------- TYPES -----------------
 
@@ -166,25 +167,32 @@ export default function QrCrudPage() {
   // ----------------- RENDER -----------------
 
   return (
-    <div className="min-h-screen relative font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+    <div className="min-h-screen relative font-sans text-slate-900 bg-slate-50">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10"
+      >
         <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900">QR Codes</h1>
-            <p className="mt-1 text-slate-500 text-sm font-medium">Manage and generate QR checkpoints</p>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">QR Code Management</h1>
+            <p className="mt-1 text-slate-500 text-sm font-medium">Create and manage patrol checkpoints</p>
           </div>
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={handleAddQr}
-            className="px-6 py-2.5 bg-indigo-600 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-500/30 hover:bg-indigo-700 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-indigo-500/40 transition-all duration-200 flex items-center gap-2"
+            className="px-6 py-2.5 bg-purple-600 text-white font-bold text-sm rounded-xl shadow-lg shadow-purple-500/30 hover:bg-purple-700 hover:shadow-xl hover:shadow-purple-500/40 transition-all duration-200 flex items-center gap-2"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
             </svg>
-            Add QR
-          </button>
+            Add New Checkpoint
+          </motion.button>
         </div>
 
-        <div className="glass-panel rounded-3xl p-6 sm:p-8">
+        <div className="glass-panel rounded-3xl p-6 sm:p-8 min-h-[500px]">
           <div className="mb-6">
             <QrFilters
               value={searchQuery}
@@ -200,7 +208,7 @@ export default function QrCrudPage() {
             onDelete={handleDeleteQr}
           />
         </div>
-      </div>
+      </motion.div>
 
       {isFormOpen && (
         <QrForm
