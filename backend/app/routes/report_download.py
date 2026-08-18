@@ -161,7 +161,7 @@ def download_report(
                     else:
                         # Future round (today only) → PENDING, past → MISSED
                         # A round is still pending if its end time hasn't passed yet
-                        if (is_today and end_slot_dt > now_ist) or current_dt.date() > now_ist.date():
+                        if (is_today and end_slot_dt > now_ist) or current_dt > now_ist.date():
                             status = "PENDING"
                         else:
                             status = "MISSED"
