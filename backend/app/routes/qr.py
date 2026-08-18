@@ -41,7 +41,7 @@ def create_qr_endpoint(data: dict, _: dict = Depends(admin_only)):
     return result
 
 
-from app.utils.security import generate_qr_token, verify_qr_token
+from app.utils.security import generate_qr_token
 
 # ---------------------------
 # GET QR BY FACTORY
@@ -58,19 +58,8 @@ def get_qr_by_campus(campus_code: str, _: dict = Depends(get_current_user)):
 # ---------------------------
 # GET QR BY ID
 # ---------------------------
-@router.get("/{qr_id_or_token}")
-def get_qr_by_id(qr_id_or_token: str, _: dict = Depends(get_current_user)):
-    if ":" in qr_id_or_token:
-        real_id = verify_qr_token(qr_id_or_token)
-        if not real_id:
-            raise HTTPException(status_code=403, detail="Invalid secure token")
-        qr_id = int(real_id)
-    else:
-        try:
-            qr_id = int(qr_id_or_token)
-        except ValueError:
-            raise HTTPException(status_code=400, detail="Invalid QR ID format")
-            
+@router.get("/{qr_id}")
+def get_qr_by_id(qr_id: int, _: dict = Depends(get_current_user)):
     rows = select_rows(TABLE, {"qr_id": qr_id})
     if not rows:
         raise HTTPException(status_code=404, detail="QR not found")
