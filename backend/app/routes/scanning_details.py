@@ -29,8 +29,6 @@ def to_scan_response(data: dict) -> ScanResponse:
     return ScanResponse(**data)
 
 
-from app.utils.security import verify_qr_token
-
 # --------------------------------------------------
 # CREATE SCAN
 # --------------------------------------------------
@@ -40,17 +38,6 @@ def create_scan(scan: ScanCreate):
 
     try:
         scan_data = scan.dict()
-
-        raw_token = scan_data.get("qr_id")
-        if not raw_token:
-            raise HTTPException(status_code=400, detail="Missing QR ID token")
-            
-        real_qr_id = verify_qr_token(str(raw_token))
-        if not real_qr_id:
-            raise HTTPException(status_code=403, detail="Invalid or forged QR Code")
-            
-        # Overwrite the token with the real ID for the database
-        scan_data["qr_id"] = real_qr_id
 
         # Add timestamp if DB doesn't auto-generate
         scan_data.setdefault(

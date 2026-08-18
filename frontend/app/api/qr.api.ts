@@ -10,7 +10,6 @@ export interface QRData {
   status?: string;
   waiting_time: number;
   created_at?: string;
-  secure_token?: string;
 }
 
 // ----------------- Campus Data -----------------

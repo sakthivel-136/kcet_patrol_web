@@ -46,7 +46,7 @@ const renderQrToPdf = async (doc: jsPDF, qr: QRCodeType) => {
   doc.text(`Checkpoint ID: ${qr.qr_id}`, pageWidth / 2, 50, { align: "center" });
 
   // Generate QR Code Data URL
-  const qrDataUrl = await QRCode.toDataURL(qr.secure_token || String(qr.qr_id), {
+  const qrDataUrl = await QRCode.toDataURL(String(qr.qr_id), {
     errorCorrectionLevel: "H",
     margin: 1,
     width: 400,

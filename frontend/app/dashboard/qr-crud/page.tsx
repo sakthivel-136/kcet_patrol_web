@@ -51,7 +51,6 @@ export default function QrCrudPage() {
     status: data.status ?? "inactive",
     created_at: data.created_at,
     campus_code: data.campus_code ?? FIXED_CAMPUS,
-    secure_token: data.secure_token,
     waiting_time:
       typeof data.waiting_time === "number"
         ? data.waiting_time
@@ -231,7 +230,7 @@ export default function QrCrudPage() {
                   
                   <div className="bg-white p-2 rounded-xl shadow-sm border border-slate-100 mb-6">
                     <QRCodeSVG 
-                      value={qr.secure_token || String(qr.qr_id)}
+                      value={String(qr.qr_id)}
                       size={150}
                       level="H"
                     />

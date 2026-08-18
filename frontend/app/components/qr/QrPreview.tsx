@@ -11,7 +11,7 @@ interface QrPreviewProps {
 
 export default function QrPreview({ qr, onClose }: QrPreviewProps) {
 
-  const qrData = qr.secure_token || String(qr.qr_id || "0");
+  const qrData = String(qr.qr_id || "0");
 
   const handlePrint = () => {
     window.print();
