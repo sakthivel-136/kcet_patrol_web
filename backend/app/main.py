@@ -94,3 +94,19 @@ def root():
     return {
         "message": "Security Verifier API is running ✅"
     }
+
+# -----------------------------
+# Cron endpoint
+# -----------------------------
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+from cron_mark_missed import run_cron
+
+@app.get("/cron/mark-missed", summary="Cron Endpoint to Mark Missed Scans")
+def cron_mark_missed():
+    try:
+        run_cron()
+        return {"status": "success", "message": "Missed scans evaluated successfully."}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}

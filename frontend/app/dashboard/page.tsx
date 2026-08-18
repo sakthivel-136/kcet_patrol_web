@@ -9,6 +9,7 @@ import {
 } from 'recharts'
 import { getPatrolReport, PatrolReportItem } from '../api/report'
 import { getShifts } from '../api/shifts.api'
+import { getQRCodes } from '../api/qr.api'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import { useAuthGuard } from '@/app/services/auth.guard'
@@ -373,10 +374,9 @@ export default function DashboardPage() {
   const FIXED_CAMPUS                          = 'KCET01'
   const [selectedDate, setSelectedDate]       = useState(today)
   const [report, setReport]                   = useState<PatrolReportItem[]>([])
-  const [loading, setLoading]                 = useState(false)
-  const [lastUpdated, setLastUpdated]         = useState('')
-
   const [shifts, setShifts]                   = useState<any[]>([])
+  const [qrs, setQrs]                         = useState<any[]>([])
+  const [lastUpdated, setLastUpdated]         = useState('')
 
   /* auth check */
   useEffect(() => {
@@ -391,14 +391,16 @@ export default function DashboardPage() {
     setLoading(true)
     Promise.all([
       getPatrolReport(FIXED_CAMPUS, selectedDate),
-      getShifts()
+      getShifts(),
+      getQRCodes()
     ])
-      .then(([reportData, shiftsData]) => {
+      .then(([reportData, shiftsData, qrsData]) => {
         setReport(reportData)
         setShifts(shiftsData)
+        setQrs(qrsData)
         setLastUpdated(new Date().toLocaleTimeString())
       })
-      .catch(() => { setReport([]); setShifts([]) })
+      .catch(() => { setReport([]); setShifts([]); setQrs([]) })
       .finally(() => setLoading(false))
   }, [selectedDate, authorized])
 
@@ -425,6 +427,16 @@ export default function DashboardPage() {
       "08:00","10:00","12:00","14:00",
       "16:00","18:00","20:00","22:00"
     ];
+
+    // Compute expected target based on historical QRs
+    const selectedDateEnd = new Date(`${selectedDate}T23:59:59.999`);
+    const activeQRsOnDate = qrs.filter((q: any) => {
+      if (q.campus_code && q.campus_code !== FIXED_CAMPUS) return false;
+      const createdDate = new Date(q.created_at);
+      return createdDate <= selectedDateEnd;
+    });
+    // Fallback to 1 if no QRs found to avoid divide by zero, though UI handles 0
+    const targetScansPerRound = activeQRsOnDate.length;
 
     let dueRoundsCount = ROUND_TIMES.length;
     if (isToday) {
@@ -589,12 +601,15 @@ export default function DashboardPage() {
       const roundNo = idx + 1;
       const h = parseInt(time.split(':')[0]);
       
-      let status: 'COMPLETED' | 'MISSED' | 'ACTIVE' | 'PENDING' = 'PENDING';
+      let status: 'COMPLETED' | 'PARTIAL' | 'MISSED' | 'ACTIVE' | 'PENDING' = 'PENDING';
       let isActive = false;
       
       const items = report.filter(r => r.round === roundNo);
-      const isSuccess = items.some(r => r.status === 'SUCCESS');
-      const isMissed = items.length > 0 && items.every(r => r.status !== 'SUCCESS');
+      const successCount = items.filter(r => r.status === 'SUCCESS').length;
+      
+      // We expect 'targetScansPerRound' scans for a fully completed round
+      const isSuccess = successCount >= targetScansPerRound && targetScansPerRound > 0;
+      const isPartial = successCount > 0 && successCount < targetScansPerRound;
       
       if (isToday) {
         const now = new Date();
@@ -606,17 +621,16 @@ export default function DashboardPage() {
         const isPast = currentMins >= endMins;
         
         if (isSuccess) status = 'COMPLETED';
+        else if (isPartial) status = 'PARTIAL';
         else if (isActive) status = 'ACTIVE';
         else if (isPast) status = 'MISSED';
         else status = 'PENDING';
       } else {
         // Past day
         if (isSuccess) status = 'COMPLETED';
+        else if (isPartial) status = 'PARTIAL';
         else status = 'MISSED';
       }
-      
-      // Handle missing scans on past dates or earlier today
-      if (!isToday && status === 'PENDING') status = 'MISSED';
       
       return {
         roundNo,
@@ -792,6 +806,8 @@ export default function DashboardPage() {
                 let badge = null;
                 if (item.status === 'COMPLETED') {
                   badge = <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">🟢 Verified</span>;
+                } else if (item.status === 'PARTIAL') {
+                  badge = <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-blue-50 text-blue-700 text-xs font-bold border border-blue-200">🔵 Partial</span>;
                 } else if (item.status === 'ACTIVE') {
                   badge = <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-amber-50 text-amber-700 text-xs font-bold border border-amber-200"><span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>🟡 Active Window</span>;
                 } else if (item.status === 'MISSED') {
@@ -807,6 +823,11 @@ export default function DashboardPage() {
                       {badge}
                     </div>
                     <p className="text-xs text-slate-500 font-medium">{item.timeLabel}</p>
+                    {(item.status === 'COMPLETED' || item.status === 'PARTIAL' || item.status === 'MISSED') && (
+                      <p className={`text-xs mt-2 font-semibold ${item.status === 'COMPLETED' ? 'text-emerald-600' : item.status === 'PARTIAL' ? 'text-blue-600' : 'text-rose-600'}`}>
+                        {item.successCount} out of {item.targetScans} Scanned
+                      </p>
+                    )}
                     {item.status === 'ACTIVE' && (
                       <p className="text-[10px] text-amber-600 mt-2 font-semibold uppercase tracking-wider">Accepting Scans...</p>
                     )}
@@ -917,14 +938,12 @@ export default function DashboardPage() {
               </div>
             )}
 
-            {/* ROW 2: Hourly activity + Scan Point Coverage */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-
-              {/* Hourly Activity */}
-              <div className="glass-panel rounded-3xl p-6">
-                <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-1">📈 Hourly Activity</h2>
-                <p className="text-xs text-slate-400 mb-4">Successful scans by hour of day</p>
-                {stats.hourlyActivity.some(h => h.scans > 0) ? (
+            {/* ROW 2: Hourly activity */}
+            {stats.hourlyActivity.some(h => h.scans > 0) && (
+              <div className="mb-6">
+                <div className="glass-panel rounded-3xl p-6">
+                  <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-1">📈 Hourly Activity</h2>
+                  <p className="text-xs text-slate-400 mb-4">Successful scans by hour of day</p>
                   <ResponsiveContainer width="100%" height={240}>
                     <AreaChart data={stats.hourlyActivity}>
                       <defs>
@@ -940,18 +959,18 @@ export default function DashboardPage() {
                       <Area type="monotone" dataKey="scans" stroke="#6366f1" strokeWidth={2} fill="url(#hGrad)" dot={false} name="Scans" />
                     </AreaChart>
                   </ResponsiveContainer>
-                ) : (
-                  <div className="h-60 flex items-center justify-center text-slate-400 text-sm">No scan activity recorded</div>
-                )}
+                  </ResponsiveContainer>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* ROW 3: Guard bar + Scan Point Coverage */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
 
               {/* Guard Performance Bar */}
-              <div className="glass-panel rounded-3xl p-6">
-                <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-1">Guard Scans vs Missed</h2>
+              {stats.guardLeaderboard.length > 0 && (
+                <div className={`glass-panel rounded-3xl p-6 ${stats.coverageByPoint.length === 0 ? 'lg:col-span-2' : ''}`}>
+                  <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-1">Guard Scans vs Missed</h2>
                 <p className="text-xs text-slate-400 mb-4">Side-by-side comparison</p>
                 {stats.guardLeaderboard.length > 0 ? (
                   <ResponsiveContainer width="100%" height={240}>
@@ -970,29 +989,32 @@ export default function DashboardPage() {
                       <Bar dataKey="missed"  fill="#f43f5e" radius={[6, 6, 0, 0]} name="Missed" />
                     </BarChart>
                   </ResponsiveContainer>
-                ) : <div className="h-60 flex items-center justify-center text-slate-400 text-sm">No guard data</div>}
-              </div>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
 
               {/* Scan Point Coverage */}
-              <div className="glass-panel rounded-3xl p-6">
-                <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-1">📍 Scan Point Coverage</h2>
-                <p className="text-xs text-slate-400 mb-4">% of rounds scanned per checkpoint</p>
-                <div className="overflow-y-auto max-h-64 pr-1">
+              {stats.coverageByPoint.length > 0 && (
+                <div className={`glass-panel rounded-3xl p-6 ${stats.guardLeaderboard.length === 0 ? 'lg:col-span-2' : ''}`}>
+                  <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-1">📍 Scan Point Coverage</h2>
+                  <p className="text-xs text-slate-400 mb-4">% of rounds scanned per checkpoint</p>
+                  <div className="overflow-y-auto max-h-64 pr-1">
                   {stats.coverageByPoint.map((p, i) => (
                     <CoverageBar key={i} name={p.name} done={p.done} total={p.total} />
                   ))}
                 </div>
-              </div>
+              )}
             </div>
 
             {/* ROW 4: Recent Activity Feed + Missed Points Table */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
 
               {/* Recent Activity Feed */}
-              <div className="glass-panel rounded-3xl p-6">
-                <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-1">🕐 Recent Activity</h2>
-                <p className="text-xs text-slate-400 mb-4">Last 10 successful scans</p>
-                {stats.recentActivity.length > 0 ? (
+              {stats.recentActivity.length > 0 && (
+                <div className={`glass-panel rounded-3xl p-6 ${stats.coverageByPoint.filter((p: any) => p.done < p.total).length === 0 ? 'lg:col-span-2' : ''}`}>
+                  <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-1">🕐 Recent Activity</h2>
+                  <p className="text-xs text-slate-400 mb-4">Last 10 successful scans</p>
                   <div className="space-y-2">
                     {stats.recentActivity.map((r, i) => (
                       <div key={i} className="flex items-center gap-3 py-2 border-b border-slate-50 last:border-0">
@@ -1009,14 +1031,12 @@ export default function DashboardPage() {
                       </div>
                     ))}
                   </div>
-                ) : (
-                  <div className="h-48 flex items-center justify-center text-slate-400 text-sm">No recent activity</div>
-                )}
-              </div>
+                </div>
+              )}
 
               {/* Missed Points Table */}
-              {stats.coverageByPoint.filter(p => p.done < p.total).length > 0 ? (
-                <div className="glass-panel rounded-3xl p-6">
+              {stats.coverageByPoint.filter(p => p.done < p.total).length > 0 && (
+                <div className={`glass-panel rounded-3xl p-6 ${stats.recentActivity.length === 0 ? 'lg:col-span-2' : ''}`}>
                   <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-1">⚠️ Problem Checkpoints</h2>
                   <p className="text-xs text-slate-400 mb-4">Scan points with incomplete coverage</p>
                   <div className="overflow-x-auto">
@@ -1055,14 +1075,16 @@ export default function DashboardPage() {
                     </table>
                   </div>
                 </div>
-              ) : stats.completed > 0 ? (
-                <div className="glass-panel rounded-3xl p-6 flex flex-col items-center justify-center gap-3 text-amber-600">
-                  <span className="text-5xl">🎉</span>
-                  <p className="font-bold text-lg">All checkpoints covered!</p>
-                  <p className="text-sm text-slate-400">Every scan point has 100% coverage</p>
-                </div>
-              ) : null}
+              )}
             </div>
+            
+            {stats.coverageByPoint.filter(p => p.done < p.total).length === 0 && stats.completed > 0 && (
+              <div className="glass-panel rounded-3xl p-6 flex flex-col items-center justify-center gap-3 text-amber-600">
+                <span className="text-5xl">🎉</span>
+                <p className="font-bold text-lg">All checkpoints covered!</p>
+                <p className="text-sm text-slate-400">Every scan point has 100% coverage</p>
+              </div>
+            )}
           </>
         ) : report.length === 0 && !loading ? (
           <div className="glass-panel rounded-3xl min-h-[300px] flex flex-col items-center justify-center gap-3 text-slate-400">

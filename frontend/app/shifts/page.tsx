@@ -7,6 +7,7 @@ import { getAllocations, allocateGuards, ShiftAllocation } from '@/app/api/alloc
 import { SecurityUser } from '@/app/types/securityUser'
 import { useAuthGuard } from '@/app/services/auth.guard'
 import { motion, AnimatePresence } from 'framer-motion'
+import { generateTimetablePDF } from '../components/reports/TimetablePDF'
 
 export default function ShiftsPage() {
   const { authorized } = useAuthGuard({ allowedRoles: ['ADMIN', 'SUPERVISOR'] })
@@ -153,16 +154,28 @@ export default function ShiftsPage() {
             <h1 className="text-4xl font-extrabold text-slate-800 tracking-tight drop-shadow-sm">Shift Management</h1>
             <p className="text-slate-500 mt-2 font-medium tracking-wide">Configure recurring shifts and assign guard rosters</p>
           </div>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => openModal()}
-            className="group relative overflow-hidden bg-purple-600 hover:bg-purple-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-md hover:shadow-lg"
-          >
-            <span className="relative z-10 flex items-center gap-2">
-              <span className="text-lg leading-none">+</span> Add Shift
-            </span>
-          </motion.button>
+          <div className="flex gap-4">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => generateTimetablePDF(shifts, guards, allocations)}
+              className="group relative overflow-hidden bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm hover:shadow"
+            >
+              <span className="relative z-10 flex items-center gap-2">
+                📄 Download Timetable
+              </span>
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => openModal()}
+              className="group relative overflow-hidden bg-purple-600 hover:bg-purple-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-md hover:shadow-lg"
+            >
+              <span className="relative z-10 flex items-center gap-2">
+                <span className="text-lg leading-none">+</span> Add Shift
+              </span>
+            </motion.button>
+          </div>
         </div>
 
         {loading ? (
