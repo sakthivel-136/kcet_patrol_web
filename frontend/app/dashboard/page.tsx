@@ -970,8 +970,7 @@ export default function DashboardPage() {
               {stats.guardLeaderboard.length > 0 && (
                 <div className={`glass-panel rounded-3xl p-6 ${stats.coverageByPoint.length === 0 ? 'lg:col-span-2' : ''}`}>
                   <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-1">Guard Scans vs Missed</h2>
-                <p className="text-xs text-slate-400 mb-4">Side-by-side comparison</p>
-                {stats.guardLeaderboard.length > 0 ? (
+                  <p className="text-xs text-slate-400 mb-4">Side-by-side comparison</p>
                   <ResponsiveContainer width="100%" height={240}>
                     <BarChart
                       data={stats.guardLeaderboard.slice(0, 8).map(g => ({
@@ -988,8 +987,6 @@ export default function DashboardPage() {
                       <Bar dataKey="missed"  fill="#f43f5e" radius={[6, 6, 0, 0]} name="Missed" />
                     </BarChart>
                   </ResponsiveContainer>
-                    </BarChart>
-                  </ResponsiveContainer>
                 </div>
               )}
 
@@ -999,9 +996,10 @@ export default function DashboardPage() {
                   <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-1">📍 Scan Point Coverage</h2>
                   <p className="text-xs text-slate-400 mb-4">% of rounds scanned per checkpoint</p>
                   <div className="overflow-y-auto max-h-64 pr-1">
-                  {stats.coverageByPoint.map((p, i) => (
-                    <CoverageBar key={i} name={p.name} done={p.done} total={p.total} />
-                  ))}
+                    {stats.coverageByPoint.map((p, i) => (
+                      <CoverageBar key={i} name={p.name} done={p.done} total={p.total} />
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
