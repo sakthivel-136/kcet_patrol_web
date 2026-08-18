@@ -3,6 +3,6 @@
 4:I[97367,["/_next/static/chunks/ff1a16fafef87110.js","/_next/static/chunks/64c0a5e3a0354479.js"],"MetadataBoundary"]
 5:"$Sreact.suspense"
 7:I[27201,["/_next/static/chunks/ff1a16fafef87110.js","/_next/static/chunks/64c0a5e3a0354479.js"],"IconMark"]
-0:{"buildId":"zCC6JYozMXuF0M8OAxbr5","rsc":["$","$1","h",{"children":[null,["$","$L2",null,{"children":"$@3"}],["$","div",null,{"hidden":true,"children":["$","$L4",null,{"children":["$","$5",null,{"name":"Next.Metadata","children":"$@6"}]}]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}],"loading":null,"isPartial":false}
+0:{"buildId":"c1lA4LDgtRH7iJDtG1ysU","rsc":["$","$1","h",{"children":[null,["$","$L2",null,{"children":"$@3"}],["$","div",null,{"hidden":true,"children":["$","$L4",null,{"children":["$","$5",null,{"name":"Next.Metadata","children":"$@6"}]}]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}],"loading":null,"isPartial":false}
 3:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
 6:[["$","title","0",{"children":"KCET Security Rounds"}],["$","meta","1",{"name":"description","content":"Admin panel for KCET Security Rounds"}],["$","link","2",{"rel":"shortcut icon","href":"/favicon.jpeg"}],["$","link","3",{"rel":"icon","href":"/favicon.jpeg"}],["$","link","4",{"rel":"apple-touch-icon","href":"/favicon.jpeg"}],["$","$L7","5",{}]]
