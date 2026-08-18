@@ -25,6 +25,7 @@ const normalizeQR = (data: QRData): QRCode => ({
       : "inactive",
   created_at: data.created_at,
   campus_code: data.campus_code || "",
+  secure_token: data.secure_token,
   waiting_time:
     typeof data.waiting_time === "number" ? data.waiting_time : 15,
 });
