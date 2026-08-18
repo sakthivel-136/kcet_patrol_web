@@ -959,7 +959,6 @@ export default function DashboardPage() {
                       <Area type="monotone" dataKey="scans" stroke="#6366f1" strokeWidth={2} fill="url(#hGrad)" dot={false} name="Scans" />
                     </AreaChart>
                   </ResponsiveContainer>
-                  </ResponsiveContainer>
                 </div>
               </div>
             )}
