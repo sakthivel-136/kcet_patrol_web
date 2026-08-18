@@ -9,7 +9,7 @@ import {
 } from 'recharts'
 import { getPatrolReport, PatrolReportItem } from '../api/report'
 import { getShifts } from '../api/shifts.api'
-import { getQRCodes } from '../api/qr.api'
+import { fetchQRByCampus } from '../api/qr.api'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import { useAuthGuard } from '@/app/services/auth.guard'
@@ -376,6 +376,7 @@ export default function DashboardPage() {
   const [report, setReport]                   = useState<PatrolReportItem[]>([])
   const [shifts, setShifts]                   = useState<any[]>([])
   const [qrs, setQrs]                         = useState<any[]>([])
+  const [loading, setLoading]                 = useState(false)
   const [lastUpdated, setLastUpdated]         = useState('')
 
   /* auth check */
@@ -392,7 +393,7 @@ export default function DashboardPage() {
     Promise.all([
       getPatrolReport(FIXED_CAMPUS, selectedDate),
       getShifts(),
-      getQRCodes()
+      fetchQRByCampus(FIXED_CAMPUS)
     ])
       .then(([reportData, shiftsData, qrsData]) => {
         setReport(reportData)
