@@ -12,19 +12,20 @@ def generate_round_slots(report_date: str):
       (round_no, start_dt, end_dt),
       ...
     ]
-    Where start_dt is 10 minutes before the hour, and end_dt is 20 minutes after the hour.
+    Where start_dt is 45 minutes past the start of the 2-hour interval, and end_dt is 1 hour 30 minutes past.
     """
     base = datetime.strptime(report_date, "%Y-%m-%d")
     base = IST.localize(base)
 
     slots = []
 
-    for h in range(24):
+    for i in range(12):
+        h = i * 2
         nominal = base.replace(hour=h, minute=0, second=0)
         
-        start = nominal - timedelta(minutes=10)
-        end = nominal + timedelta(minutes=20)
+        start = nominal + timedelta(minutes=45)
+        end = nominal + timedelta(hours=1, minutes=30)
 
-        slots.append((h + 1, start, end))
+        slots.append((i + 1, start, end))
 
     return slots

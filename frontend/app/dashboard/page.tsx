@@ -414,19 +414,16 @@ export default function DashboardPage() {
     const empty = {
       total: 0, completed: 0, missed: 0, pending: 0, rate: 0, lastScan: null as string | null,
       pie: [], roundSummary: [], shiftLeaderboards: [], guardLeaderboard: [], coverageByPoint: [],
-      hourlyActivity: [], recentActivity: [], isPartialDay: false, nothingScannedToday: false
+      hourlyActivity: [], recentActivity: [], isPartialDay: false, nothingScannedToday: false, timeline: [] as any[]
     }
     if (!report.length) return empty
 
     const isToday = selectedDate === today
 
     const ROUND_TIMES = [
-      "00:00","01:00","02:00","03:00",
-      "04:00","05:00","06:00","07:00",
-      "08:00","09:00","10:00","11:00",
-      "12:00","13:00","14:00","15:00",
-      "16:00","17:00","18:00","19:00",
-      "20:00","21:00","22:00","23:00"
+      "00:00","02:00","04:00","06:00",
+      "08:00","10:00","12:00","14:00",
+      "16:00","18:00","20:00","22:00"
     ];
 
     let dueRoundsCount = ROUND_TIMES.length;
@@ -436,8 +433,9 @@ export default function DashboardPage() {
       const currentMinute = now.getMinutes();
       dueRoundsCount = 0;
       for (let i = 0; i < ROUND_TIMES.length; i++) {
-        const [h, m] = ROUND_TIMES[i].split(':').map(Number);
-        if (currentHour > h || (currentHour === h && currentMinute >= m)) {
+        const h = parseInt(ROUND_TIMES[i].split(':')[0]);
+        // A round is considered "due" (its window has closed) if we are past +1h30m from start
+        if (currentHour > h + 1 || (currentHour === h + 1 && currentMinute >= 30)) {
           dueRoundsCount = i + 1;
         } else {
           break;
@@ -586,10 +584,51 @@ export default function DashboardPage() {
       .sort((a, b) => (b.scan_time || '').localeCompare(a.scan_time || ''))
       .slice(0, 10)
 
+    /* ── timeline cards ── */
+    const timeline = ROUND_TIMES.map((time, idx) => {
+      const roundNo = idx + 1;
+      const h = parseInt(time.split(':')[0]);
+      
+      let status: 'COMPLETED' | 'MISSED' | 'ACTIVE' | 'PENDING' = 'PENDING';
+      let isActive = false;
+      
+      const items = report.filter(r => r.round === roundNo);
+      const isSuccess = items.some(r => r.status === 'SUCCESS');
+      const isMissed = items.length > 0 && items.every(r => r.status !== 'SUCCESS');
+      
+      if (isToday) {
+        const now = new Date();
+        const currentMins = now.getHours() * 60 + now.getMinutes();
+        const startMins = h * 60 + 45; // opens at +45m
+        const endMins = h * 60 + 90;   // closes at +1h30m
+        
+        isActive = currentMins >= startMins && currentMins < endMins;
+        const isPast = currentMins >= endMins;
+        
+        if (isSuccess) status = 'COMPLETED';
+        else if (isActive) status = 'ACTIVE';
+        else if (isPast) status = 'MISSED';
+        else status = 'PENDING';
+      } else {
+        // Past day
+        if (isSuccess) status = 'COMPLETED';
+        else status = 'MISSED';
+      }
+      
+      // Handle missing scans on past dates or earlier today
+      if (!isToday && status === 'PENDING') status = 'MISSED';
+      
+      return {
+        roundNo,
+        timeLabel: `${String(h).padStart(2, '0')}:00 - ${String(h + 2).padStart(2, '0')}:00`,
+        status
+      };
+    });
+
     return {
       total, completed, missed, pending, rate, lastScan, pie, roundSummary,
       shiftLeaderboards, guardLeaderboard, coverageByPoint, hourlyActivity, recentActivity,
-      isPartialDay, nothingScannedToday,
+      isPartialDay, nothingScannedToday, timeline
     }
   }, [report, selectedDate, today])
 
@@ -737,6 +776,43 @@ export default function DashboardPage() {
               <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-purple-500 inline-block" />Completed</span>
               <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-rose-400 inline-block" />Missed</span>
               <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-slate-200 inline-block" />Not due yet</span>
+            </div>
+          </div>
+        )}
+
+        {/* ── ROUND TIMELINE CARDS ── */}
+        {report.length > 0 && (
+          <div className="mb-6">
+            <h2 className="text-xl font-bold text-slate-800 tracking-tight mb-4 flex items-center gap-2">
+              ⏱️ Daily Patrol Timeline
+              <span className="text-sm font-normal text-slate-500 bg-slate-100 px-3 py-1 rounded-full">12-Round Daily Cycle</span>
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {stats.timeline?.map((item: any) => {
+                let badge = null;
+                if (item.status === 'COMPLETED') {
+                  badge = <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">🟢 Verified</span>;
+                } else if (item.status === 'ACTIVE') {
+                  badge = <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-amber-50 text-amber-700 text-xs font-bold border border-amber-200"><span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>🟡 Active Window</span>;
+                } else if (item.status === 'MISSED') {
+                  badge = <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-rose-50 text-rose-700 text-xs font-bold border border-rose-200">🔴 Missed</span>;
+                } else {
+                  badge = <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-slate-50 text-slate-500 text-xs font-bold border border-slate-200">⚪ Upcoming</span>;
+                }
+
+                return (
+                  <div key={item.roundNo} className={`p-4 rounded-2xl border transition-all ${item.status === 'ACTIVE' ? 'bg-amber-50/50 border-amber-200 shadow-md ring-1 ring-amber-200' : 'bg-white border-slate-200 shadow-sm'}`}>
+                    <div className="flex justify-between items-start mb-2">
+                      <span className="text-sm font-bold text-slate-700">Round {item.roundNo}</span>
+                      {badge}
+                    </div>
+                    <p className="text-xs text-slate-500 font-medium">{item.timeLabel}</p>
+                    {item.status === 'ACTIVE' && (
+                      <p className="text-[10px] text-amber-600 mt-2 font-semibold uppercase tracking-wider">Accepting Scans...</p>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
