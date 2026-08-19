@@ -34,15 +34,31 @@ def download_report(
         end_dt = datetime.strptime(end_date, "%Y-%m-%d").date()
 
         # ==============================
-        # 1. Fetch QR codes
+        # 1. Fetch QR codes (with created_at so we can filter historically)
         # ==============================
         qr_codes = (
             db.table("qr")
-            .select("qr_id, qr_name")
+            .select("qr_id, qr_name, created_at")
             .eq("campus_code", campus_code)
             .execute()
             .data or []
         )
+
+        # Pre-parse each QR's created_at into a timezone-aware IST datetime
+        for qr in qr_codes:
+            raw = qr.get("created_at")
+            if raw:
+                try:
+                    dt = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+                    if dt.tzinfo is None:
+                        dt = IST.localize(dt)
+                    else:
+                        dt = dt.astimezone(IST)
+                    qr["created_at_ist"] = dt
+                except Exception:
+                    qr["created_at_ist"] = None
+            else:
+                qr["created_at_ist"] = None
 
         # ==============================
         # 2. Fetch ALL scan logs for the range (paginated to avoid 1000-row limit)
@@ -134,6 +150,17 @@ def download_report(
                 qr_id = str(qr["qr_id"])
 
                 for round_no, start_slot_dt, end_slot_dt in round_slots:
+
+                    # ── HISTORICAL FILTER ───────────────────────────────────
+                    # Only include this QR if it existed BEFORE this round started.
+                    # If a QR was added AFTER the round window, skip it entirely —
+                    # it should not show as MISSED for a time it didn't exist yet.
+                    qr_created = qr.get("created_at_ist")
+                    if qr_created and qr_created > start_slot_dt:
+                        continue  # QR added after this round started — skip silently
+                    # ────────────────────────────────────────────────────────
+
+
                     qr_scans = scans_by_qr.get(qr_id, [])
                     matching_scans = [
                         s for s in qr_scans

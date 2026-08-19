@@ -120,15 +120,28 @@ export default function LoginPage() {
             {/* ── Logo & Title ─────────────────────── */}
             <div className="flex flex-col items-center mb-8 space-y-4">
               <motion.div
-                whileHover={{ scale: 1.08, rotate: 6 }}
+                whileHover={{ scale: 1.06 }}
                 transition={{ type: 'spring', stiffness: 300 }}
-                className="relative w-16 h-16"
+                className="relative w-20 h-20"
               >
-                {/* Glow ring */}
-                <div className="absolute inset-0 rounded-2xl bg-purple-500/30 blur-xl scale-125 animate-pulse" />
-                <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600 to-violet-700
-                                text-white flex items-center justify-center shadow-2xl shadow-purple-500/40">
-                  <ShieldCheck size={32} strokeWidth={2} />
+                {/* Outer glow */}
+                <div className="absolute inset-0 rounded-full bg-purple-500/20 blur-xl scale-125 animate-pulse" />
+                {/* Avatar circle */}
+                <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-purple-600 to-violet-700
+                                text-white flex flex-col items-center justify-center shadow-2xl shadow-purple-500/40 gap-0">
+                  {/* First letter of user ID typed, or fallback shield */}
+                  {userId.trim() ? (
+                    <>
+                      <span className="text-2xl font-extrabold leading-none tracking-tight">
+                        {userId.trim()[0].toUpperCase()}
+                      </span>
+                      <User size={14} className="opacity-60 mt-0.5" />
+                    </>
+                  ) : (
+                    <>
+                      <ShieldCheck size={28} strokeWidth={2} />
+                    </>
+                  )}
                 </div>
               </motion.div>
 
@@ -136,7 +149,7 @@ export default function LoginPage() {
                 <h1 className="text-3xl font-extrabold tracking-tight text-purple-950">
                   KCET <span className="text-gradient">SECURITY</span>
                 </h1>
-                <p className="text-purple-500/80 font-medium text-sm mt-1 tracking-wide uppercase text-xs">
+                <p className="text-purple-500/80 font-medium mt-1 tracking-wide uppercase text-xs">
                   Admin Control Panel
                 </p>
               </div>
@@ -187,17 +200,14 @@ export default function LoginPage() {
                       <label className="text-xs font-semibold uppercase tracking-widest text-purple-500">
                         User ID
                       </label>
-                      <div className="relative">
-                        <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-purple-300" />
-                        <input
-                          value={userId}
-                          onChange={e => setUserId(e.target.value)}
-                          className="input-field pl-10"
-                          placeholder="Enter your user ID"
-                          required
-                          autoComplete="username"
-                        />
-                      </div>
+                      <input
+                        value={userId}
+                        onChange={e => setUserId(e.target.value)}
+                        className="input-field"
+                        placeholder="Enter your user ID"
+                        required
+                        autoComplete="username"
+                      />
                     </div>
 
                     {/* Password */}
@@ -206,12 +216,11 @@ export default function LoginPage() {
                         Password
                       </label>
                       <div className="relative">
-                        <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-purple-300" />
                         <input
                           type={showPwd ? 'text' : 'password'}
                           value={password}
                           onChange={e => setPassword(e.target.value)}
-                          className="input-field pl-10 pr-12"
+                          className="input-field pr-12"
                           placeholder="••••••••"
                           required
                           autoComplete="current-password"
