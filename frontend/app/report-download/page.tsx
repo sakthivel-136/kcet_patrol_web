@@ -66,6 +66,23 @@ function getSegregatedWeeks(yearMonthStr: string): WeekSegregation[] {
   return weeks;
 }
 
+const MONTHS = [
+  { value: "01", label: "January (01)" },
+  { value: "02", label: "February (02)" },
+  { value: "03", label: "March (03)" },
+  { value: "04", label: "April (04)" },
+  { value: "05", label: "May (05)" },
+  { value: "06", label: "June (06)" },
+  { value: "07", label: "July (07)" },
+  { value: "08", label: "August (08)" },
+  { value: "09", label: "September (09)" },
+  { value: "10", label: "October (10)" },
+  { value: "11", label: "November (11)" },
+  { value: "12", label: "December (12)" },
+];
+
+const YEARS = Array.from({ length: 11 }, (_, i) => 2024 + i);
+
 // ================= PAGE =================
 export default function ReportDownloadPage() {
   const { authorized } = useAuthGuard({ allowedRoles: ['ADMIN', 'SUPERVISOR'] });
@@ -83,6 +100,19 @@ export default function ReportDownloadPage() {
   const [selectedMonth, setSelectedMonth] = useState(todayStr.slice(0, 7)); // YYYY-MM
   const [selectedWeekIndex, setSelectedWeekIndex] = useState<number>(0);
   const [reportType, setReportType] = useState<"single" | "range" | "weekly" | "month">("single");
+
+  const currentYear = useMemo(() => {
+    return selectedMonth ? selectedMonth.split("-")[0] : String(new Date().getFullYear());
+  }, [selectedMonth]);
+
+  const currentMonthNum = useMemo(() => {
+    return selectedMonth ? selectedMonth.split("-")[1] : String(new Date().getMonth() + 1).padStart(2, "0");
+  }, [selectedMonth]);
+
+  const handleYearMonthChange = (year: string, monthVal: string) => {
+    setSelectedMonth(`${year}-${monthVal}`);
+    setSelectedWeekIndex(0);
+  };
 
   const [report, setReport] = useState<PatrolReportItem[]>([]);
   const [shifts, setShifts] = useState<any[]>([]);
@@ -348,19 +378,57 @@ export default function ReportDownloadPage() {
             {/* WEEKLY SEGREGATED REPORT MODE */}
             {reportType === "weekly" && (
               <>
-                <div className="md:col-span-3 space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-wider text-purple-400 block">
-                    Select Month
-                  </label>
-                  <input
-                    type="month"
-                    className="input-field py-2.5 text-xs font-semibold text-purple-950 bg-white/90"
-                    value={selectedMonth}
-                    onChange={(e) => { setSelectedMonth(e.target.value); setSelectedWeekIndex(0); }}
-                  />
+                <div className="md:col-span-4 glass-panel p-3.5 rounded-2xl border border-purple-100/80 space-y-2.5 bg-purple-50/30">
+                  <p className="text-[11px] font-extrabold uppercase tracking-widest text-purple-700 flex items-center gap-1.5 border-b border-purple-100/80 pb-2">
+                    <CalendarDays size={14} className="text-purple-600" /> Month Selection (Year Top, Month Below)
+                  </p>
+
+                  <div className="space-y-2">
+                    {/* Top: Select Year */}
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
+                        <Calendar size={12} /> Select Year (Top)
+                      </label>
+                      <div className="relative">
+                        <select
+                          value={currentYear}
+                          onChange={(e) => handleYearMonthChange(e.target.value, currentMonthNum)}
+                          className="input-field py-2 text-xs bg-white/95 cursor-pointer font-bold text-purple-950 pr-8 appearance-none shadow-sm"
+                        >
+                          {YEARS.map((y) => (
+                            <option key={y} value={y}>
+                              {y}
+                            </option>
+                          ))}
+                        </select>
+                        <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-purple-400 pointer-events-none" />
+                      </div>
+                    </div>
+
+                    {/* Below: Select Month Dropdown */}
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
+                        <CalendarDays size={12} /> Select Month (Below)
+                      </label>
+                      <div className="relative">
+                        <select
+                          value={currentMonthNum}
+                          onChange={(e) => handleYearMonthChange(currentYear, e.target.value)}
+                          className="input-field py-2 text-xs bg-white/95 cursor-pointer font-bold text-purple-950 pr-8 appearance-none shadow-sm"
+                        >
+                          {MONTHS.map((m) => (
+                            <option key={m.value} value={m.value}>
+                              {m.label}
+                            </option>
+                          ))}
+                        </select>
+                        <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-purple-400 pointer-events-none" />
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="md:col-span-4 space-y-1.5">
+                <div className="md:col-span-4 space-y-1.5 self-end">
                   <label className="text-[11px] font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1">
                     <Grid size={13} /> Segregated Week of Month
                   </label>
@@ -384,16 +452,54 @@ export default function ReportDownloadPage() {
 
             {/* MONTH-WISE MODE */}
             {reportType === "month" && (
-              <div className="md:col-span-3 space-y-1.5">
-                <label className="text-[11px] font-bold uppercase tracking-wider text-purple-400 block">
-                  Select Month
-                </label>
-                <input
-                  type="month"
-                  className="input-field py-2.5 text-xs font-semibold text-purple-950 bg-white/90"
-                  value={selectedMonth}
-                  onChange={(e) => setSelectedMonth(e.target.value)}
-                />
+              <div className="md:col-span-4 glass-panel p-3.5 rounded-2xl border border-purple-100/80 space-y-2.5 bg-purple-50/30">
+                <p className="text-[11px] font-extrabold uppercase tracking-widest text-purple-700 flex items-center gap-1.5 border-b border-purple-100/80 pb-2">
+                  <CalendarDays size={14} className="text-purple-600" /> Month Selection (Year Top, Month Below)
+                </p>
+
+                <div className="space-y-2">
+                  {/* Top: Select Year */}
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
+                      <Calendar size={12} /> Select Year (Top)
+                    </label>
+                    <div className="relative">
+                      <select
+                        value={currentYear}
+                        onChange={(e) => handleYearMonthChange(e.target.value, currentMonthNum)}
+                        className="input-field py-2 text-xs bg-white/95 cursor-pointer font-bold text-purple-950 pr-8 appearance-none shadow-sm"
+                      >
+                        {YEARS.map((y) => (
+                          <option key={y} value={y}>
+                            {y}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-purple-400 pointer-events-none" />
+                    </div>
+                  </div>
+
+                  {/* Below: Select Month Dropdown */}
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
+                      <CalendarDays size={12} /> Select Month (Below)
+                    </label>
+                    <div className="relative">
+                      <select
+                        value={currentMonthNum}
+                        onChange={(e) => handleYearMonthChange(currentYear, e.target.value)}
+                        className="input-field py-2 text-xs bg-white/95 cursor-pointer font-bold text-purple-950 pr-8 appearance-none shadow-sm"
+                      >
+                        {MONTHS.map((m) => (
+                          <option key={m.value} value={m.value}>
+                            {m.label}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-purple-400 pointer-events-none" />
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
 
