@@ -16,7 +16,11 @@ import autoTable from 'jspdf-autotable'
 import { useAuthGuard } from '@/app/services/auth.guard'
 import GuardLeaderboard from '../components/analytics/GuardLeaderboard'
 import { LOGO_BASE64 } from '../components/reports/logoBase64'
-import { Filter, Calendar, UserCheck, Shield, Clock, CheckCircle2, AlertTriangle, Activity, RefreshCw } from 'lucide-react'
+import {
+  Filter, Calendar, UserCheck, Shield, Clock, CheckCircle2,
+  AlertTriangle, Activity, RefreshCw, ChevronDown, Sparkles,
+  CalendarDays, Layers
+} from 'lucide-react'
 
 /* ================================================================
    TYPES & CONSTANTS
@@ -57,7 +61,7 @@ function exportDashboardPDF(
   statsData: DashboardStats,
   campus: string,
   campusName: string,
-  date: string,
+  dateRangeStr: string,
   adminName: string
 ) {
   const btn = document.getElementById('pdf-export-btn')
@@ -91,7 +95,7 @@ function exportDashboardPDF(
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(12)
     doc.setTextColor(109, 40, 217)
-    doc.text(`Date : ${date}`, 14, 44)
+    doc.text(`Timeframe : ${dateRangeStr}`, 14, 44)
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(10)
     doc.setTextColor(40)
@@ -193,7 +197,7 @@ function exportDashboardPDF(
       )
     }
 
-    doc.save(`KCET_Patrol_Analytics_${date}.pdf`)
+    doc.save(`KCET_Patrol_Analytics_${dateRangeStr}.pdf`)
   } catch (err) {
     console.error('PDF export error:', err)
     alert('Failed to generate PDF. Check console.')
@@ -224,7 +228,7 @@ export default function DashboardPage() {
   const router = useRouter()
   const { authorized } = useAuthGuard({ allowedRoles: ['ADMIN'] });
 
-  const today = useMemo(() => {
+  const todayStr = useMemo(() => {
     const d = new Date();
     const offset = d.getTimezoneOffset() * 60000;
     return new Date(d.getTime() - offset).toISOString().slice(0, 10);
@@ -232,7 +236,12 @@ export default function DashboardPage() {
 
   const [adminName, setAdminName]             = useState('')
   const FIXED_CAMPUS                          = 'KCET01'
-  const [selectedDate, setSelectedDate]       = useState(today)
+  
+  // ── DATE RANGE STATES ──
+  const [selectedDate, setSelectedDate]       = useState(todayStr)
+  const [endDate, setEndDate]                 = useState(todayStr)
+  const [activePreset, setActivePreset]       = useState<'today' | 'yesterday' | 'thisWeek' | 'thisMonth' | 'custom'>('today')
+
   const [report, setReport]                   = useState<PatrolReportItem[]>([])
   const [shifts, setShifts]                   = useState<any[]>([])
   const [qrs, setQrs]                         = useState<any[]>([])
@@ -253,13 +262,13 @@ export default function DashboardPage() {
     }
   }, [authorized])
 
-  /* ── FETCH LOGIC WITH SILENT REFRESH SUPPORT ── */
+  /* ── FETCH LOGIC WITH DATE RANGE & SILENT REFRESH SUPPORT ── */
   const fetchReportAndShifts = useCallback((showLoading = true) => {
     if (!authorized || !selectedDate) return
     if (showLoading) setLoading(true)
     
     Promise.all([
-      getPatrolReport(FIXED_CAMPUS, selectedDate),
+      getPatrolReport(FIXED_CAMPUS, selectedDate, endDate),
       getShifts(),
       fetchQRByCampus(FIXED_CAMPUS),
       getSecurityUsers()
@@ -275,9 +284,9 @@ export default function DashboardPage() {
         if (showLoading) { setReport([]); setShifts([]); setQrs([]); setSecUsers([]) }
       })
       .finally(() => { if (showLoading) setLoading(false) })
-  }, [selectedDate, authorized])
+  }, [selectedDate, endDate, authorized])
 
-  /* auto-fetch when campus/date changes */
+  /* auto-fetch when dates change */
   useEffect(() => {
     fetchReportAndShifts(true)
   }, [fetchReportAndShifts])
@@ -291,37 +300,43 @@ export default function DashboardPage() {
     return () => clearInterval(interval)
   }, [fetchReportAndShifts, authorized, selectedDate])
 
-  /* ── DATE SHORTCUT HANDLERS ── */
+  /* ── DATE SHORTCUT HANDLERS WITH FULL DATE RANGES ── */
   const setPresetDate = (type: 'today' | 'yesterday' | 'thisWeek' | 'thisMonth') => {
+    setActivePreset(type)
     const now = new Date()
     const offset = now.getTimezoneOffset() * 60000
     const localNow = new Date(now.getTime() - offset)
+    const tStr = localNow.toISOString().slice(0, 10)
 
     if (type === 'today') {
-      setSelectedDate(localNow.toISOString().slice(0, 10))
+      setSelectedDate(tStr)
+      setEndDate(tStr)
     } else if (type === 'yesterday') {
       const yest = new Date(localNow.getTime() - 86400000)
-      setSelectedDate(yest.toISOString().slice(0, 10))
+      const yStr = yest.toISOString().slice(0, 10)
+      setSelectedDate(yStr)
+      setEndDate(yStr)
     } else if (type === 'thisWeek') {
       const day = localNow.getDay()
-      const diff = localNow.getDate() - day + (day === 0 ? -6 : 1)
-      const mon = new Date(localNow.setDate(diff))
-      setSelectedDate(mon.toISOString().slice(0, 10))
+      const diffToMon = localNow.getDate() - day + (day === 0 ? -6 : 1)
+      const mon = new Date(localNow.getFullYear(), localNow.getMonth(), diffToMon)
+      const monStr = new Date(mon.getTime() - offset).toISOString().slice(0, 10)
+      setSelectedDate(monStr)
+      setEndDate(tStr) // Monday to Today
     } else if (type === 'thisMonth') {
       const firstDay = new Date(localNow.getFullYear(), localNow.getMonth(), 1)
-      const loc = new Date(firstDay.getTime() - offset)
-      setSelectedDate(loc.toISOString().slice(0, 10))
+      const firstStr = new Date(firstDay.getTime() - offset).toISOString().slice(0, 10)
+      setSelectedDate(firstStr)
+      setEndDate(tStr) // 1st of month to Today
     }
   }
 
   /* ── COMBINED GUARD LIST FOR DROPDOWN (REGISTERED + REPORT GUARDS) ── */
   const availableGuards = useMemo(() => {
     const guardsSet = new Set<string>()
-    // Add all registered security users
     secUsers.forEach(u => {
       if (u.security_name) guardsSet.add(u.security_name.trim())
     })
-    // Add any guard names present in report logs
     report.forEach(r => {
       if (r.guard_name && r.guard_name !== 'SYSTEM_MISSED') {
         r.guard_name.split(',').forEach(g => guardsSet.add(g.trim()))
@@ -342,28 +357,23 @@ export default function DashboardPage() {
 
   /* ── COMPUTED STATS (time-aware & filtered) ── */
   const stats = useMemo(() => {
-    const isToday = selectedDate === today
+    const isToday = (selectedDate === todayStr && endDate === todayStr)
 
     // Filter report according to user selection
     const filteredReport = report.filter(r => {
-      // Guard filter
       if (selectedGuard !== 'ALL') {
-        if (!isMatchGuard(r.guard_name, selectedGuard)) {
-          return false
-        }
+        if (!isMatchGuard(r.guard_name, selectedGuard)) return false
       }
-      // Round filter
       if (selectedRound !== 'ALL' && r.round !== Number(selectedRound)) {
         return false
       }
-      // Status filter
       if (selectedStatus !== 'ALL' && r.status !== selectedStatus) {
         return false
       }
       return true
     })
 
-    const selectedDateEnd = new Date(`${selectedDate}T23:59:59.999`);
+    const selectedDateEnd = new Date(`${endDate}T23:59:59.999`);
     const activeQRsOnDate = qrs.filter((q: any) => {
       if (q.campus_code && q.campus_code !== FIXED_CAMPUS) return false;
       const createdDate = new Date(q.created_at);
@@ -517,9 +527,10 @@ export default function DashboardPage() {
       shiftLeaderboards: [], guardLeaderboard, coverageByPoint, hourlyActivity: [], recentActivity: [],
       nothingScannedToday, timeline, activeRoundInfo
     }
-  }, [report, selectedDate, today, selectedGuard, selectedRound, selectedStatus, qrs])
+  }, [report, selectedDate, endDate, todayStr, selectedGuard, selectedRound, selectedStatus, qrs])
 
   const selectedCampusName = "KCET Main Campus"
+  const dateRangeDisplay = selectedDate === endDate ? selectedDate : `${selectedDate} to ${endDate}`
 
   if (!authorized) {
     return <div className="p-6 text-slate-500 min-h-screen flex items-center justify-center">Checking access...</div>
@@ -544,7 +555,7 @@ export default function DashboardPage() {
             <p className="mt-1 text-slate-500 text-sm flex items-center gap-2">
               <span className="font-semibold text-purple-700">{selectedCampusName}</span>
               {' · '}
-              <span>Real-time patrol monitoring</span>
+              <span>Range: <strong className="text-slate-800">{dateRangeDisplay}</strong></span>
               {lastUpdated && (
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -553,8 +564,8 @@ export default function DashboardPage() {
               )}
             </p>
           </div>
-          <div className="flex items-center gap-2 px-3 py-1.5 glass-panel rounded-xl text-xs font-semibold text-purple-900">
-            <Shield size={14} className="text-purple-600" />
+          <div className="flex items-center gap-2 px-3.5 py-2 glass-panel rounded-2xl text-xs font-semibold text-purple-950 border border-purple-100 shadow-sm">
+            <Shield size={15} className="text-purple-600" />
             <span>Admin: {adminName || 'Admin User'}</span>
           </div>
         </div>
@@ -564,41 +575,41 @@ export default function DashboardPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="glass-panel border-l-4 border-l-purple-600 rounded-3xl p-5 bg-gradient-to-r from-purple-50/60 via-white to-white"
+            className="glass-panel border-l-4 border-l-purple-600 rounded-3xl p-5 bg-gradient-to-r from-purple-50/70 via-white to-white shadow-xl shadow-purple-900/5"
           >
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-purple-600 text-white flex items-center justify-center font-extrabold shadow-md shadow-purple-500/20">
+              <div className="flex items-center gap-3.5">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-purple-600 to-violet-700 text-white flex items-center justify-center font-extrabold shadow-lg shadow-purple-500/30 text-base">
                   R{stats.activeRoundInfo.roundNo}
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="font-extrabold text-purple-950 text-base">Round {stats.activeRoundInfo.roundNo} In Progress</h3>
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-purple-100 text-purple-700 border border-purple-200 animate-pulse">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-purple-100 text-purple-800 border border-purple-200 animate-pulse">
                       <Activity size={12} /> ONGOING
                     </span>
                   </div>
                   <p className="text-xs text-slate-500 font-medium mt-0.5">
-                    Window: {stats.activeRoundInfo.timeLabel} · Scanning active
+                    Window: {stats.activeRoundInfo.timeLabel} · Patrol active
                   </p>
                 </div>
               </div>
 
               {/* Progress meter */}
-              <div className="flex items-center gap-4 min-w-[200px] sm:min-w-[260px]">
+              <div className="flex items-center gap-4 min-w-[220px] sm:min-w-[280px]">
                 <div className="flex-1">
-                  <div className="flex justify-between text-xs font-bold text-slate-700 mb-1">
-                    <span>Progress</span>
+                  <div className="flex justify-between text-xs font-bold text-slate-700 mb-1.5">
+                    <span>Scan Progress</span>
                     <span className="text-purple-700">{stats.activeRoundInfo.completed} / {stats.activeRoundInfo.target} Scanned</span>
                   </div>
-                  <div className="w-full h-2.5 bg-purple-100 rounded-full overflow-hidden">
+                  <div className="w-full h-3 bg-purple-100 rounded-full overflow-hidden p-0.5 border border-purple-200/60">
                     <div
                       className="h-full bg-gradient-to-r from-purple-600 to-violet-500 rounded-full transition-all duration-500"
                       style={{ width: `${Math.round((stats.activeRoundInfo.completed / (stats.activeRoundInfo.target || 1)) * 100)}%` }}
                     />
                   </div>
                 </div>
-                <span className="text-lg font-extrabold text-purple-950 min-w-[45px] text-right">
+                <span className="text-xl font-black text-purple-950 min-w-[48px] text-right">
                   {Math.round((stats.activeRoundInfo.completed / (stats.activeRoundInfo.target || 1)) * 100)}%
                 </span>
               </div>
@@ -606,105 +617,149 @@ export default function DashboardPage() {
           </motion.div>
         )}
 
-        {/* ── CONTROLS & FILTERING BAR ── */}
-        <div className="glass-panel rounded-3xl p-5 space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-purple-100/60 pb-3">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-purple-500">
-              <Filter size={15} /> Advanced Controls & Filters
+        {/* ── CONTROLS & FILTERING BAR (PREMIUM STYLED) ── */}
+        <div className="glass-panel rounded-3xl p-6 space-y-5 border border-purple-100/80 shadow-xl shadow-purple-900/5">
+          
+          {/* Header & Date Preset Pills */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-purple-100/60 pb-4">
+            <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-widest text-purple-600">
+              <Sparkles size={16} className="text-amber-500" /> Control & Filter Dashboard
             </div>
 
-            {/* Date Preset Shortcuts */}
-            <div className="flex flex-wrap items-center gap-1.5">
+            {/* Glowing Preset Pills */}
+            <div className="flex flex-wrap items-center gap-2">
               {[
-                { label: 'Today', key: 'today' },
-                { label: 'Yesterday', key: 'yesterday' },
-                { label: 'This Week', key: 'thisWeek' },
-                { label: 'This Month', key: 'thisMonth' },
-              ].map(preset => (
-                <button
-                  key={preset.key}
-                  onClick={() => setPresetDate(preset.key as any)}
-                  className="px-3 py-1 rounded-xl text-xs font-semibold bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-100 transition-colors"
-                >
-                  {preset.label}
-                </button>
-              ))}
+                { label: 'Today', key: 'today', icon: <Clock size={13} /> },
+                { label: 'Yesterday', key: 'yesterday', icon: <Calendar size={13} /> },
+                { label: 'This Week', key: 'thisWeek', icon: <CalendarDays size={13} /> },
+                { label: 'This Month', key: 'thisMonth', icon: <Layers size={13} /> },
+              ].map(preset => {
+                const isActive = activePreset === preset.key
+                return (
+                  <motion.button
+                    key={preset.key}
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.96 }}
+                    onClick={() => setPresetDate(preset.key as any)}
+                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
+                      isActive
+                        ? 'bg-gradient-to-r from-purple-600 to-violet-700 text-white shadow-md shadow-purple-500/30 ring-2 ring-purple-400/40'
+                        : 'bg-white/80 hover:bg-purple-50 text-slate-600 hover:text-purple-700 border border-purple-100'
+                    }`}
+                  >
+                    {preset.icon}
+                    {preset.label}
+                  </motion.button>
+                )
+              })}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-12 gap-3 items-end">
+          {/* Controls Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 items-end">
             
-            {/* Date Picker */}
-            <div className="lg:col-span-3">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-purple-400 mb-1 block">Date</label>
+            {/* Start Date */}
+            <div className="lg:col-span-3 space-y-1.5">
+              <label className="text-[11px] font-bold uppercase tracking-widest text-purple-400 flex items-center gap-1">
+                <Calendar size={13} /> From Date
+              </label>
               <input
                 type="date"
                 value={selectedDate}
-                onChange={e => setSelectedDate(e.target.value)}
-                className="input-field py-2 text-xs"
+                onChange={e => { setSelectedDate(e.target.value); setActivePreset('custom') }}
+                className="input-field py-2.5 text-xs font-semibold text-purple-950 bg-white/90"
+              />
+            </div>
+
+            {/* End Date */}
+            <div className="lg:col-span-3 space-y-1.5">
+              <label className="text-[11px] font-bold uppercase tracking-widest text-purple-400 flex items-center gap-1">
+                <Calendar size={13} /> To Date
+              </label>
+              <input
+                type="date"
+                value={endDate}
+                onChange={e => { setEndDate(e.target.value); setActivePreset('custom') }}
+                className="input-field py-2.5 text-xs font-semibold text-purple-950 bg-white/90"
               />
             </div>
 
             {/* Guard Filter */}
-            <div className="lg:col-span-3">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-purple-400 mb-1 block">Security Officer</label>
-              <select
-                value={selectedGuard}
-                onChange={e => setSelectedGuard(e.target.value)}
-                className="input-field py-2 text-xs bg-white cursor-pointer font-semibold text-purple-950"
-              >
-                <option value="ALL">All Officers</option>
-                {availableGuards.map(g => (
-                  <option key={g} value={g}>{g}</option>
-                ))}
-              </select>
+            <div className="lg:col-span-2 space-y-1.5">
+              <label className="text-[11px] font-bold uppercase tracking-widest text-purple-400 flex items-center gap-1">
+                <UserCheck size={13} /> Officer
+              </label>
+              <div className="relative">
+                <select
+                  value={selectedGuard}
+                  onChange={e => setSelectedGuard(e.target.value)}
+                  className="input-field py-2.5 text-xs bg-white/90 cursor-pointer font-bold text-purple-950 pr-8 appearance-none"
+                >
+                  <option value="ALL">All Officers</option>
+                  {availableGuards.map(g => (
+                    <option key={g} value={g}>{g}</option>
+                  ))}
+                </select>
+                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-purple-400 pointer-events-none" />
+              </div>
             </div>
 
             {/* Round Filter */}
-            <div className="lg:col-span-2">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-purple-400 mb-1 block">Round Slot</label>
-              <select
-                value={selectedRound}
-                onChange={e => setSelectedRound(e.target.value)}
-                className="input-field py-2 text-xs bg-white cursor-pointer font-semibold text-purple-950"
-              >
-                <option value="ALL">All Rounds</option>
-                {ROUND_TIMES.map((_, idx) => (
-                  <option key={idx + 1} value={idx + 1}>Round {idx + 1}</option>
-                ))}
-              </select>
+            <div className="lg:col-span-2 space-y-1.5">
+              <label className="text-[11px] font-bold uppercase tracking-widest text-purple-400 flex items-center gap-1">
+                <Clock size={13} /> Round Slot
+              </label>
+              <div className="relative">
+                <select
+                  value={selectedRound}
+                  onChange={e => setSelectedRound(e.target.value)}
+                  className="input-field py-2.5 text-xs bg-white/90 cursor-pointer font-bold text-purple-950 pr-8 appearance-none"
+                >
+                  <option value="ALL">All Rounds</option>
+                  {ROUND_TIMES.map((_, idx) => (
+                    <option key={idx + 1} value={idx + 1}>Round {idx + 1}</option>
+                  ))}
+                </select>
+                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-purple-400 pointer-events-none" />
+              </div>
             </div>
 
             {/* Status Filter */}
-            <div className="lg:col-span-2">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-purple-400 mb-1 block">Status</label>
-              <select
-                value={selectedStatus}
-                onChange={e => setSelectedStatus(e.target.value)}
-                className="input-field py-2 text-xs bg-white cursor-pointer font-semibold text-purple-950"
-              >
-                <option value="ALL">All Statuses</option>
-                <option value="SUCCESS">Completed (Success)</option>
-                <option value="MISSED">Missed</option>
-              </select>
+            <div className="lg:col-span-2 space-y-1.5">
+              <label className="text-[11px] font-bold uppercase tracking-widest text-purple-400 flex items-center gap-1">
+                <CheckCircle2 size={13} /> Status
+              </label>
+              <div className="relative">
+                <select
+                  value={selectedStatus}
+                  onChange={e => setSelectedStatus(e.target.value)}
+                  className="input-field py-2.5 text-xs bg-white/90 cursor-pointer font-bold text-purple-950 pr-8 appearance-none"
+                >
+                  <option value="ALL">All Statuses</option>
+                  <option value="SUCCESS">Completed (Success)</option>
+                  <option value="MISSED">Missed</option>
+                </select>
+                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-purple-400 pointer-events-none" />
+              </div>
             </div>
 
-            {/* Actions */}
-            <div className="lg:col-span-2 flex items-center gap-2">
-              <button
-                id="pdf-export-btn"
-                onClick={() => exportDashboardPDF(stats, FIXED_CAMPUS, selectedCampusName, selectedDate, adminName)}
-                className="btn-primary py-2 px-3 text-xs w-full justify-center flex items-center gap-1.5"
-              >
-                📊 PDF
-              </button>
-            </div>
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex justify-end gap-3 pt-3 border-t border-purple-100/60">
+            <button
+              id="pdf-export-btn"
+              onClick={() => exportDashboardPDF(stats, FIXED_CAMPUS, selectedCampusName, dateRangeDisplay, adminName)}
+              className="btn-primary py-2.5 px-6 text-xs flex items-center gap-2 shadow-md shadow-purple-500/20"
+            >
+              📊 Export PDF Analytics
+            </button>
           </div>
         </div>
 
         {/* ── STAT CARDS ── */}
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-          <StatCard label="Effective Scans"  value={stats.total}        sub="Due in window"      color="text-purple-700"  bg="bg-purple-500"  icon="📋" />
+          <StatCard label="Effective Scans"  value={stats.total}        sub="Due in timeframe"    color="text-purple-700"  bg="bg-purple-500"  icon="📋" />
           <StatCard label="Completed"        value={stats.completed}    sub={`${stats.rate}% completion`} color="text-emerald-700" bg="bg-emerald-500" icon="✅" />
           <StatCard label="Missed"           value={stats.missed}       sub="Uncompleted rounds" color="text-rose-700"    bg="bg-rose-500"    icon="⚠️" />
           <StatCard label="Not Due Yet"      value={stats.pending ?? 0} sub="Scheduled later"    color="text-slate-500"   bg="bg-slate-400"   icon="🕐" />
