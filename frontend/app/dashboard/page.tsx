@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import {
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend,
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, LineChart, Line, Area, AreaChart,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid
 } from 'recharts'
 import { getPatrolReport, PatrolReportItem } from '../api/report'
 import { getShifts } from '../api/shifts.api'
@@ -18,8 +18,7 @@ import GuardLeaderboard from '../components/analytics/GuardLeaderboard'
 import { LOGO_BASE64 } from '../components/reports/logoBase64'
 import {
   Filter, Calendar, UserCheck, Shield, Clock, CheckCircle2,
-  AlertTriangle, Activity, RefreshCw, ChevronDown, Sparkles,
-  CalendarDays, Layers
+  AlertTriangle, Activity, ChevronDown, Sparkles
 } from 'lucide-react'
 
 /* ================================================================
@@ -29,11 +28,6 @@ type DashboardStats = {
   total: number; completed: number; missed: number; pending: number; rate: number
   lastScan: string | null
   roundSummary: { round: string; completed: number; missed: number }[]
-  shiftLeaderboards: {
-    shiftName: string;
-    totalExpectedScans: number;
-    guards: { name: string; scanned: number; missed: number; total: number }[];
-  }[]
   guardLeaderboard: { name: string; scanned: number; missed: number; total: number }[]
   coverageByPoint: { name: string; done: number; total: number }[]
   recentActivity: PatrolReportItem[]
@@ -61,7 +55,7 @@ function exportDashboardPDF(
   statsData: DashboardStats,
   campus: string,
   campusName: string,
-  dateRangeStr: string,
+  dateStr: string,
   adminName: string
 ) {
   const btn = document.getElementById('pdf-export-btn')
@@ -95,7 +89,7 @@ function exportDashboardPDF(
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(12)
     doc.setTextColor(109, 40, 217)
-    doc.text(`Timeframe : ${dateRangeStr}`, 14, 44)
+    doc.text(`Patrol Date : ${dateStr}`, 14, 44)
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(10)
     doc.setTextColor(40)
@@ -197,7 +191,7 @@ function exportDashboardPDF(
       )
     }
 
-    doc.save(`KCET_Patrol_Analytics_${dateRangeStr}.pdf`)
+    doc.save(`KCET_Patrol_Analytics_${dateStr}.pdf`)
   } catch (err) {
     console.error('PDF export error:', err)
     alert('Failed to generate PDF. Check console.')
@@ -237,10 +231,9 @@ export default function DashboardPage() {
   const [adminName, setAdminName]             = useState('')
   const FIXED_CAMPUS                          = 'KCET01'
   
-  // ── DATE RANGE STATES ──
+  // ── SINGLE DATE STATE ──
   const [selectedDate, setSelectedDate]       = useState(todayStr)
-  const [endDate, setEndDate]                 = useState(todayStr)
-  const [activePreset, setActivePreset]       = useState<'today' | 'yesterday' | 'thisWeek' | 'thisMonth' | 'custom'>('today')
+  const [activePreset, setActivePreset]       = useState<'today' | 'yesterday' | 'custom'>('today')
 
   const [report, setReport]                   = useState<PatrolReportItem[]>([])
   const [shifts, setShifts]                   = useState<any[]>([])
@@ -262,13 +255,13 @@ export default function DashboardPage() {
     }
   }, [authorized])
 
-  /* ── FETCH LOGIC WITH DATE RANGE & SILENT REFRESH SUPPORT ── */
+  /* ── FETCH LOGIC WITH SILENT REFRESH SUPPORT ── */
   const fetchReportAndShifts = useCallback((showLoading = true) => {
     if (!authorized || !selectedDate) return
     if (showLoading) setLoading(true)
     
     Promise.all([
-      getPatrolReport(FIXED_CAMPUS, selectedDate, endDate),
+      getPatrolReport(FIXED_CAMPUS, selectedDate),
       getShifts(),
       fetchQRByCampus(FIXED_CAMPUS),
       getSecurityUsers()
@@ -284,9 +277,9 @@ export default function DashboardPage() {
         if (showLoading) { setReport([]); setShifts([]); setQrs([]); setSecUsers([]) }
       })
       .finally(() => { if (showLoading) setLoading(false) })
-  }, [selectedDate, endDate, authorized])
+  }, [selectedDate, authorized])
 
-  /* auto-fetch when dates change */
+  /* auto-fetch when selectedDate changes */
   useEffect(() => {
     fetchReportAndShifts(true)
   }, [fetchReportAndShifts])
@@ -300,8 +293,8 @@ export default function DashboardPage() {
     return () => clearInterval(interval)
   }, [fetchReportAndShifts, authorized, selectedDate])
 
-  /* ── DATE SHORTCUT HANDLERS WITH FULL DATE RANGES ── */
-  const setPresetDate = (type: 'today' | 'yesterday' | 'thisWeek' | 'thisMonth') => {
+  /* ── DATE SHORTCUT HANDLERS ── */
+  const setPresetDate = (type: 'today' | 'yesterday') => {
     setActivePreset(type)
     const now = new Date()
     const offset = now.getTimezoneOffset() * 60000
@@ -310,24 +303,9 @@ export default function DashboardPage() {
 
     if (type === 'today') {
       setSelectedDate(tStr)
-      setEndDate(tStr)
     } else if (type === 'yesterday') {
       const yest = new Date(localNow.getTime() - 86400000)
-      const yStr = yest.toISOString().slice(0, 10)
-      setSelectedDate(yStr)
-      setEndDate(yStr)
-    } else if (type === 'thisWeek') {
-      const day = localNow.getDay()
-      const diffToMon = localNow.getDate() - day + (day === 0 ? -6 : 1)
-      const mon = new Date(localNow.getFullYear(), localNow.getMonth(), diffToMon)
-      const monStr = new Date(mon.getTime() - offset).toISOString().slice(0, 10)
-      setSelectedDate(monStr)
-      setEndDate(tStr) // Monday to Today
-    } else if (type === 'thisMonth') {
-      const firstDay = new Date(localNow.getFullYear(), localNow.getMonth(), 1)
-      const firstStr = new Date(firstDay.getTime() - offset).toISOString().slice(0, 10)
-      setSelectedDate(firstStr)
-      setEndDate(tStr) // 1st of month to Today
+      setSelectedDate(yest.toISOString().slice(0, 10))
     }
   }
 
@@ -355,9 +333,10 @@ export default function DashboardPage() {
     return gLower.includes(sLower) || sLower.includes(gLower)
   }
 
-  /* ── COMPUTED STATS (time-aware & filtered) ── */
+  /* ── COMPUTED STATS (time-aware for past dates vs today) ── */
   const stats = useMemo(() => {
-    const isToday = (selectedDate === todayStr && endDate === todayStr)
+    const isToday = (selectedDate === todayStr)
+    const isPastDate = (selectedDate < todayStr)
 
     // Filter report according to user selection
     const filteredReport = report.filter(r => {
@@ -373,7 +352,7 @@ export default function DashboardPage() {
       return true
     })
 
-    const selectedDateEnd = new Date(`${endDate}T23:59:59.999`);
+    const selectedDateEnd = new Date(`${selectedDate}T23:59:59.999`);
     const activeQRsOnDate = qrs.filter((q: any) => {
       if (q.campus_code && q.campus_code !== FIXED_CAMPUS) return false;
       const createdDate = new Date(q.created_at);
@@ -412,14 +391,18 @@ export default function DashboardPage() {
     const maxScannedRound = scannedRounds.length ? Math.max(...scannedRounds) : 0
     const nothingScannedToday = isToday && maxScannedRound === 0
 
+    // Effective records evaluation:
+    // For past dates: All 12 rounds are due! pending = 0
+    // For today: Only rounds due so far or scanned success are effective
     const effective = isToday
       ? filteredReport.filter(r => r.round <= dueRoundsCount || r.status === 'SUCCESS')
       : filteredReport
-    const pending = filteredReport.length - effective.length
+
+    const pending = isToday ? (filteredReport.length - effective.length) : 0
 
     /* base stats */
     const completed = effective.filter(r => r.status === 'SUCCESS').length
-    const missed    = nothingScannedToday ? 0 : effective.filter(r => r.status === 'MISSED').length
+    const missed    = (isToday && nothingScannedToday) ? 0 : effective.filter(r => r.status === 'MISSED').length
     const total     = completed + missed
     const rate      = total ? Math.round((completed / total) * 100) : 0
 
@@ -436,7 +419,7 @@ export default function DashboardPage() {
 
     /* rounds summary */
     const roundNums = [...new Set(effective.map(r => r.round))].sort((a, b) => a - b)
-    const roundSummary = nothingScannedToday ? [] : roundNums.map(rnd => {
+    const roundSummary = (isToday && nothingScannedToday) ? [] : roundNums.map(rnd => {
       const items = effective.filter(r => r.round === rnd)
       return {
         round: `Round ${rnd}`,
@@ -527,10 +510,9 @@ export default function DashboardPage() {
       shiftLeaderboards: [], guardLeaderboard, coverageByPoint, hourlyActivity: [], recentActivity: [],
       nothingScannedToday, timeline, activeRoundInfo
     }
-  }, [report, selectedDate, endDate, todayStr, selectedGuard, selectedRound, selectedStatus, qrs])
+  }, [report, selectedDate, todayStr, selectedGuard, selectedRound, selectedStatus, qrs])
 
   const selectedCampusName = "KCET Main Campus"
-  const dateRangeDisplay = selectedDate === endDate ? selectedDate : `${selectedDate} to ${endDate}`
 
   if (!authorized) {
     return <div className="p-6 text-slate-500 min-h-screen flex items-center justify-center">Checking access...</div>
@@ -555,7 +537,7 @@ export default function DashboardPage() {
             <p className="mt-1 text-slate-500 text-sm flex items-center gap-2">
               <span className="font-semibold text-purple-700">{selectedCampusName}</span>
               {' · '}
-              <span>Range: <strong className="text-slate-800">{dateRangeDisplay}</strong></span>
+              <span>Date: <strong className="text-slate-800">{selectedDate}</strong></span>
               {lastUpdated && (
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -623,16 +605,14 @@ export default function DashboardPage() {
           {/* Header & Date Preset Pills */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-purple-100/60 pb-4">
             <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-widest text-purple-600">
-              <Sparkles size={16} className="text-amber-500" /> Control & Filter Dashboard
+              <Sparkles size={16} className="text-amber-500" /> Dashboard Analytics Controls
             </div>
 
-            {/* Glowing Preset Pills */}
+            {/* Glowing Preset Pills for Single Dates */}
             <div className="flex flex-wrap items-center gap-2">
               {[
                 { label: 'Today', key: 'today', icon: <Clock size={13} /> },
                 { label: 'Yesterday', key: 'yesterday', icon: <Calendar size={13} /> },
-                { label: 'This Week', key: 'thisWeek', icon: <CalendarDays size={13} /> },
-                { label: 'This Month', key: 'thisMonth', icon: <Layers size={13} /> },
               ].map(preset => {
                 const isActive = activePreset === preset.key
                 return (
@@ -658,10 +638,10 @@ export default function DashboardPage() {
           {/* Controls Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 items-end">
             
-            {/* Start Date */}
+            {/* Single Specific Date Selector */}
             <div className="lg:col-span-3 space-y-1.5">
               <label className="text-[11px] font-bold uppercase tracking-widest text-purple-400 flex items-center gap-1">
-                <Calendar size={13} /> From Date
+                <Calendar size={13} /> Select Specific Date
               </label>
               <input
                 type="date"
@@ -671,21 +651,8 @@ export default function DashboardPage() {
               />
             </div>
 
-            {/* End Date */}
-            <div className="lg:col-span-3 space-y-1.5">
-              <label className="text-[11px] font-bold uppercase tracking-widest text-purple-400 flex items-center gap-1">
-                <Calendar size={13} /> To Date
-              </label>
-              <input
-                type="date"
-                value={endDate}
-                onChange={e => { setEndDate(e.target.value); setActivePreset('custom') }}
-                className="input-field py-2.5 text-xs font-semibold text-purple-950 bg-white/90"
-              />
-            </div>
-
             {/* Guard Filter */}
-            <div className="lg:col-span-2 space-y-1.5">
+            <div className="lg:col-span-3 space-y-1.5">
               <label className="text-[11px] font-bold uppercase tracking-widest text-purple-400 flex items-center gap-1">
                 <UserCheck size={13} /> Officer
               </label>
@@ -743,23 +710,23 @@ export default function DashboardPage() {
               </div>
             </div>
 
-          </div>
+            {/* Actions */}
+            <div className="lg:col-span-2 flex items-center gap-2">
+              <button
+                id="pdf-export-btn"
+                onClick={() => exportDashboardPDF(stats, FIXED_CAMPUS, selectedCampusName, selectedDate, adminName)}
+                className="btn-primary py-2.5 px-3 text-xs w-full justify-center flex items-center gap-1.5 shadow-md shadow-purple-500/20"
+              >
+                📊 Export PDF
+              </button>
+            </div>
 
-          {/* Action buttons */}
-          <div className="flex justify-end gap-3 pt-3 border-t border-purple-100/60">
-            <button
-              id="pdf-export-btn"
-              onClick={() => exportDashboardPDF(stats, FIXED_CAMPUS, selectedCampusName, dateRangeDisplay, adminName)}
-              className="btn-primary py-2.5 px-6 text-xs flex items-center gap-2 shadow-md shadow-purple-500/20"
-            >
-              📊 Export PDF Analytics
-            </button>
           </div>
         </div>
 
         {/* ── STAT CARDS ── */}
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-          <StatCard label="Effective Scans"  value={stats.total}        sub="Due in timeframe"    color="text-purple-700"  bg="bg-purple-500"  icon="📋" />
+          <StatCard label="Effective Scans"  value={stats.total}        sub="Due in window"      color="text-purple-700"  bg="bg-purple-500"  icon="📋" />
           <StatCard label="Completed"        value={stats.completed}    sub={`${stats.rate}% completion`} color="text-emerald-700" bg="bg-emerald-500" icon="✅" />
           <StatCard label="Missed"           value={stats.missed}       sub="Uncompleted rounds" color="text-rose-700"    bg="bg-rose-500"    icon="⚠️" />
           <StatCard label="Not Due Yet"      value={stats.pending ?? 0} sub="Scheduled later"    color="text-slate-500"   bg="bg-slate-400"   icon="🕐" />

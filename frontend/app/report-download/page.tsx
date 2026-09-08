@@ -12,7 +12,7 @@ import { getSecurityUsers } from "../api/securityUsers.api";
 import {
   Filter, Calendar, Shield, FileText, Download, CheckCircle2,
   AlertTriangle, UserCheck, Clock, ChevronDown, Sparkles,
-  CalendarDays, Layers
+  CalendarDays, Layers, Grid
 } from "lucide-react";
 
 // ================= TYPES =================
@@ -21,6 +21,50 @@ type Campus = {
   campus_name: string;
   campus_address: string | null;
 };
+
+type WeekSegregation = {
+  weekNum: number;
+  label: string;
+  startDate: string;
+  endDate: string;
+};
+
+// ================= HELPER: CALCULATE SEGREGATED WEEKS OF MONTH =================
+function getSegregatedWeeks(yearMonthStr: string): WeekSegregation[] {
+  if (!yearMonthStr) return [];
+  const [year, month] = yearMonthStr.split("-").map(Number);
+  if (!year || !month) return [];
+
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+  const monthName = monthNames[month - 1] || "";
+  const totalDays = new Date(year, month, 0).getDate();
+
+  const weeks: WeekSegregation[] = [];
+  let weekNum = 1;
+  let startDay = 1;
+
+  while (startDay <= totalDays) {
+    const endDay = Math.min(startDay + 6, totalDays);
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const startStr = `${year}-${pad(month)}-${pad(startDay)}`;
+    const endStr = `${year}-${pad(month)}-${pad(endDay)}`;
+
+    weeks.push({
+      weekNum,
+      label: `Week ${weekNum} (${monthName} ${pad(startDay)} - ${pad(endDay)}, ${year})`,
+      startDate: startStr,
+      endDate: endStr,
+    });
+
+    startDay = endDay + 1;
+    weekNum++;
+  }
+
+  return weeks;
+}
 
 // ================= PAGE =================
 export default function ReportDownloadPage() {
@@ -37,8 +81,8 @@ export default function ReportDownloadPage() {
   const [reportDate, setReportDate] = useState(todayStr);
   const [endDate, setEndDate] = useState(todayStr);
   const [selectedMonth, setSelectedMonth] = useState(todayStr.slice(0, 7)); // YYYY-MM
-  const [reportType, setReportType] = useState<"single" | "range" | "month">("single");
-  const [activePreset, setActivePreset] = useState<"today" | "yesterday" | "thisWeek" | "thisMonth" | "custom">("today");
+  const [selectedWeekIndex, setSelectedWeekIndex] = useState<number>(0);
+  const [reportType, setReportType] = useState<"single" | "range" | "weekly" | "month">("single");
 
   const [report, setReport] = useState<PatrolReportItem[]>([]);
   const [shifts, setShifts] = useState<any[]>([]);
@@ -53,6 +97,23 @@ export default function ReportDownloadPage() {
   const [pdfLoading, setPdfLoading] = useState(false);
   const [pdfTrigger, setPdfTrigger] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // ================= CALCULATED SEGREGATED WEEKS FOR SELECTED MONTH =================
+  const monthWeeks = useMemo(() => {
+    return getSegregatedWeeks(selectedMonth);
+  }, [selectedMonth]);
+
+  // Sync dates when week selection or month changes in "weekly" mode
+  useEffect(() => {
+    if (reportType === "weekly" && monthWeeks.length > 0) {
+      const idx = Math.min(selectedWeekIndex, monthWeeks.length - 1);
+      const w = monthWeeks[idx];
+      if (w) {
+        setReportDate(w.startDate);
+        setEndDate(w.endDate);
+      }
+    }
+  }, [reportType, selectedMonth, selectedWeekIndex, monthWeeks]);
 
   // ================= INITIAL LOAD =================
   useEffect(() => {
@@ -82,7 +143,7 @@ export default function ReportDownloadPage() {
     let start = reportDate;
     let end = reportDate;
 
-    if (reportType === "range") {
+    if (reportType === "range" || reportType === "weekly") {
       start = reportDate;
       end = endDate;
     } else if (reportType === "month") {
@@ -108,43 +169,6 @@ export default function ReportDownloadPage() {
       console.error(err);
     } finally {
       setLoading(false);
-    }
-  };
-
-  // ================= PRESET DATE SHORTCUT HANDLER =================
-  const setPresetDate = (type: "today" | "yesterday" | "thisWeek" | "thisMonth") => {
-    setActivePreset(type);
-    const now = new Date();
-    const offset = now.getTimezoneOffset() * 60000;
-    const localNow = new Date(now.getTime() - offset);
-    const tStr = localNow.toISOString().slice(0, 10);
-
-    if (type === "today") {
-      setReportType("single");
-      setReportDate(tStr);
-      setEndDate(tStr);
-    } else if (type === "yesterday") {
-      setReportType("single");
-      const yest = new Date(localNow.getTime() - 86400000);
-      const yStr = yest.toISOString().slice(0, 10);
-      setReportDate(yStr);
-      setEndDate(yStr);
-    } else if (type === "thisWeek") {
-      setReportType("range");
-      const day = localNow.getDay();
-      const diffToMon = localNow.getDate() - day + (day === 0 ? -6 : 1);
-      const mon = new Date(localNow.getFullYear(), localNow.getMonth(), diffToMon);
-      const monStr = new Date(mon.getTime() - offset).toISOString().slice(0, 10);
-      setReportDate(monStr);
-      setEndDate(tStr); // Monday to Today
-    } else if (type === "thisMonth") {
-      setReportType("month");
-      const mStr = tStr.slice(0, 7);
-      setSelectedMonth(mStr);
-      const firstDay = new Date(localNow.getFullYear(), localNow.getMonth(), 1);
-      const firstStr = new Date(firstDay.getTime() - offset).toISOString().slice(0, 10);
-      setReportDate(firstStr);
-      setEndDate(tStr);
     }
   };
 
@@ -225,7 +249,7 @@ export default function ReportDownloadPage() {
               Patrol <span className="text-gradient">Logs & Documentation</span>
             </h1>
             <p className="mt-1 text-slate-500 text-sm">
-              Generate official patrol reports, inspect guard compliance, and export PDF audits.
+              Generate official single-day, date-range, segregated weekly, or monthly PDF audit reports.
             </p>
           </div>
 
@@ -235,7 +259,7 @@ export default function ReportDownloadPage() {
           </div>
         </div>
 
-        {/* CONTROLS (ULTRA-PREMIUM STYLED) */}
+        {/* CONTROLS */}
         <div className="glass-panel rounded-3xl p-6 space-y-5 border border-purple-100/80 shadow-xl shadow-purple-900/5">
           {error && (
             <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-semibold flex items-center gap-2">
@@ -243,74 +267,45 @@ export default function ReportDownloadPage() {
             </div>
           )}
 
-          {/* Preset Pills & Report Type Bar */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-purple-100/60 pb-4">
-            {/* Mode selection buttons */}
-            <div className="flex flex-wrap items-center gap-2">
-              {[
-                { id: "single", label: "One Day Report" },
-                { id: "range", label: "Date Range Report" },
-                { id: "month", label: "Month-wise Report" },
-              ].map((t) => (
-                <button
-                  key={t.id}
-                  onClick={() => { setReportType(t.id as any); setActivePreset("custom") }}
-                  className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${
-                    reportType === t.id
-                      ? "btn-primary shadow-sm"
-                      : "bg-white/80 text-slate-600 hover:bg-purple-50 hover:text-purple-700 border border-purple-100"
-                  }`}
-                >
-                  {t.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Glowing Preset Shortcut Pills */}
-            <div className="flex flex-wrap items-center gap-2">
-              {[
-                { label: "Today", key: "today", icon: <Clock size={13} /> },
-                { label: "Yesterday", key: "yesterday", icon: <Calendar size={13} /> },
-                { label: "This Week", key: "thisWeek", icon: <CalendarDays size={13} /> },
-                { label: "This Month", key: "thisMonth", icon: <Layers size={13} /> },
-              ].map((preset) => {
-                const isActive = activePreset === preset.key;
-                return (
-                  <motion.button
-                    key={preset.key}
-                    whileHover={{ scale: 1.04 }}
-                    whileTap={{ scale: 0.96 }}
-                    onClick={() => setPresetDate(preset.key as any)}
-                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
-                      isActive
-                        ? "bg-gradient-to-r from-purple-600 to-violet-700 text-white shadow-md shadow-purple-500/30 ring-2 ring-purple-400/40"
-                        : "bg-white/80 hover:bg-purple-50 text-slate-600 hover:text-purple-700 border border-purple-100"
-                    }`}
-                  >
-                    {preset.icon}
-                    {preset.label}
-                  </motion.button>
-                );
-              })}
-            </div>
+          {/* Toggle buttons for Report Type Modes */}
+          <div className="flex flex-wrap items-center gap-2 border-b border-purple-100/60 pb-4">
+            {[
+              { id: "single", label: "Single Day Report" },
+              { id: "range", label: "Custom Date Range" },
+              { id: "weekly", label: "Weekly Segregated Report" },
+              { id: "month", label: "Full Month Report" },
+            ].map((t) => (
+              <button
+                key={t.id}
+                onClick={() => setReportType(t.id as any)}
+                className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${
+                  reportType === t.id
+                    ? "btn-primary shadow-sm"
+                    : "bg-white/80 text-slate-600 hover:bg-purple-50 hover:text-purple-700 border border-purple-100"
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-            {/* DATE SELECTORS BASED ON TYPE */}
+            {/* SINGLE DAY MODE */}
             {reportType === "single" && (
               <div className="md:col-span-3 space-y-1.5">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-purple-400 block">
-                  Patrol Date
+                  Select Specific Date
                 </label>
                 <input
                   type="date"
                   className="input-field py-2.5 text-xs font-semibold text-purple-950 bg-white/90"
                   value={reportDate}
-                  onChange={(e) => { setReportDate(e.target.value); setActivePreset("custom") }}
+                  onChange={(e) => { setReportDate(e.target.value); setEndDate(e.target.value); }}
                 />
               </div>
             )}
 
+            {/* CUSTOM RANGE MODE */}
             {reportType === "range" && (
               <>
                 <div className="md:col-span-3 space-y-1.5">
@@ -321,7 +316,7 @@ export default function ReportDownloadPage() {
                     type="date"
                     className="input-field py-2.5 text-xs font-semibold text-purple-950 bg-white/90"
                     value={reportDate}
-                    onChange={(e) => { setReportDate(e.target.value); setActivePreset("custom") }}
+                    onChange={(e) => setReportDate(e.target.value)}
                   />
                 </div>
                 <div className="md:col-span-3 space-y-1.5">
@@ -332,12 +327,50 @@ export default function ReportDownloadPage() {
                     type="date"
                     className="input-field py-2.5 text-xs font-semibold text-purple-950 bg-white/90"
                     value={endDate}
-                    onChange={(e) => { setEndDate(e.target.value); setActivePreset("custom") }}
+                    onChange={(e) => setEndDate(e.target.value)}
                   />
                 </div>
               </>
             )}
 
+            {/* WEEKLY SEGREGATED REPORT MODE */}
+            {reportType === "weekly" && (
+              <>
+                <div className="md:col-span-3 space-y-1.5">
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-purple-400 block">
+                    Select Month
+                  </label>
+                  <input
+                    type="month"
+                    className="input-field py-2.5 text-xs font-semibold text-purple-950 bg-white/90"
+                    value={selectedMonth}
+                    onChange={(e) => { setSelectedMonth(e.target.value); setSelectedWeekIndex(0); }}
+                  />
+                </div>
+
+                <div className="md:col-span-4 space-y-1.5">
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1">
+                    <Grid size={13} /> Segregated Week of Month
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={selectedWeekIndex}
+                      onChange={(e) => setSelectedWeekIndex(Number(e.target.value))}
+                      className="input-field py-2.5 text-xs bg-white/90 cursor-pointer font-bold text-purple-950 pr-8 appearance-none"
+                    >
+                      {monthWeeks.map((w, idx) => (
+                        <option key={idx} value={idx}>
+                          {w.label}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-purple-400 pointer-events-none" />
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* MONTH-WISE MODE */}
             {reportType === "month" && (
               <div className="md:col-span-3 space-y-1.5">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-purple-400 block">
@@ -347,7 +380,7 @@ export default function ReportDownloadPage() {
                   type="month"
                   className="input-field py-2.5 text-xs font-semibold text-purple-950 bg-white/90"
                   value={selectedMonth}
-                  onChange={(e) => { setSelectedMonth(e.target.value); setActivePreset("custom") }}
+                  onChange={(e) => setSelectedMonth(e.target.value)}
                 />
               </div>
             )}
