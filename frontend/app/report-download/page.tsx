@@ -8,6 +8,7 @@ import PatrolReportPDF from "../components/reports/PatrolReportPDF";
 import { useAuthGuard } from "@/app/services/auth.guard";
 import { motion } from "framer-motion";
 import { getShifts } from "../api/shifts.api";
+import { getSecurityUsers } from "../api/securityUsers.api";
 import { Filter, Calendar, Shield, FileText, Download, CheckCircle2, AlertTriangle, User } from "lucide-react";
 
 // ================= TYPES =================
@@ -30,6 +31,7 @@ export default function ReportDownloadPage() {
   const [reportType, setReportType] = useState<"single" | "range" | "month">("single");
   const [report, setReport] = useState<PatrolReportItem[]>([]);
   const [shifts, setShifts] = useState<any[]>([]);
+  const [secUsers, setSecUsers] = useState<any[]>([]);
 
   // ── ADVANCED FILTERS ──
   const [selectedGuard, setSelectedGuard] = useState("ALL");
@@ -40,7 +42,6 @@ export default function ReportDownloadPage() {
   const [pdfLoading, setPdfLoading] = useState(false);
   const [pdfTrigger, setPdfTrigger] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const printRef = useRef<HTMLDivElement>(null);
 
   // ================= INITIAL LOAD =================
   useEffect(() => {
@@ -82,12 +83,14 @@ export default function ReportDownloadPage() {
     }
 
     try {
-      const [data, shiftsData] = await Promise.all([
+      const [data, shiftsData, usersData] = await Promise.all([
         getPatrolReport(FIXED_CAMPUS, start, end),
-        getShifts()
+        getShifts(),
+        getSecurityUsers()
       ]);
       setReport(data || []);
       setShifts(shiftsData || []);
+      setSecUsers(usersData || []);
       if (!data || data.length === 0) setError("No patrol records found for this timeframe.");
     } catch (err) {
       setError("Failed to fetch report data. Please try again.");
@@ -105,23 +108,36 @@ export default function ReportDownloadPage() {
     setTimeout(() => setPdfLoading(false), 800);
   };
 
-  // ================= AVAILABLE GUARDS =================
+  // ================= AVAILABLE GUARDS (REGISTERED + REPORT GUARDS) =================
   const availableGuards = useMemo(() => {
     const setG = new Set<string>();
+    secUsers.forEach(u => {
+      if (u.security_name) setG.add(u.security_name.trim());
+    });
     report.forEach((r) => {
       if (r.guard_name && r.guard_name !== "SYSTEM_MISSED") {
         r.guard_name.split(",").forEach((g) => setG.add(g.trim()));
       }
     });
     return Array.from(setG).sort();
-  }, [report]);
+  }, [secUsers, report]);
+
+  // ================= HELPER: MATCH GUARD NAME FLEXIBLY =================
+  const isMatchGuard = (guardName: string | null | undefined, selected: string) => {
+    if (selected === "ALL") return true;
+    if (!guardName) return false;
+    if (guardName === "SYSTEM_MISSED") return true;
+    const sLower = selected.toLowerCase().trim();
+    const gLower = guardName.toLowerCase().trim();
+    return gLower.includes(sLower) || sLower.includes(gLower);
+  };
 
   // ================= CLEAN & FILTERED LOGS =================
   const cleanLogs = useMemo(() => {
     return report
       .filter((i) => {
         if (selectedGuard !== "ALL") {
-          if (!i.guard_name || !i.guard_name.toLowerCase().includes(selectedGuard.toLowerCase())) {
+          if (!isMatchGuard(i.guard_name, selectedGuard)) {
             return false;
           }
         }
@@ -265,7 +281,7 @@ export default function ReportDownloadPage() {
               <select
                 value={selectedGuard}
                 onChange={(e) => setSelectedGuard(e.target.value)}
-                className="input-field py-2 text-xs bg-white"
+                className="input-field py-2 text-xs bg-white cursor-pointer font-semibold text-purple-950"
               >
                 <option value="ALL">All Officers</option>
                 {availableGuards.map((g) => (
@@ -284,7 +300,7 @@ export default function ReportDownloadPage() {
               <select
                 value={selectedRound}
                 onChange={(e) => setSelectedRound(e.target.value)}
-                className="input-field py-2 text-xs bg-white"
+                className="input-field py-2 text-xs bg-white cursor-pointer font-semibold text-purple-950"
               >
                 <option value="ALL">All Rounds</option>
                 {Array.from({ length: 12 }, (_, i) => i + 1).map((r) => (
@@ -303,7 +319,7 @@ export default function ReportDownloadPage() {
               <select
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
-                className="input-field py-2 text-xs bg-white"
+                className="input-field py-2 text-xs bg-white cursor-pointer font-semibold text-purple-950"
               >
                 <option value="ALL">All Statuses</option>
                 <option value="SUCCESS">Completed (Success)</option>

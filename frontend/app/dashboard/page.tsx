@@ -10,6 +10,7 @@ import {
 import { getPatrolReport, PatrolReportItem } from '../api/report'
 import { getShifts } from '../api/shifts.api'
 import { fetchQRByCampus } from '../api/qr.api'
+import { getSecurityUsers } from '../api/securityUsers.api'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import { useAuthGuard } from '@/app/services/auth.guard'
@@ -228,7 +229,6 @@ export default function DashboardPage() {
     const offset = d.getTimezoneOffset() * 60000;
     return new Date(d.getTime() - offset).toISOString().slice(0, 10);
   }, [])
-  const dashboardContentRef = useRef<HTMLDivElement>(null)
 
   const [adminName, setAdminName]             = useState('')
   const FIXED_CAMPUS                          = 'KCET01'
@@ -236,6 +236,7 @@ export default function DashboardPage() {
   const [report, setReport]                   = useState<PatrolReportItem[]>([])
   const [shifts, setShifts]                   = useState<any[]>([])
   const [qrs, setQrs]                         = useState<any[]>([])
+  const [secUsers, setSecUsers]               = useState<any[]>([])
   const [loading, setLoading]                 = useState(false)
   const [lastUpdated, setLastUpdated]         = useState('')
 
@@ -260,16 +261,18 @@ export default function DashboardPage() {
     Promise.all([
       getPatrolReport(FIXED_CAMPUS, selectedDate),
       getShifts(),
-      fetchQRByCampus(FIXED_CAMPUS)
+      fetchQRByCampus(FIXED_CAMPUS),
+      getSecurityUsers()
     ])
-      .then(([reportData, shiftsData, qrsData]) => {
+      .then(([reportData, shiftsData, qrsData, usersData]) => {
         setReport(reportData || [])
         setShifts(shiftsData || [])
         setQrs(qrsData || [])
+        setSecUsers(usersData || [])
         setLastUpdated(new Date().toLocaleTimeString())
       })
       .catch(() => { 
-        if (showLoading) { setReport([]); setShifts([]); setQrs([]) }
+        if (showLoading) { setReport([]); setShifts([]); setQrs([]); setSecUsers([]) }
       })
       .finally(() => { if (showLoading) setLoading(false) })
   }, [selectedDate, authorized])
@@ -289,7 +292,7 @@ export default function DashboardPage() {
   }, [fetchReportAndShifts, authorized, selectedDate])
 
   /* ── DATE SHORTCUT HANDLERS ── */
-  const setPresetDate = (type: 'today' | 'yesterday' | 'thisWeek' | 'lastWeek' | 'thisMonth') => {
+  const setPresetDate = (type: 'today' | 'yesterday' | 'thisWeek' | 'thisMonth') => {
     const now = new Date()
     const offset = now.getTimezoneOffset() * 60000
     const localNow = new Date(now.getTime() - offset)
@@ -301,7 +304,7 @@ export default function DashboardPage() {
       setSelectedDate(yest.toISOString().slice(0, 10))
     } else if (type === 'thisWeek') {
       const day = localNow.getDay()
-      const diff = localNow.getDate() - day + (day === 0 ? -6 : 1) // Mon
+      const diff = localNow.getDate() - day + (day === 0 ? -6 : 1)
       const mon = new Date(localNow.setDate(diff))
       setSelectedDate(mon.toISOString().slice(0, 10))
     } else if (type === 'thisMonth') {
@@ -311,16 +314,31 @@ export default function DashboardPage() {
     }
   }
 
-  /* ── GUARD OPTIONS FOR FILTER ── */
+  /* ── COMBINED GUARD LIST FOR DROPDOWN (REGISTERED + REPORT GUARDS) ── */
   const availableGuards = useMemo(() => {
     const guardsSet = new Set<string>()
+    // Add all registered security users
+    secUsers.forEach(u => {
+      if (u.security_name) guardsSet.add(u.security_name.trim())
+    })
+    // Add any guard names present in report logs
     report.forEach(r => {
       if (r.guard_name && r.guard_name !== 'SYSTEM_MISSED') {
         r.guard_name.split(',').forEach(g => guardsSet.add(g.trim()))
       }
     })
     return Array.from(guardsSet).sort()
-  }, [report])
+  }, [secUsers, report])
+
+  /* ── HELPER: MATCH GUARD NAME FLEXIBLY ── */
+  const isMatchGuard = (guardName: string | null | undefined, selected: string) => {
+    if (selected === 'ALL') return true
+    if (!guardName) return false
+    if (guardName === 'SYSTEM_MISSED') return true
+    const sLower = selected.toLowerCase().trim()
+    const gLower = guardName.toLowerCase().trim()
+    return gLower.includes(sLower) || sLower.includes(gLower)
+  }
 
   /* ── COMPUTED STATS (time-aware & filtered) ── */
   const stats = useMemo(() => {
@@ -330,7 +348,7 @@ export default function DashboardPage() {
     const filteredReport = report.filter(r => {
       // Guard filter
       if (selectedGuard !== 'ALL') {
-        if (!r.guard_name || !r.guard_name.toLowerCase().includes(selectedGuard.toLowerCase())) {
+        if (!isMatchGuard(r.guard_name, selectedGuard)) {
           return false
         }
       }
@@ -383,7 +401,6 @@ export default function DashboardPage() {
     const scannedRounds = filteredReport.filter(r => r.scan_time !== null).map(r => r.round)
     const maxScannedRound = scannedRounds.length ? Math.max(...scannedRounds) : 0
     const nothingScannedToday = isToday && maxScannedRound === 0
-    const isPartialDay = isToday && dueRoundsCount < ROUND_TIMES.length
 
     const effective = isToday
       ? filteredReport.filter(r => r.round <= dueRoundsCount || r.status === 'SUCCESS')
@@ -498,7 +515,7 @@ export default function DashboardPage() {
     return {
       total, completed, missed, pending, rate, lastScan, pie, roundSummary,
       shiftLeaderboards: [], guardLeaderboard, coverageByPoint, hourlyActivity: [], recentActivity: [],
-      isPartialDay, nothingScannedToday, timeline, activeRoundInfo
+      nothingScannedToday, timeline, activeRoundInfo
     }
   }, [report, selectedDate, today, selectedGuard, selectedRound, selectedStatus, qrs])
 
@@ -634,7 +651,7 @@ export default function DashboardPage() {
               <select
                 value={selectedGuard}
                 onChange={e => setSelectedGuard(e.target.value)}
-                className="input-field py-2 text-xs bg-white"
+                className="input-field py-2 text-xs bg-white cursor-pointer font-semibold text-purple-950"
               >
                 <option value="ALL">All Officers</option>
                 {availableGuards.map(g => (
@@ -649,7 +666,7 @@ export default function DashboardPage() {
               <select
                 value={selectedRound}
                 onChange={e => setSelectedRound(e.target.value)}
-                className="input-field py-2 text-xs bg-white"
+                className="input-field py-2 text-xs bg-white cursor-pointer font-semibold text-purple-950"
               >
                 <option value="ALL">All Rounds</option>
                 {ROUND_TIMES.map((_, idx) => (
@@ -664,7 +681,7 @@ export default function DashboardPage() {
               <select
                 value={selectedStatus}
                 onChange={e => setSelectedStatus(e.target.value)}
-                className="input-field py-2 text-xs bg-white"
+                className="input-field py-2 text-xs bg-white cursor-pointer font-semibold text-purple-950"
               >
                 <option value="ALL">All Statuses</option>
                 <option value="SUCCESS">Completed (Success)</option>
