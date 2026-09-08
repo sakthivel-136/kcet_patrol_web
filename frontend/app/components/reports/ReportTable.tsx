@@ -227,10 +227,7 @@ const ReportTable: React.FC<ReportTableProps> = ({ logs, loading }) => {
       if (value && String(value).toUpperCase() !== "SYSTEM_MISSED") {
         return value;
       }
-      const r = row.round;
-      if (r === 6 || r === 9) return "GOKUL";
-      if (r === 7 || r === 8) return "SAKTHI VEL C";
-      return "Allotted Guard";
+      return "-";
     }
 
     // Date

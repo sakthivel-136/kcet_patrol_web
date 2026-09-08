@@ -9,6 +9,7 @@ import { useAuthGuard } from "@/app/services/auth.guard";
 import { motion } from "framer-motion";
 import { getShifts } from "../api/shifts.api";
 import { getSecurityUsers } from "../api/securityUsers.api";
+import { getAllocations } from "../api/allocations.api";
 import {
   Filter, Calendar, Shield, FileText, Download, CheckCircle2,
   AlertTriangle, UserCheck, Clock, ChevronDown, Sparkles,
@@ -117,6 +118,7 @@ export default function ReportDownloadPage() {
   const [report, setReport] = useState<PatrolReportItem[]>([]);
   const [shifts, setShifts] = useState<any[]>([]);
   const [secUsers, setSecUsers] = useState<any[]>([]);
+  const [allocations, setAllocations] = useState<any[]>([]);
 
   // ── ADVANCED FILTERS ──
   const [selectedGuard, setSelectedGuard] = useState("ALL");
@@ -185,14 +187,16 @@ export default function ReportDownloadPage() {
     }
 
     try {
-      const [data, shiftsData, usersData] = await Promise.all([
+      const [data, shiftsData, usersData, allocsData] = await Promise.all([
         getPatrolReport(FIXED_CAMPUS, start, end),
         getShifts(),
-        getSecurityUsers()
+        getSecurityUsers(),
+        getAllocations()
       ]);
       setReport(data || []);
       setShifts(shiftsData || []);
       setSecUsers(usersData || []);
+      setAllocations(allocsData || []);
       if (!data || data.length === 0) setError("No patrol records found for this timeframe.");
     } catch (err) {
       setError("Failed to fetch report data. Please try again.");
@@ -210,6 +214,53 @@ export default function ReportDownloadPage() {
     setTimeout(() => setPdfLoading(false), 800);
   };
 
+  const ROUND_TIMES_LIST = [
+    '00:45', '02:45', '04:45', '06:45', '08:45', '10:45',
+    '12:45', '14:45', '16:45', '18:45', '20:45', '22:45'
+  ];
+
+  // ================= HELPER: DYNAMIC SHIFT GUARD RESOLUTION =================
+  const resolveShiftGuardNames = (roundNo: number): string[] => {
+    if (roundNo < 1 || roundNo > ROUND_TIMES_LIST.length) return [];
+    const roundTimeStr = ROUND_TIMES_LIST[roundNo - 1];
+    const [rH, rM] = roundTimeStr.split(":").map(Number);
+    const roundMins = rH * 60 + rM;
+
+    const matchingShift = shifts.find((s) => {
+      if (!s.start_time || !s.end_time) return false;
+      const [sH, sM] = s.start_time.split(":").map(Number);
+      const [eH, eM] = s.end_time.split(":").map(Number);
+      const startMins = sH * 60 + sM;
+      let endMins = eH * 60 + eM;
+      if (endMins <= startMins) {
+        return roundMins >= startMins || roundMins < endMins;
+      }
+      return roundMins >= startMins && roundMins < endMins;
+    });
+
+    if (!matchingShift) return [];
+
+    const shiftAllocs = allocations.filter(
+      (a) => a.shift_id === matchingShift.shift_id && a.guard_id !== "CLEAR"
+    );
+
+    const names: string[] = [];
+    shiftAllocs.forEach((a) => {
+      const user = secUsers.find(
+        (u) =>
+          u.security_id === a.guard_id ||
+          (u.security_name && u.security_name.trim() === a.guard_id.trim())
+      );
+      if (user && user.security_name && user.security_name.toUpperCase() !== "SYSTEM_MISSED") {
+        names.push(user.security_name.trim());
+      } else if (a.guard_id && a.guard_id.toUpperCase() !== "SYSTEM_MISSED") {
+        names.push(a.guard_id.trim());
+      }
+    });
+
+    return Array.from(new Set(names));
+  };
+
   // ================= AVAILABLE GUARDS =================
   const availableGuards = useMemo(() => {
     const setG = new Set<string>();
@@ -224,28 +275,25 @@ export default function ReportDownloadPage() {
           if (g.toUpperCase() !== "SYSTEM_MISSED") setG.add(g.trim());
         });
       }
+      const shiftGuards = resolveShiftGuardNames(r.round);
+      shiftGuards.forEach(g => setG.add(g));
     });
     return Array.from(setG).sort();
-  }, [secUsers, report]);
-
-  // ================= HELPER: MATCH GUARD NAME FLEXIBLY =================
-  const isMatchGuard = (guardName: string | null | undefined, selected: string) => {
-    if (selected === "ALL") return true;
-    if (!guardName) return false;
-    if (guardName === "SYSTEM_MISSED") return true;
-    const sLower = selected.toLowerCase().trim();
-    const gLower = guardName.toLowerCase().trim();
-    return gLower.includes(sLower) || sLower.includes(gLower);
-  };
+  }, [secUsers, report, shifts, allocations]);
 
   // ================= CLEAN & FILTERED LOGS =================
   const cleanLogs = useMemo(() => {
     return report
       .filter((i) => {
         if (selectedGuard !== "ALL") {
-          if (!isMatchGuard(i.guard_name, selectedGuard)) {
-            return false;
+          const sLower = selectedGuard.toLowerCase().trim();
+          let match = false;
+          if (i.guard_name && i.guard_name.toUpperCase() !== "SYSTEM_MISSED") {
+            if (i.guard_name.toLowerCase().trim().includes(sLower)) match = true;
           }
+          const shiftGuards = resolveShiftGuardNames(i.round);
+          if (shiftGuards.some((g) => g.toLowerCase().trim().includes(sLower))) match = true;
+          if (!match) return false;
         }
         if (selectedRound !== "ALL" && i.round !== Number(selectedRound)) {
           return false;
@@ -258,9 +306,12 @@ export default function ReportDownloadPage() {
       .map((i) => {
         let gName = i.guard_name;
         if (!gName || gName.toUpperCase() === "SYSTEM_MISSED") {
-          if (i.round === 6 || i.round === 9) gName = "GOKUL";
-          else if (i.round === 7 || i.round === 8) gName = "SAKTHI VEL C";
-          else gName = "Allotted Guard";
+          const shiftGuards = resolveShiftGuardNames(i.round);
+          if (shiftGuards.length > 0) {
+            gName = shiftGuards.join(", ");
+          } else {
+            gName = "-";
+          }
         }
         return {
           ...i,
@@ -269,7 +320,7 @@ export default function ReportDownloadPage() {
           guard_name: gName,
         };
       });
-  }, [report, selectedGuard, selectedRound, selectedStatus]);
+  }, [report, selectedGuard, selectedRound, selectedStatus, shifts, allocations, secUsers]);
 
   if (!authorized) {
     return <div className="p-6 text-slate-500 min-h-screen flex items-center justify-center">Checking access...</div>;

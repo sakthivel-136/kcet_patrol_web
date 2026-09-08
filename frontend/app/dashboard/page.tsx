@@ -11,6 +11,7 @@ import { getPatrolReport, PatrolReportItem } from '../api/report'
 import { getShifts } from '../api/shifts.api'
 import { fetchQRByCampus } from '../api/qr.api'
 import { getSecurityUsers } from '../api/securityUsers.api'
+import { getAllocations } from '../api/allocations.api'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import { useAuthGuard } from '@/app/services/auth.guard'
@@ -239,6 +240,7 @@ export default function DashboardPage() {
   const [shifts, setShifts]                   = useState<any[]>([])
   const [qrs, setQrs]                         = useState<any[]>([])
   const [secUsers, setSecUsers]               = useState<any[]>([])
+  const [allocations, setAllocations]         = useState<any[]>([])
   const [loading, setLoading]                 = useState(false)
   const [lastUpdated, setLastUpdated]         = useState('')
 
@@ -264,17 +266,19 @@ export default function DashboardPage() {
       getPatrolReport(FIXED_CAMPUS, selectedDate),
       getShifts(),
       fetchQRByCampus(FIXED_CAMPUS),
-      getSecurityUsers()
+      getSecurityUsers(),
+      getAllocations()
     ])
-      .then(([reportData, shiftsData, qrsData, usersData]) => {
+      .then(([reportData, shiftsData, qrsData, usersData, allocsData]) => {
         setReport(reportData || [])
         setShifts(shiftsData || [])
         setQrs(qrsData || [])
         setSecUsers(usersData || [])
+        setAllocations(allocsData || [])
         setLastUpdated(new Date().toLocaleTimeString())
       })
       .catch(() => { 
-        if (showLoading) { setReport([]); setShifts([]); setQrs([]); setSecUsers([]) }
+        if (showLoading) { setReport([]); setShifts([]); setQrs([]); setSecUsers([]); setAllocations([]) }
       })
       .finally(() => { if (showLoading) setLoading(false) })
   }, [selectedDate, authorized])
@@ -309,7 +313,41 @@ export default function DashboardPage() {
     }
   }
 
-  /* ── COMBINED GUARD LIST FOR DROPDOWN (REGISTERED + REPORT GUARDS) ── */
+  /* ── HELPER: DYNAMIC SHIFT GUARD RESOLUTION FROM DB ALLOCATIONS ── */
+  const resolveShiftGuardNames = useCallback((roundNo: number): string[] => {
+    if (roundNo < 1 || roundNo > ROUND_TIMES.length) return []
+    const roundTimeStr = ROUND_TIMES[roundNo - 1]
+    const [rH, rM] = roundTimeStr.split(':').map(Number)
+    const roundMins = rH * 60 + rM
+
+    const matchingShift = shifts.find(s => {
+      if (!s.start_time || !s.end_time) return false
+      const [sH, sM] = s.start_time.split(':').map(Number)
+      const [eH, eM] = s.end_time.split(':').map(Number)
+      const startMins = sH * 60 + sM
+      let endMins = eH * 60 + eM
+      if (endMins <= startMins) {
+        return roundMins >= startMins || roundMins < endMins
+      }
+      return roundMins >= startMins && roundMins < endMins
+    })
+
+    if (!matchingShift) return []
+
+    const shiftAllocs = allocations.filter(a => a.shift_id === matchingShift.shift_id && a.guard_id !== 'CLEAR')
+    const names: string[] = []
+    shiftAllocs.forEach(a => {
+      const user = secUsers.find(u => u.security_id === a.guard_id || (u.security_name && u.security_name.trim() === a.guard_id.trim()))
+      if (user && user.security_name && user.security_name.toUpperCase() !== 'SYSTEM_MISSED') {
+        names.push(user.security_name.trim())
+      } else if (a.guard_id && a.guard_id.toUpperCase() !== 'SYSTEM_MISSED') {
+        names.push(a.guard_id.trim())
+      }
+    })
+    return Array.from(new Set(names))
+  }, [shifts, allocations, secUsers])
+
+  /* ── COMBINED GUARD LIST FOR DROPDOWN (REGISTERED + REPORT + SHIFT ALLOCATED GUARDS) ── */
   const availableGuards = useMemo(() => {
     const guardsSet = new Set<string>()
     secUsers.forEach(u => {
@@ -323,18 +361,22 @@ export default function DashboardPage() {
           if (g.toUpperCase() !== 'SYSTEM_MISSED') guardsSet.add(g.trim())
         })
       }
+      const shiftGuards = resolveShiftGuardNames(r.round)
+      shiftGuards.forEach(g => guardsSet.add(g))
     })
     return Array.from(guardsSet).sort()
-  }, [secUsers, report])
+  }, [secUsers, report, resolveShiftGuardNames])
 
   /* ── HELPER: MATCH GUARD NAME FLEXIBLY ── */
-  const isMatchGuard = (guardName: string | null | undefined, selected: string) => {
+  const isMatchGuard = (r: PatrolReportItem, selected: string) => {
     if (selected === 'ALL') return true
-    if (!guardName) return false
-    if (guardName === 'SYSTEM_MISSED') return true
+    if (!selected) return false
     const sLower = selected.toLowerCase().trim()
-    const gLower = guardName.toLowerCase().trim()
-    return gLower.includes(sLower) || sLower.includes(gLower)
+    if (r.guard_name && r.guard_name.toUpperCase() !== 'SYSTEM_MISSED') {
+      if (r.guard_name.toLowerCase().trim().includes(sLower)) return true
+    }
+    const shiftGuards = resolveShiftGuardNames(r.round)
+    return shiftGuards.some(g => g.toLowerCase().trim().includes(sLower))
   }
 
   /* ── COMPUTED STATS (time-aware for past dates vs today) ── */
@@ -345,7 +387,7 @@ export default function DashboardPage() {
     // Filter report according to user selection
     const filteredReport = report.filter(r => {
       if (selectedGuard !== 'ALL') {
-        if (!isMatchGuard(r.guard_name, selectedGuard)) return false
+        if (!isMatchGuard(r, selectedGuard)) return false
       }
       if (selectedRound !== 'ALL' && r.round !== Number(selectedRound)) {
         return false
@@ -435,24 +477,29 @@ export default function DashboardPage() {
     /* guard leaderboard */
     const overallGuardMap: Record<string, { scanned: number; missed: number }> = {}
     effective.forEach(r => {
-      if (r.status === 'SUCCESS' || (!nothingScannedToday && r.status === 'MISSED')) {
-        let rawGuard = r.guard_name;
-        if (!rawGuard || rawGuard.toUpperCase() === 'SYSTEM_MISSED') {
-          if (r.round === 6 || r.round === 9) rawGuard = 'GOKUL';
-          else if (r.round === 7 || r.round === 8) rawGuard = 'SAKTHI VEL C';
-          else rawGuard = 'Allotted Guard';
-        }
-        const guardsList = rawGuard.split(',').map(name => name.trim()).filter(Boolean);
+      if (r.status === 'SUCCESS') {
+        const guardsList = (r.guard_name || '').split(',').map(name => name.trim()).filter(Boolean);
         guardsList.forEach(g => {
           if (g.toUpperCase() === 'SYSTEM_MISSED' || g.toLowerCase() === 'unknown') return;
           if (!overallGuardMap[g]) overallGuardMap[g] = { scanned: 0, missed: 0 };
-          if (r.status === 'SUCCESS') overallGuardMap[g].scanned++;
-          else overallGuardMap[g].missed++;
+          overallGuardMap[g].scanned++;
+        });
+      } else if (!nothingScannedToday && r.status === 'MISSED') {
+        let guardsList: string[] = [];
+        if (r.guard_name && r.guard_name.toUpperCase() !== 'SYSTEM_MISSED') {
+          guardsList = r.guard_name.split(',').map(name => name.trim()).filter(Boolean);
+        } else {
+          guardsList = resolveShiftGuardNames(r.round);
+        }
+        guardsList.forEach(g => {
+          if (g.toUpperCase() === 'SYSTEM_MISSED' || g.toLowerCase() === 'unknown') return;
+          if (!overallGuardMap[g]) overallGuardMap[g] = { scanned: 0, missed: 0 };
+          overallGuardMap[g].missed++;
         });
       }
     })
     const guardLeaderboard = Object.entries(overallGuardMap)
-      .filter(([n, d]) => n !== 'Unknown' && n.toUpperCase() !== 'SYSTEM_MISSED')
+      .filter(([n]) => n !== 'Unknown' && n.toUpperCase() !== 'SYSTEM_MISSED')
       .map(([name, d]) => ({ name, ...d, total: d.scanned + d.missed }))
       .sort((a, b) => b.scanned / (b.total || 1) - a.scanned / (a.total || 1))
 
