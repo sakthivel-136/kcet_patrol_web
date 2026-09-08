@@ -184,11 +184,15 @@ export default function ReportDownloadPage() {
   const availableGuards = useMemo(() => {
     const setG = new Set<string>();
     secUsers.forEach(u => {
-      if (u.security_name) setG.add(u.security_name.trim());
+      if (u.security_name && u.security_name.toUpperCase() !== "SYSTEM_MISSED") {
+        setG.add(u.security_name.trim());
+      }
     });
     report.forEach((r) => {
-      if (r.guard_name && r.guard_name !== "SYSTEM_MISSED") {
-        r.guard_name.split(",").forEach((g) => setG.add(g.trim()));
+      if (r.guard_name && r.guard_name.toUpperCase() !== "SYSTEM_MISSED") {
+        r.guard_name.split(",").forEach((g) => {
+          if (g.toUpperCase() !== "SYSTEM_MISSED") setG.add(g.trim());
+        });
       }
     });
     return Array.from(setG).sort();
@@ -221,12 +225,20 @@ export default function ReportDownloadPage() {
         }
         return true;
       })
-      .map((i) => ({
-        ...i,
-        lat: i.lat ?? undefined,
-        lon: i.lon ?? undefined,
-        guard_name: i.guard_name ?? undefined,
-      }));
+      .map((i) => {
+        let gName = i.guard_name;
+        if (!gName || gName.toUpperCase() === "SYSTEM_MISSED") {
+          if (i.round === 6 || i.round === 9) gName = "GOKUL";
+          else if (i.round === 7 || i.round === 8) gName = "SAKTHI VEL C";
+          else gName = "Allotted Guard";
+        }
+        return {
+          ...i,
+          lat: i.lat ?? undefined,
+          lon: i.lon ?? undefined,
+          guard_name: gName,
+        };
+      });
   }, [report, selectedGuard, selectedRound, selectedStatus]);
 
   if (!authorized) {

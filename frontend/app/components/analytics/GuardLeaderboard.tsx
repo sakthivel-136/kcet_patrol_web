@@ -19,6 +19,8 @@ export default function GuardLeaderboard({ guards }: GuardLeaderboardProps) {
   const [search, setSearch] = useState('')
 
   const filteredGuards = guards.filter(g =>
+    g.name.toUpperCase() !== 'SYSTEM_MISSED' &&
+    g.name.toLowerCase() !== 'unknown' &&
     g.name.toLowerCase().includes(search.toLowerCase())
   )
 

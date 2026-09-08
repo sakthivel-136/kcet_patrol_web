@@ -222,6 +222,17 @@ const ReportTable: React.FC<ReportTableProps> = ({ logs, loading }) => {
     const value = row[key];
 
 
+    // Guard Name
+    if (key === "guard_name") {
+      if (value && String(value).toUpperCase() !== "SYSTEM_MISSED") {
+        return value;
+      }
+      const r = row.round;
+      if (r === 6 || r === 9) return "GOKUL";
+      if (r === 7 || r === 8) return "SAKTHI VEL C";
+      return "Allotted Guard";
+    }
+
     // Date
     if (key === "scan_time") {
 

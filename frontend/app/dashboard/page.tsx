@@ -313,11 +313,15 @@ export default function DashboardPage() {
   const availableGuards = useMemo(() => {
     const guardsSet = new Set<string>()
     secUsers.forEach(u => {
-      if (u.security_name) guardsSet.add(u.security_name.trim())
+      if (u.security_name && u.security_name.toUpperCase() !== 'SYSTEM_MISSED') {
+        guardsSet.add(u.security_name.trim())
+      }
     })
     report.forEach(r => {
-      if (r.guard_name && r.guard_name !== 'SYSTEM_MISSED') {
-        r.guard_name.split(',').forEach(g => guardsSet.add(g.trim()))
+      if (r.guard_name && r.guard_name.toUpperCase() !== 'SYSTEM_MISSED') {
+        r.guard_name.split(',').forEach(g => {
+          if (g.toUpperCase() !== 'SYSTEM_MISSED') guardsSet.add(g.trim())
+        })
       }
     })
     return Array.from(guardsSet).sort()
@@ -432,8 +436,15 @@ export default function DashboardPage() {
     const overallGuardMap: Record<string, { scanned: number; missed: number }> = {}
     effective.forEach(r => {
       if (r.status === 'SUCCESS' || (!nothingScannedToday && r.status === 'MISSED')) {
-        const guardsList = (r.guard_name || 'Unknown').split(',').map(name => name.trim()).filter(Boolean);
+        let rawGuard = r.guard_name;
+        if (!rawGuard || rawGuard.toUpperCase() === 'SYSTEM_MISSED') {
+          if (r.round === 6 || r.round === 9) rawGuard = 'GOKUL';
+          else if (r.round === 7 || r.round === 8) rawGuard = 'SAKTHI VEL C';
+          else rawGuard = 'Allotted Guard';
+        }
+        const guardsList = rawGuard.split(',').map(name => name.trim()).filter(Boolean);
         guardsList.forEach(g => {
+          if (g.toUpperCase() === 'SYSTEM_MISSED' || g.toLowerCase() === 'unknown') return;
           if (!overallGuardMap[g]) overallGuardMap[g] = { scanned: 0, missed: 0 };
           if (r.status === 'SUCCESS') overallGuardMap[g].scanned++;
           else overallGuardMap[g].missed++;
@@ -441,7 +452,7 @@ export default function DashboardPage() {
       }
     })
     const guardLeaderboard = Object.entries(overallGuardMap)
-      .filter(([n, d]) => n !== 'Unknown' || d.scanned > 0)
+      .filter(([n, d]) => n !== 'Unknown' && n.toUpperCase() !== 'SYSTEM_MISSED')
       .map(([name, d]) => ({ name, ...d, total: d.scanned + d.missed }))
       .sort((a, b) => b.scanned / (b.total || 1) - a.scanned / (a.total || 1))
 
