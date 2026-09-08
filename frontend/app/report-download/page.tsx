@@ -7,8 +7,8 @@ import ReportTable from "../components/reports/ReportTable";
 import PatrolReportPDF from "../components/reports/PatrolReportPDF";
 import { useAuthGuard } from "@/app/services/auth.guard";
 import { motion } from "framer-motion";
-
 import { getShifts } from "../api/shifts.api";
+import { Filter, Calendar, Shield, FileText, Download, CheckCircle2, AlertTriangle, User } from "lucide-react";
 
 // ================= TYPES =================
 type Campus = {
@@ -17,49 +17,24 @@ type Campus = {
   campus_address: string | null;
 };
 
-// ================= ICONS (SVG) =================
-const IconCampus = () => (
-  <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-  </svg>
-);
-
-const IconCalendar = () => (
-  <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-  </svg>
-);
-
-const IconDownload = () => (
-  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-  </svg>
-);
-
-const IconSpinner = () => (
-  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-    <path className="opacity-75" fill="currentColor"
-      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-    </path>
-  </svg>
-);
-
 // ================= PAGE =================
 export default function ReportDownloadPage() {
   const { authorized } = useAuthGuard({ allowedRoles: ['ADMIN', 'SUPERVISOR'] });
   const [adminName, setAdminName] = useState("");
   const FIXED_CAMPUS = "KCET01";
-  
-  const [reportDate, setReportDate] = useState(new Date().toISOString().slice(0, 10));
-  const [endDate, setEndDate] = useState(new Date().toISOString().slice(0, 10));
-  const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7)); // YYYY-MM
+
+  const today = new Date().toISOString().slice(0, 10);
+  const [reportDate, setReportDate] = useState(today);
+  const [endDate, setEndDate] = useState(today);
+  const [selectedMonth, setSelectedMonth] = useState(today.slice(0, 7)); // YYYY-MM
   const [reportType, setReportType] = useState<"single" | "range" | "month">("single");
   const [report, setReport] = useState<PatrolReportItem[]>([]);
   const [shifts, setShifts] = useState<any[]>([]);
+
+  // ── ADVANCED FILTERS ──
+  const [selectedGuard, setSelectedGuard] = useState("ALL");
+  const [selectedRound, setSelectedRound] = useState("ALL");
+  const [selectedStatus, setSelectedStatus] = useState("ALL");
 
   const [loading, setLoading] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
@@ -100,7 +75,7 @@ export default function ReportDownloadPage() {
       end = endDate;
     } else if (reportType === "month") {
       const [year, month] = selectedMonth.split("-").map(Number);
-      const lastDay = new Date(year, month, 0); // last day of current month
+      const lastDay = new Date(year, month, 0);
       const pad = (n: number) => String(n).padStart(2, "0");
       start = `${year}-${pad(month)}-01`;
       end = `${year}-${pad(month)}-${pad(lastDay.getDate())}`;
@@ -111,9 +86,9 @@ export default function ReportDownloadPage() {
         getPatrolReport(FIXED_CAMPUS, start, end),
         getShifts()
       ]);
-      setReport(data);
-      setShifts(shiftsData);
-      if (data.length === 0) setError("No patrol records found for this timeframe.");
+      setReport(data || []);
+      setShifts(shiftsData || []);
+      if (!data || data.length === 0) setError("No patrol records found for this timeframe.");
     } catch (err) {
       setError("Failed to fetch report data. Please try again.");
       console.error(err);
@@ -130,99 +105,111 @@ export default function ReportDownloadPage() {
     setTimeout(() => setPdfLoading(false), 800);
   };
 
-  // ================= CLEAN =================
-  const cleanLogs = useMemo(() => {
-    return report.map((i) => ({
-      ...i,
-      lat: i.lat ?? undefined,
-      lon: i.lon ?? undefined,
-      guard_name: i.guard_name ?? undefined,
-    }));
+  // ================= AVAILABLE GUARDS =================
+  const availableGuards = useMemo(() => {
+    const setG = new Set<string>();
+    report.forEach((r) => {
+      if (r.guard_name && r.guard_name !== "SYSTEM_MISSED") {
+        r.guard_name.split(",").forEach((g) => setG.add(g.trim()));
+      }
+    });
+    return Array.from(setG).sort();
   }, [report]);
+
+  // ================= CLEAN & FILTERED LOGS =================
+  const cleanLogs = useMemo(() => {
+    return report
+      .filter((i) => {
+        if (selectedGuard !== "ALL") {
+          if (!i.guard_name || !i.guard_name.toLowerCase().includes(selectedGuard.toLowerCase())) {
+            return false;
+          }
+        }
+        if (selectedRound !== "ALL" && i.round !== Number(selectedRound)) {
+          return false;
+        }
+        if (selectedStatus !== "ALL" && i.status !== selectedStatus) {
+          return false;
+        }
+        return true;
+      })
+      .map((i) => ({
+        ...i,
+        lat: i.lat ?? undefined,
+        lon: i.lon ?? undefined,
+        guard_name: i.guard_name ?? undefined,
+      }));
+  }, [report, selectedGuard, selectedRound, selectedStatus]);
 
   if (!authorized) {
     return <div className="p-6 text-slate-500 min-h-screen flex items-center justify-center">Checking access...</div>;
   }
 
   return (
-    <div className="min-h-screen relative font-sans text-slate-900">
-      <motion.div 
+    <div className="min-h-screen relative font-sans text-slate-900 selection:bg-purple-100 selection:text-purple-900">
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10"
+        transition={{ duration: 0.45 }}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10 space-y-6"
       >
-
         {/* HEADER */}
-        <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900">Patrol Reports</h1>
-            <p className="mt-2 text-slate-500">
-              View logs and generate official patrol documentation.
+            <p className="section-heading">Official Audit Reports</p>
+            <h1 className="text-3xl font-extrabold tracking-tight text-purple-950">
+              Patrol <span className="text-gradient">Logs & Documentation</span>
+            </h1>
+            <p className="mt-1 text-slate-500 text-sm">
+              Generate official patrol reports, inspect guard compliance, and export PDF audits.
             </p>
           </div>
 
-          <div className="flex items-center gap-3 px-4 py-2 glass-panel rounded-xl">
-            <div className="w-2 h-2 rounded-full bg-amber-500"></div>
-            <span className="text-sm font-medium text-slate-600">
-              Admin: {adminName || "Loading..."}
-            </span>
+          <div className="flex items-center gap-2 px-3.5 py-2 glass-panel rounded-xl text-xs font-semibold text-purple-900">
+            <Shield size={14} className="text-purple-600" />
+            <span>Admin: {adminName || "Loading..."}</span>
           </div>
         </div>
 
         {/* CONTROLS */}
-        <div className="glass-panel rounded-3xl p-6 mb-6">
+        <div className="glass-panel rounded-3xl p-6 space-y-5">
           {error && (
-            <div className="mb-4 p-4 rounded-lg bg-red-50 border border-red-100 text-red-600 text-sm">
-              {error}
+            <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-semibold flex items-center gap-2">
+              <AlertTriangle size={16} /> {error}
             </div>
           )}
 
           {/* Toggle buttons for Report Type */}
-          <div className="flex gap-2 mb-6 border-b pb-4">
-            <button
-              onClick={() => setReportType("single")}
-              className={`px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${
-                reportType === "single"
-                  ? "bg-purple-600 text-white"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-              }`}
-            >
-              One Day Report
-            </button>
-            <button
-              onClick={() => setReportType("range")}
-              className={`px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${
-                reportType === "range"
-                  ? "bg-purple-600 text-white"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-              }`}
-            >
-              Date Range Report
-            </button>
-            <button
-              onClick={() => setReportType("month")}
-              className={`px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${
-                reportType === "month"
-                  ? "bg-purple-600 text-white"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-              }`}
-            >
-              Month-wise Report
-            </button>
+          <div className="flex flex-wrap items-center gap-2 border-b border-purple-100/60 pb-4">
+            {[
+              { id: "single", label: "One Day Report" },
+              { id: "range", label: "Date Range Report" },
+              { id: "month", label: "Month-wise Report" },
+            ].map((t) => (
+              <button
+                key={t.id}
+                onClick={() => setReportType(t.id as any)}
+                className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${
+                  reportType === t.id
+                    ? "btn-primary shadow-sm"
+                    : "bg-purple-50 text-slate-600 hover:bg-purple-100 hover:text-purple-700"
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
-
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
             {/* DATE SELECTORS BASED ON TYPE */}
             {reportType === "single" && (
-              <div className="md:col-span-4">
-                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <div className="md:col-span-3">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-purple-400 mb-1 block">
                   Patrol Date
                 </label>
                 <input
                   type="date"
-                  className="w-full mt-2 pl-3 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg"
+                  className="input-field py-2 text-xs"
                   value={reportDate}
                   onChange={(e) => setReportDate(e.target.value)}
                 />
@@ -232,23 +219,23 @@ export default function ReportDownloadPage() {
             {reportType === "range" && (
               <>
                 <div className="md:col-span-3">
-                  <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-purple-400 mb-1 block">
                     From Date
                   </label>
                   <input
                     type="date"
-                    className="w-full mt-2 pl-3 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg"
+                    className="input-field py-2 text-xs"
                     value={reportDate}
                     onChange={(e) => setReportDate(e.target.value)}
                   />
                 </div>
                 <div className="md:col-span-3">
-                  <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-purple-400 mb-1 block">
                     To Date
                   </label>
                   <input
                     type="date"
-                    className="w-full mt-2 pl-3 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg"
+                    className="input-field py-2 text-xs"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
                   />
@@ -257,77 +244,120 @@ export default function ReportDownloadPage() {
             )}
 
             {reportType === "month" && (
-              <div className="md:col-span-4">
-                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <div className="md:col-span-3">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-purple-400 mb-1 block">
                   Select Month
                 </label>
                 <input
                   type="month"
-                  className="w-full mt-2 pl-3 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg"
+                  className="input-field py-2 text-xs"
                   value={selectedMonth}
                   onChange={(e) => setSelectedMonth(e.target.value)}
                 />
               </div>
             )}
 
-            {/* BUTTONS */}
-            <div className="md:col-span-3 flex gap-3">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={fetchReport}
-                disabled={loading}
-                className="flex-1 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-semibold py-2.5 rounded-lg flex items-center justify-center"
+            {/* GUARD FILTER */}
+            <div className="md:col-span-3">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-purple-400 mb-1 block">
+                Security Officer
+              </label>
+              <select
+                value={selectedGuard}
+                onChange={(e) => setSelectedGuard(e.target.value)}
+                className="input-field py-2 text-xs bg-white"
               >
-                {loading ? <IconSpinner /> : "View Report"}
-              </motion.button>
+                <option value="ALL">All Officers</option>
+                {availableGuards.map((g) => (
+                  <option key={g} value={g}>
+                    {g}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleDownloadPdf}
-                disabled={!report.length || pdfLoading || loading}
-                className="flex-1 bg-amber-600 hover:bg-amber-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold py-2.5 px-3 rounded-lg flex items-center justify-center gap-2 transition-colors"
+            {/* ROUND FILTER */}
+            <div className="md:col-span-2">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-purple-400 mb-1 block">
+                Round Slot
+              </label>
+              <select
+                value={selectedRound}
+                onChange={(e) => setSelectedRound(e.target.value)}
+                className="input-field py-2 text-xs bg-white"
               >
-                {pdfLoading ? <IconSpinner /> : <><IconDownload /><span>Download PDF</span></>}
-              </motion.button>
+                <option value="ALL">All Rounds</option>
+                {Array.from({ length: 12 }, (_, i) => i + 1).map((r) => (
+                  <option key={r} value={r}>
+                    Round {r}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* STATUS FILTER */}
+            <div className="md:col-span-2">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-purple-400 mb-1 block">
+                Status
+              </label>
+              <select
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+                className="input-field py-2 text-xs bg-white"
+              >
+                <option value="ALL">All Statuses</option>
+                <option value="SUCCESS">Completed (Success)</option>
+                <option value="MISSED">Missed</option>
+              </select>
+            </div>
+
+            {/* ACTION BUTTON */}
+            <div className="md:col-span-2 flex justify-end">
+              <button
+                onClick={handleDownloadPdf}
+                disabled={pdfLoading || loading || cleanLogs.length === 0}
+                className="btn-primary py-2 px-4 text-xs w-full flex items-center justify-center gap-1.5 disabled:opacity-50"
+              >
+                {pdfLoading ? (
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <Download size={14} /> Export PDF
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>
 
-        {/* TABLE */}
-        <div className="glass-panel rounded-3xl overflow-hidden min-h-[400px]">
-          {!loading && cleanLogs.length > 0 && (
-            <div ref={printRef}>
-              <div className="border-b border-slate-100 px-6 py-4 bg-slate-50/50">
-                <h3 className="font-semibold text-slate-800">Report Data</h3>
-              </div>
-              <ReportTable logs={cleanLogs} loading={loading} />
+        {/* REPORT TABLE */}
+        <div className="glass-panel rounded-3xl p-6">
+          {loading ? (
+            <div className="flex flex-col gap-3 p-6">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="skeleton h-12 w-full" style={{ animationDelay: `${i * 0.1}s` }} />
+              ))}
             </div>
+          ) : (
+            <ReportTable logs={cleanLogs} loading={loading} />
           )}
         </div>
 
-        {/* PDF */}
-        {pdfTrigger && cleanLogs.length > 0 && (
-          <div className="hidden">
+        {/* PDF HIDDEN GENERATOR */}
+        <div style={{ position: "absolute", top: "-9999px", left: "-9999px" }}>
+          {pdfTrigger !== null && (
             <PatrolReportPDF
               key={pdfTrigger}
               logs={cleanLogs}
-              campusCode={FIXED_CAMPUS}
-              campusName={"KCET Main Campus"}
-              campusAddress={"Virudhunagar"}
-              reportDate={
-                reportType === "single"
-                  ? reportDate
-                  : reportType === "range"
-                  ? `${reportDate} to ${endDate}`
-                  : `${new Date(selectedMonth + "-02").toLocaleDateString("en-IN", { month: "long", year: "numeric" })}`
-              }
-              generatedBy={adminName}
               shifts={shifts}
+              campusCode={FIXED_CAMPUS}
+              campusName="KCET Main Campus"
+              campusAddress="Kamaraj College of Engineering and Technology"
+              reportDate={reportDate}
+              generatedBy={adminName}
             />
-          </div>
-        )}
+          )}
+        </div>
       </motion.div>
     </div>
   );
