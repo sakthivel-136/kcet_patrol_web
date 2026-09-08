@@ -35,13 +35,13 @@ export default function UserFilters({
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="glass-panel p-5 rounded-3xl mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
 
         <div>
           <label
             htmlFor="role"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className="block text-xs font-bold uppercase tracking-wider text-purple-400 mb-1"
           >
             Role
           </label>
@@ -50,7 +50,7 @@ export default function UserFilters({
             name="role"
             value={filters.role}
             onChange={handleChange}
-            className="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            className="input-field py-2 text-xs bg-white/90 cursor-pointer"
           >
             <option value="All">All Roles</option>
             <option value="Admin">Admin</option>
@@ -62,7 +62,7 @@ export default function UserFilters({
         <div>
           <label
             htmlFor="status"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className="block text-xs font-bold uppercase tracking-wider text-purple-400 mb-1"
           >
             Status
           </label>
@@ -71,9 +71,9 @@ export default function UserFilters({
             name="status"
             value={filters.status}
             onChange={handleChange}
-            className="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            className="input-field py-2 text-xs bg-white/90 cursor-pointer"
           >
-            <option value="All">All Status</option>
+            <option value="All">All Statuses</option>
             <option value="Active">Active</option>
             <option value="Inactive">Inactive</option>
           </select>
@@ -82,18 +82,18 @@ export default function UserFilters({
         <div>
           <label
             htmlFor="site"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className="block text-xs font-bold uppercase tracking-wider text-purple-400 mb-1"
           >
-            Site
+            Campus Site
           </label>
           <select
             id="site"
             name="site"
             value={filters.site}
             onChange={handleChange}
-            className="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            className="input-field py-2 text-xs bg-white/90 cursor-pointer"
           >
-            <option value="All">All Sites</option>
+            <option value="All">All Campus Sites</option>
             {sites.map((site) => (
               <option key={site} value={site}>
                 {site}
