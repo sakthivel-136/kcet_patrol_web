@@ -448,7 +448,7 @@ export default function DashboardPage() {
 
     /* base stats */
     const completed = effective.filter(r => r.status === 'SUCCESS').length
-    const missed    = (isToday && nothingScannedToday) ? 0 : effective.filter(r => r.status === 'MISSED').length
+    const missed    = effective.filter(r => r.status === 'MISSED').length
     const total     = completed + missed
     const rate      = total ? Math.round((completed / total) * 100) : 0
 
@@ -465,7 +465,7 @@ export default function DashboardPage() {
 
     /* rounds summary */
     const roundNums = [...new Set(effective.map(r => r.round))].sort((a, b) => a - b)
-    const roundSummary = (isToday && nothingScannedToday) ? [] : roundNums.map(rnd => {
+    const roundSummary = roundNums.map(rnd => {
       const items = effective.filter(r => r.round === rnd)
       return {
         round: `Round ${rnd}`,
@@ -484,7 +484,7 @@ export default function DashboardPage() {
           if (!overallGuardMap[g]) overallGuardMap[g] = { scanned: 0, missed: 0 };
           overallGuardMap[g].scanned++;
         });
-      } else if (!nothingScannedToday && r.status === 'MISSED') {
+      } else if (r.status === 'MISSED') {
         let guardsList: string[] = [];
         if (r.guard_name && r.guard_name.toUpperCase() !== 'SYSTEM_MISSED') {
           guardsList = r.guard_name.split(',').map(name => name.trim()).filter(Boolean);
