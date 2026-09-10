@@ -330,17 +330,22 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
 
           // ================= Rows =================
             const rows = byRound[round].map((l) => {
+              let dateStr = l.date || d;
               let timeStr = "-";
               if (l.scan_time) {
                 const safeTime = (l.scan_time as string).replace(' ', 'T');
-                const d = new Date(safeTime);
-                if (!isNaN(d.getTime())) {
-                  timeStr = d.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+                const parsedDate = new Date(safeTime);
+                if (!isNaN(parsedDate.getTime())) {
+                  timeStr = parsedDate.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+                  if (!l.date) {
+                    dateStr = parsedDate.toISOString().split("T")[0];
+                  }
                 }
               }
               
               const status = normalizeStatus(l.status);
               return [
+                dateStr.toUpperCase(),
                 timeStr.toUpperCase(),
                 (l.guard_name || "-").toUpperCase(),
                 (l.qr_name || "-").toUpperCase(),
@@ -354,6 +359,7 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
           autoTable(doc, {
             startY: y,
             head: [[
+              "DATE",
               "TIME",
               "GUARD",
               "QR POINT",
