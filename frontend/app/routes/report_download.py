@@ -127,6 +127,8 @@ def download_report(
                     "guard_name": scan.get("guard_name") if scan else None,
 
                     "status": status,
+
+                    "date": report_date,
                 })
 
 
