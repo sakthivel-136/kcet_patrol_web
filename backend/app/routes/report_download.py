@@ -196,7 +196,7 @@ def download_report(
                     report.append({
                         "qr_name": qr["qr_name"],
                         "round": round_no,
-                        "scan_time": scan["scan_dt_ist"].strftime("%Y-%m-%d %I:%M:%S %p") if scan and "scan_dt_ist" in scan else (scan.get("scan_time") if scan else None),
+                        "scan_time": scan.get("scan_time") if (scan and status == "SUCCESS") else None,
                         "lat": scan.get("lat") if scan else None,
                         "lon": scan.get("log") if scan else None,
                         "guard_name": scan.get("guard_name") if scan else None,
