@@ -1,45 +1,49 @@
 # app/utils/round_slots.py
+# 12 rounds of 2 hours each — MUST match frontend roundtime.ts exactly:
+#   1: 00:00–02:00, 2: 02:00–04:00, ... 12: 22:00–00:00 (next day)
 
 from datetime import datetime, timedelta
 import pytz
 
 IST = pytz.timezone("Asia/Kolkata")
 
-# Base round start times
-ROUND_TIMES = [
-    "00:00","00:30","01:00","01:30","02:00","02:30","03:00","03:30",
-    "04:00","04:30","05:00","05:30","06:00","07:00","08:00","09:00",
-    "10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00",
-    "18:00","19:00","20:00","21:00","21:30","22:00","22:30","23:00","23:30"
+# 12 rounds: (round_number, start_hour, start_min, end_hour, end_min)
+# Round 12 ends at 24:00 (midnight next day), handled below
+ROUND_DEFINITIONS = [
+    (1,  0,  0,  2,  0),
+    (2,  2,  0,  4,  0),
+    (3,  4,  0,  6,  0),
+    (4,  6,  0,  8,  0),
+    (5,  8,  0, 10,  0),
+    (6, 10,  0, 12,  0),
+    (7, 12,  0, 14,  0),
+    (8, 14,  0, 16,  0),
+    (9, 16,  0, 18,  0),
+    (10, 18,  0, 20,  0),
+    (11, 20,  0, 22,  0),
+    (12, 22,  0,  0,  0),   # ends next day midnight
 ]
 
 
 def generate_round_slots(report_date: str):
     """
-    Returns:
-    [
-      (round_no, start_dt, end_dt),
-      ...
-    ]
+    Returns list of (round_no, start_dt, end_dt) in IST.
+    Matches the 12 rounds used by the frontend ROUND_TIMES.
     """
-
     base = datetime.strptime(report_date, "%Y-%m-%d")
     base = IST.localize(base)
 
     slots = []
 
-    for i, t in enumerate(ROUND_TIMES):
+    for (rno, sh, sm, eh, em) in ROUND_DEFINITIONS:
+        start = base.replace(hour=sh, minute=sm, second=0, microsecond=0)
 
-        h, m = map(int, t.split(":"))
-
-        start = base.replace(hour=h, minute=m, second=0)
-
-        if i < len(ROUND_TIMES) - 1:
-            nh, nm = map(int, ROUND_TIMES[i+1].split(":"))
-            end = base.replace(hour=nh, minute=nm, second=0)
+        if rno == 12:
+            # Round 12 ends at midnight of the NEXT day
+            end = (base + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
         else:
-            end = start + timedelta(minutes=30)
+            end = base.replace(hour=eh, minute=em, second=0, microsecond=0)
 
-        slots.append((i + 1, start, end))
+        slots.append((rno, start, end))
 
     return slots

@@ -154,7 +154,7 @@ const ReportTable: React.FC<ReportTableProps> = ({ logs, loading }) => {
   // -------------------------------
   const validLogs = useMemo(() => {
     return logs.filter(
-      (log) => log.round >= 1 && log.round <= 24
+      (log) => log.round >= 1 && log.round <= 12
     );
   }, [logs]);
 
