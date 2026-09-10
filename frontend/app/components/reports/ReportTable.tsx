@@ -232,13 +232,10 @@ const ReportTable: React.FC<ReportTableProps> = ({ logs, loading }) => {
 
     // Date
     if (key === "scan_time") {
-
-      if (!value) return "—";
-      
-      // Safari requires strict ISO8601 (replace space with T)
+      if (!value) return "-";
       const safeValue = (value as string).replace(' ', 'T');
       const d = new Date(safeValue);
-      return isNaN(d.getTime()) ? String(value) : d.toLocaleString();
+      return isNaN(d.getTime()) ? "-" : d.toLocaleString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit", day: "2-digit", month: "2-digit", year: "numeric" });
     }
 
 

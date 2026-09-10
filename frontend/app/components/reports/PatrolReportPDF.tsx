@@ -330,9 +330,16 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
 
           // ================= Rows =================
             const rows = byRound[round].map((l) => {
-              const status = normalizeStatus(l.status);
-              const timeStr = l.scan_time ? new Date(l.scan_time.replace(' ', 'T')).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) : "-";
+              let timeStr = "-";
+              if (l.scan_time) {
+                const safeTime = (l.scan_time as string).replace(' ', 'T');
+                const d = new Date(safeTime);
+                if (!isNaN(d.getTime())) {
+                  timeStr = d.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+                }
+              }
               
+              const status = normalizeStatus(l.status);
               return [
                 timeStr.toUpperCase(),
                 (l.guard_name || "-").toUpperCase(),
