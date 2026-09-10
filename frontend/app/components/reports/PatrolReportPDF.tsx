@@ -394,7 +394,8 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
               fillColor: [245, 248, 255],
             },
             didParseCell: (data) => {
-              if (data.section === "body" && data.column.index === 5) {
+              // The STATUS column is at index 6 (DATE=0, TIME=1, GUARD=2, QR=3, LAT=4, LON=5, STATUS=6)
+              if (data.section === "body" && data.column.index === 6) {
                 if (data.cell.raw === "SUCCESS") {
                   data.cell.styles.textColor = [0, 150, 0];
                   data.cell.styles.fontStyle = "bold";
