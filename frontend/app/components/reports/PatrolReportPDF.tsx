@@ -332,14 +332,13 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
             const rows = byRound[round].map((l) => {
               let dateStr = l.date || d;
               let timeStr = "-";
+              
               if (l.scan_time) {
                 const safeTime = (l.scan_time as string).replace(' ', 'T');
                 const parsedDate = new Date(safeTime);
                 if (!isNaN(parsedDate.getTime())) {
+                  dateStr = parsedDate.toLocaleDateString("en-CA"); // YYYY-MM-DD
                   timeStr = parsedDate.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
-                  if (!l.date) {
-                    dateStr = parsedDate.toISOString().split("T")[0];
-                  }
                 }
               }
               

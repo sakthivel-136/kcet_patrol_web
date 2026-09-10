@@ -118,7 +118,7 @@ def download_report(
 
                     "round": round_no,
 
-                    "scan_time": scan.get("scan_time") if scan else None,
+                    "scan_time": scan.get("scan_time") if (scan and scan.get("scan_time")) else (scan.get("round_slot") if (scan and scan.get("round_slot")) else start_dt.isoformat()),
 
                     "lat": scan.get("lat") if scan else None,
 
@@ -128,7 +128,7 @@ def download_report(
 
                     "status": status,
 
-                    "date": report_date,
+                    "date": scan.get("scan_time")[:10] if (scan and scan.get("scan_time")) else report_date,
                 })
 
 
