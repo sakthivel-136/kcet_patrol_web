@@ -109,9 +109,12 @@ export default function UserForm({
       onSave()
       onClose()
 
-    } catch (err: unknown) {
+    } catch (err: any) {
       console.error('Save error:', err)
-      if (err instanceof Error) {
+      const errorDetail = err.response?.data?.detail;
+      if (errorDetail) {
+        alert(errorDetail)
+      } else if (err instanceof Error) {
         alert(err.message)
       } else {
         alert('Error saving security user')

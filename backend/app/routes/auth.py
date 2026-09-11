@@ -100,3 +100,25 @@ async def login(
             status_code=500,
             detail="Login failed"
         )
+
+
+class VerifySupremeRequest(BaseModel):
+    passcode: str
+
+@router.post("/verify-supreme")
+async def verify_supreme(payload: VerifySupremeRequest, db=Depends(get_db)):
+    res = (
+        db.table("security_users")
+        .select("security_password")
+        .eq("security_id", "SUPREME_PASSCODE")
+        .limit(1)
+        .execute()
+    )
+    data = res.data or []
+    if not data:
+        raise HTTPException(status_code=500, detail="Supreme Passcode not found in DB")
+    
+    if data[0]["security_password"] != payload.passcode:
+        raise HTTPException(status_code=401, detail="Invalid Supreme Passcode")
+    
+    return {"status": "success"}

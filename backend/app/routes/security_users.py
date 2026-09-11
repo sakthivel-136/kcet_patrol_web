@@ -85,14 +85,22 @@ def get_security_user(security_id: str, _: dict = Depends(get_current_user)):
 )
 def create_security_user(payload: SecurityUserCreate, _: dict = Depends(admin_only)):
 
-    # Check duplicate ID
-    existing = supabase.table("security_users") \
+    # Check duplicate ID or Password
+    existing_id = supabase.table("security_users") \
         .select("*") \
         .eq("security_id", payload.security_id) \
         .execute()
 
-    if existing.data:
-        raise HTTPException(400, "Security ID already exists")
+    if existing_id.data:
+        raise HTTPException(400, "Already exists, try new or create new password or employee ID")
+
+    existing_pass = supabase.table("security_users") \
+        .select("*") \
+        .eq("security_password", payload.security_password) \
+        .execute()
+
+    if existing_pass.data:
+        raise HTTPException(400, "Already exists, try new or create new password or employee ID")
 
     data = {
         "security_id": payload.security_id,
@@ -153,6 +161,16 @@ def update_security_user(security_id: str, payload: SecurityUserUpdate, _: dict 
         exclude_unset=True,
         exclude_none=True
     )
+
+    if "security_password" in update_data:
+        existing_pass = supabase.table("security_users") \
+            .select("security_id") \
+            .eq("security_password", update_data["security_password"]) \
+            .neq("security_id", security_id) \
+            .execute()
+            
+        if existing_pass.data:
+            raise HTTPException(400, "Already exists, try new or create new password or employee ID")
 
     result = supabase.table("security_users") \
         .update(update_data) \
