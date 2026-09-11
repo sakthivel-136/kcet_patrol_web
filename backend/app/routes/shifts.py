@@ -35,7 +35,24 @@ def create_shift(payload: ShiftCreate, _: dict = Depends(admin_only)):
         "end_time": payload.end_time.isoformat()
     }
     result = supabase.table("shifts").insert(data).execute()
-    return result.data[0]
+    created_shift = result.data[0]
+    
+    # Auto-assign all existing guards to this new shift
+    guards_res = supabase.table("security_users").select("security_id").eq("role", "Guard").execute()
+    guards = guards_res.data or []
+    
+    allocs = []
+    for g in guards:
+        allocs.append({
+            "shift_id": created_shift["shift_id"],
+            "security_id": g["security_id"],
+            "allocation_date": "2099-12-31"
+        })
+        
+    if allocs:
+        supabase.table("shift_allocations").insert(allocs).execute()
+        
+    return created_shift
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_shift(id: str, _: dict = Depends(admin_only)):

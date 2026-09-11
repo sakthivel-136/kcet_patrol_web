@@ -44,18 +44,21 @@ def download_report(
             .data or []
         )
 
+        import dateutil.parser
+        
         # Pre-parse each QR's created_at into a timezone-aware IST datetime
         for qr in qr_codes:
             raw = qr.get("created_at")
             if raw:
                 try:
-                    dt = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+                    dt = dateutil.parser.parse(raw)
                     if dt.tzinfo is None:
                         dt = IST.localize(dt)
                     else:
                         dt = dt.astimezone(IST)
                     qr["created_at_ist"] = dt
-                except Exception:
+                except Exception as e:
+                    print(f"Failed to parse QR created_at: {raw} - {e}")
                     qr["created_at_ist"] = None
             else:
                 qr["created_at_ist"] = None
