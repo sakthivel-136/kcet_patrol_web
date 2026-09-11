@@ -106,7 +106,26 @@ def create_security_user(payload: SecurityUserCreate, _: dict = Depends(admin_on
         result = supabase.table("security_users") \
             .insert(data) \
             .execute()
-        return result.data[0]
+        
+        created_user = result.data[0]
+
+        # Automatically assign the new user to all available shifts 
+        # (Permanent roster date: 2099-12-31)
+        shifts_res = supabase.table("shifts").select("shift_id").execute()
+        shifts = shifts_res.data or []
+        
+        allocations = []
+        for shift in shifts:
+            allocations.append({
+                "shift_id": shift["shift_id"],
+                "security_id": payload.security_id,
+                "allocation_date": "2099-12-31"
+            })
+            
+        if allocations:
+            supabase.table("shift_allocations").insert(allocations).execute()
+
+        return created_user
     except Exception as e:
         err_msg = str(e)
         if "23505" in err_msg or "already exists" in err_msg:
