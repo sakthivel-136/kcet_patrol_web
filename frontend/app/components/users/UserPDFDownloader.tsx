@@ -3,38 +3,24 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { SecurityUser } from "@/app/types/securityUser";
 import { Download } from "lucide-react";
+import { LOGO_BASE64 } from "../reports/logoBase64"; // Same logo as report download
 
 interface Props {
   users: SecurityUser[];
 }
 
-const LOGO_URL = "/logo.png"; // Same as report download, assuming it's there
-
-// Ensure base64 loader
-const getBase64ImageFromUrl = async (imageUrl: string): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.crossOrigin = "Anonymous";
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-      canvas.width = img.width;
-      canvas.height = img.height;
-      const ctx = canvas.getContext("2d");
-      if (ctx) {
-        ctx.drawImage(img, 0, 0);
-        resolve(canvas.toDataURL("image/png"));
-      } else {
-        reject(new Error("Failed to get context"));
-      }
-    };
-    img.onerror = () => reject(new Error("Failed to load image"));
-    img.src = imageUrl;
-  });
-};
-
 const UserPDFDownloader: React.FC<Props> = ({ users }) => {
   const [selectedRole, setSelectedRole] = useState("Guard");
   const [loading, setLoading] = useState(false);
+
+  // ================= Border =================
+  const drawBorder = (doc: jsPDF) => {
+    const w = doc.internal.pageSize.getWidth();
+    const h = doc.internal.pageSize.getHeight();
+    doc.setDrawColor(0, 0, 180);
+    doc.setLineWidth(0.8);
+    doc.rect(8, 8, w - 16, h - 16);
+  };
 
   const handleDownload = async () => {
     setLoading(true);
@@ -44,31 +30,43 @@ const UserPDFDownloader: React.FC<Props> = ({ users }) => {
       );
 
       const doc = new jsPDF();
-      let logoData = null;
-      try {
-        logoData = await getBase64ImageFromUrl(LOGO_URL);
-      } catch (err) {
-        console.warn("Logo could not be loaded", err);
-      }
-
-      // Royal Purple & Gold header
-      doc.setFillColor(48, 14, 107); // Deep Purple bg
-      doc.rect(0, 0, doc.internal.pageSize.width, 40, "F");
-
-      if (logoData) {
-        doc.addImage(logoData, "PNG", 14, 5, 30, 30);
-      }
-
-      doc.setTextColor(255, 215, 0); // Gold text
-      doc.setFontSize(22);
-      doc.setFont("helvetica", "bold");
-      doc.text("KNOWLEDGE INSTITUTE OF TECHNOLOGY", 50, 20);
-
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(14);
-      doc.setFont("helvetica", "normal");
-      doc.text(`${selectedRole} Management Report`, 50, 28);
+      const width = doc.internal.pageSize.getWidth();
+      const generatedBy = localStorage.getItem("name") || localStorage.getItem("adminName") || "Admin";
       
+      drawBorder(doc);
+
+      // ================= Header Drawer =================
+      try {
+        doc.addImage(LOGO_BASE64, "JPEG", 14, 12, 28, 28);
+      } catch (e) {
+        console.warn("Could not load logo to PDF", e);
+      }
+
+      doc.setTextColor(0, 0, 150);
+      doc.setFont("times", "bold");
+      doc.setFontSize(20);
+      doc.text("SECURITY PERSONNEL MANAGEMENT", width / 2, 20, { align: "center" });
+
+      doc.setFontSize(16);
+      doc.text("KNOWLEDGE INSTITUTE OF TECHNOLOGY", width / 2, 30, {
+        align: "center",
+      });
+
+      doc.setFont("times", "normal");
+      doc.setFontSize(11);
+      doc.text("KNOWLEDGE INSTITUTE OF TECHNOLOGY, SALEM", width / 2, 38, {
+        align: "center",
+      });
+
+      // Role Title
+      doc.setFont("times", "bold");
+      doc.setFontSize(14);
+      doc.setTextColor(0, 0, 150);
+      doc.text(`${selectedRole.toUpperCase()} LIST`, width / 2, 50, {
+        align: "center",
+      });
+
+      // ================= Table =================
       const tableData = filteredUsers.map((u) => [
         u.security_id || "-",
         u.security_name || "-",
@@ -76,31 +74,56 @@ const UserPDFDownloader: React.FC<Props> = ({ users }) => {
       ]);
 
       autoTable(doc, {
-        startY: 50,
+        startY: 55,
         head: [["Employee ID", "Employee Name", "Password / PIN"]],
         body: tableData,
         theme: "grid",
         headStyles: {
-          fillColor: [48, 14, 107], // Deep Purple
-          textColor: [255, 215, 0], // Gold
+          fillColor: [0, 0, 150], 
+          textColor: [255, 255, 255], 
           fontStyle: "bold",
           halign: "center",
         },
         bodyStyles: {
-          textColor: [50, 50, 50],
+          textColor: [40, 40, 40],
           halign: "center",
         },
         alternateRowStyles: {
-          fillColor: [248, 246, 255], // Light purple tint
+          fillColor: [245, 245, 250], 
         },
         styles: {
-          font: "helvetica",
+          font: "times",
           fontSize: 11,
           cellPadding: 4,
-          lineColor: [220, 220, 230],
+          lineColor: [200, 200, 200],
           lineWidth: 0.1,
         },
+        didDrawPage: (data) => {
+          // Keep border on every page
+          drawBorder(doc);
+        },
       });
+
+      // ================= Footer (Generated By) =================
+      // Put session ID (Generated By) and Date/Time exactly as requested below the table
+      const finalY = (doc as any).lastAutoTable.finalY || 60;
+      
+      // If we are too close to the bottom, add a new page
+      if (finalY > doc.internal.pageSize.getHeight() - 40) {
+        doc.addPage();
+        drawBorder(doc);
+        doc.setFont("times", "normal");
+        doc.setFontSize(11);
+        doc.setTextColor(40);
+        doc.text(`GENERATED BY : ${generatedBy.toUpperCase()}`, 14, 25);
+        doc.text(`GENERATED AT : ${new Date().toLocaleString().toUpperCase()}`, 14, 31);
+      } else {
+        doc.setFont("times", "normal");
+        doc.setFontSize(11);
+        doc.setTextColor(40);
+        doc.text(`GENERATED BY : ${generatedBy.toUpperCase()}`, 14, finalY + 15);
+        doc.text(`GENERATED AT : ${new Date().toLocaleString().toUpperCase()}`, 14, finalY + 21);
+      }
 
       doc.save(`${selectedRole}_Management_Report.pdf`);
     } catch (error) {
