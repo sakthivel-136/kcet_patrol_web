@@ -555,7 +555,7 @@ export default function ReportDownloadPage() {
             )}
 
             {/* GUARD FILTER */}
-            <div className="md:col-span-3 space-y-1.5">
+            <div data-tour="report-filters" className="md:col-span-3 space-y-1.5">
               <label className="text-[11px] font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1">
                 <UserCheck size={13} /> Officer
               </label>
