@@ -21,7 +21,7 @@ interface TooltipPos {
 
 const PADDING = 10
 const TOOLTIP_W = 340
-const TOOLTIP_H = 200
+const TOOLTIP_H = 280 // Increased to ensure the Next button is never pushed off-screen
 
 export default function TourOverlay() {
   const { isTourActive, currentStep, totalSteps, stopTour, nextStep, prevStep } = useTour()

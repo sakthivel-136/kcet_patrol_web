@@ -108,7 +108,7 @@ export const TOUR_STEPS: TourStep[] = [
     target: 'qr-list',
     title: '📍 QR Scan Points',
     description: 'This is the full list of all QR code scan checkpoints registered for the campus. Each one represents a physical location guards must visit during their rounds.',
-    position: 'bottom',
+    position: 'top',
   },
   {
     id: 12,
@@ -125,7 +125,7 @@ export const TOUR_STEPS: TourStep[] = [
     target: 'shift-list',
     title: '🕐 Patrol Shifts',
     description: 'All defined patrol shifts are listed here with their name, start time, and end time. Shifts define when guards are expected to complete their rounds.',
-    position: 'bottom',
+    position: 'top',
   },
   {
     id: 14,
