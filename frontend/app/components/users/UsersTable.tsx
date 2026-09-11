@@ -45,7 +45,9 @@ export default function UsersTable({
       return
     }
 
-    if ((user.role || '').toUpperCase() === 'ADMIN') {
+    const requiresPasscode = (user.role || '').toUpperCase() === 'ADMIN' || user.security_id === 'SUPREME_PASSCODE'
+
+    if (requiresPasscode) {
       setSupremeModal({ isOpen: true, action: 'VIEW', targetUser: user })
       setPasscodeInput('')
     } else {
@@ -54,6 +56,8 @@ export default function UsersTable({
   }
 
   const handleEditAttempt = (user: SecurityUser) => {
+    if (user.security_id === 'SUPREME_PASSCODE') return // No edit allowed
+
     if ((user.role || '').toUpperCase() === 'ADMIN') {
       setSupremeModal({ isOpen: true, action: 'EDIT', targetUser: user })
       setPasscodeInput('')
@@ -133,12 +137,18 @@ export default function UsersTable({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex items-center justify-end gap-3">
-                      <button onClick={() => handleEditAttempt(user)} className="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">
-                        Edit
-                      </button>
-                      <button onClick={() => handleDelete(user.security_id)} className="text-slate-600 hover:text-red-600 transition-colors duration-200 font-medium">
-                        Delete
-                      </button>
+                      {user.security_id !== 'SUPREME_PASSCODE' ? (
+                        <>
+                          <button onClick={() => handleEditAttempt(user)} className="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">
+                            Edit
+                          </button>
+                          <button onClick={() => handleDelete(user.security_id)} className="text-slate-600 hover:text-red-600 transition-colors duration-200 font-medium">
+                            Delete
+                          </button>
+                        </>
+                      ) : (
+                        <span className="text-slate-400 text-xs italic">System Record</span>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -152,7 +162,7 @@ export default function UsersTable({
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
           <div className="bg-white rounded-3xl p-6 shadow-xl w-full max-w-sm">
             <h3 className="text-lg font-bold text-slate-800 mb-2">Admin Protection</h3>
-            <p className="text-sm text-slate-500 mb-4">Please enter the Supreme Passcode to {supremeModal.action === 'EDIT' ? 'edit' : 'view'} this Admin account.</p>
+            <p className="text-sm text-slate-500 mb-4">Please enter the Supreme Passcode to {supremeModal.action === 'EDIT' ? 'edit' : 'view'} this protected account.</p>
             <input
               type="password"
               value={passcodeInput}
