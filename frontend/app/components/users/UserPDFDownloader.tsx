@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { SecurityUser } from "@/app/types/securityUser";
-import { Download } from "lucide-react";
+import { Download, ChevronDown } from "lucide-react";
 import { LOGO_BASE64 } from "../reports/logoBase64"; 
 
 interface Props {
@@ -159,14 +159,17 @@ const UserPDFDownloader: React.FC<Props> = ({ users }) => {
 
   return (
     <div className="flex items-center gap-2">
-      <select
-        value={selectedRole}
-        onChange={(e) => setSelectedRole(e.target.value)}
-        className="px-4 py-2 rounded-xl border border-slate-200/60 bg-white/50 backdrop-blur-sm shadow-sm outline-none focus:border-purple-300 focus:ring-2 focus:ring-purple-200 transition-all font-medium text-slate-700"
-      >
-        <option value="Guard">Guards</option>
-        <option value="Supervisor">Supervisors</option>
-      </select>
+      <div className="relative">
+        <select
+          value={selectedRole}
+          onChange={(e) => setSelectedRole(e.target.value)}
+          className="input-field py-2 text-sm bg-white/95 cursor-pointer font-bold text-purple-950 pr-8 appearance-none shadow-sm h-[40px] rounded-xl"
+        >
+          <option value="Guard">Guards</option>
+          <option value="Supervisor">Supervisors</option>
+        </select>
+        <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-purple-400 pointer-events-none" />
+      </div>
       <button
         onClick={handleDownload}
         disabled={loading}
