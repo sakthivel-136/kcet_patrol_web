@@ -74,8 +74,9 @@ export default function UserCrudPage() {
             Security Users
           </h1>
           <div className="flex items-center gap-3 w-full sm:w-auto">
-            <UserPDFDownloader users={users} />
+            <div data-tour="user-pdf-download"><UserPDFDownloader users={users} /></div>
             <motion.button
+              data-tour="user-add"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleAddUser}
@@ -90,7 +91,7 @@ export default function UserCrudPage() {
         </div>
 
         {/* ── Table Panel ─────────────────────────── */}
-        <div className="glass-panel rounded-3xl p-6 sm:p-8">
+        <div data-tour="user-table" className="glass-panel rounded-3xl p-6 sm:p-8">
           {loading && users.length === 0 ? (
             <div className="flex flex-col gap-3 p-6">
               {[1,2,3,4].map(i => (

@@ -166,6 +166,7 @@ export default function ShiftsPage() {
               </span>
             </motion.button>
             <motion.button
+              data-tour="shift-add"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => openModal()}
@@ -188,7 +189,7 @@ export default function ShiftsPage() {
             <p className="text-slate-400 text-sm mt-2">Create your first shift to start allocating guards</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div data-tour="shift-list" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {shifts.map(shift => {
               const assignedGuards = allocations
                 .filter(a => a.shift_id === shift.shift_id && a.guard_id !== 'CLEAR')

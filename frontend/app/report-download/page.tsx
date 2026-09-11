@@ -361,7 +361,7 @@ export default function ReportDownloadPage() {
           )}
 
           {/* Toggle buttons for Report Type Modes */}
-          <div className="flex flex-wrap items-center gap-2 border-b border-purple-100/60 pb-4">
+          <div data-tour="report-dates" className="flex flex-wrap items-center gap-2 border-b border-purple-100/60 pb-4">
             {[
               { id: "single", label: "Single Day Report" },
               { id: "range", label: "Custom Date Range" },
@@ -620,6 +620,7 @@ export default function ReportDownloadPage() {
             {/* ACTION BUTTON */}
             <div className="md:col-span-2 flex justify-end">
               <button
+                data-tour="report-download-btn"
                 onClick={handleDownloadPdf}
                 disabled={pdfLoading || loading || cleanLogs.length === 0}
                 className="btn-primary py-2.5 px-4 text-xs w-full flex items-center justify-center gap-1.5 disabled:opacity-50 shadow-md shadow-purple-500/20"
@@ -637,7 +638,7 @@ export default function ReportDownloadPage() {
         </div>
 
         {/* REPORT TABLE */}
-        <div className="glass-panel rounded-3xl p-6">
+        <div data-tour="report-table" className="glass-panel rounded-3xl p-6">
           {loading ? (
             <div className="flex flex-col gap-3 p-6">
               {[1, 2, 3, 4, 5].map((i) => (

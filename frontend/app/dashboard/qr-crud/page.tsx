@@ -200,6 +200,7 @@ export default function QrCrudPage() {
             )}
 
             <motion.button
+              data-tour="qr-add"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleAddQr}
@@ -213,7 +214,7 @@ export default function QrCrudPage() {
           </div>
         </div>
 
-        <div className="glass-panel rounded-3xl p-6 sm:p-8 min-h-[500px]">
+        <div data-tour="qr-list" className="glass-panel rounded-3xl p-6 sm:p-8 min-h-[500px]">
           <div className="mb-6">
             <QrFilters
               value={searchQuery}

@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { clearAuth } from '@/app/services/token.service'
 import InteractiveTutorial from '../tutorial/InteractiveTutorial'
 import AppDownloadModal from './AppDownloadModal'
+import { useTour } from '@/app/context/TourContext'
 
 const navIcons: Record<string, React.ReactNode> = {
   'Dashboard':        <LayoutDashboard size={15} />,
@@ -29,6 +30,7 @@ const Navbar = () => {
   const [isAppDownloadOpen, setIsAppDownloadOpen]   = useState(false)
   const [userRole, setUserRole]                     = useState<string>('')
   const [userName, setUserName]                     = useState<string>('')
+  const { startTour } = useTour()
   const [scrolled, setScrolled]                     = useState(false)
 
   useEffect(() => {
@@ -163,7 +165,7 @@ const Navbar = () => {
                   className="absolute right-4 top-16 w-48 rounded-2xl glass-panel p-1.5 shadow-xl shadow-purple-900/10 border border-purple-100/60"
                 >
                   {[
-                    { label: 'App Guide',    icon: <BookOpen size={14}/>,    onClick: () => { setIsTutorialOpen(true); setIsUserMenuOpen(false) } },
+                    { label: 'App Guide',    icon: <BookOpen size={14}/>,    onClick: () => { startTour(); setIsUserMenuOpen(false) } },
                     { label: 'Switch User',  icon: <User size={14}/>,         onClick: () => router.push('/login') },
                     { label: 'Download App', icon: <Smartphone size={14}/>,   onClick: () => { setIsAppDownloadOpen(true); setIsUserMenuOpen(false) }, gold: true },
                     { label: 'Log out',      icon: <LogOut size={14}/>,       onClick: handleLogout, danger: true },
@@ -210,7 +212,7 @@ const Navbar = () => {
                   </Link>
                 ))}
                 <div className="border-t border-purple-50 mt-2 pt-2 space-y-1">
-                  <button onClick={() => { setIsTutorialOpen(true); setIsMobileMenuOpen(false) }} className="w-full flex items-center gap-3 text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:text-purple-700 hover:bg-purple-50/50"><BookOpen size={14}/> App Guide</button>
+                  <button onClick={() => { startTour(); setIsMobileMenuOpen(false) }} className="w-full flex items-center gap-3 text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:text-purple-700 hover:bg-purple-50/50"><BookOpen size={14}/> App Guide</button>
                   <button onClick={() => router.push('/login')} className="w-full flex items-center gap-3 text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:text-purple-700 hover:bg-purple-50/50"><User size={14}/> Switch User</button>
                   <button onClick={() => { setIsAppDownloadOpen(true); setIsMobileMenuOpen(false) }} className="w-full flex items-center gap-3 text-left px-4 py-3 rounded-xl text-sm font-medium text-amber-700 hover:bg-amber-50"><Smartphone size={14}/> Download App</button>
                   <button onClick={handleLogout} className="w-full flex items-center gap-3 text-left px-4 py-3 rounded-xl text-sm font-medium text-rose-600 hover:bg-rose-50"><LogOut size={14}/> Log out</button>

@@ -6,6 +6,8 @@ import "./globals.css";
 
 import NavbarClient from "@/app/components/navbar/NavbarClient";
 import NavbarWrapper from "@/app/components/navbar/NavbarWrapper";
+import { TourProvider } from "@/app/context/TourContext";
+import TourOverlay from "@/app/components/tutorial/TourOverlay";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -43,15 +45,20 @@ export default function RootLayout({
           antialiased
         `}
       >
-        {/* Navbar (hidden on home page) */}
-        <NavbarWrapper>
-          <NavbarClient />
-        </NavbarWrapper>
+        <TourProvider>
+          {/* Navbar (hidden on home page) */}
+          <NavbarWrapper>
+            <NavbarClient />
+          </NavbarWrapper>
 
-        {/* Page Content */}
-        <main className="min-h-screen">
-          {children}
-        </main>
+          {/* Page Content */}
+          <main className="min-h-screen">
+            {children}
+          </main>
+
+          {/* Global Tour Overlay - renders on top of every page */}
+          <TourOverlay />
+        </TourProvider>
       </body>
     </html>
   );

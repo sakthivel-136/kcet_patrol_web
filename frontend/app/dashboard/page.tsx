@@ -694,7 +694,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Controls Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 items-end">
+          <div data-tour="dashboard-filter" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 items-end">
             
             {/* Single Specific Date Selector */}
             <div className="lg:col-span-3 space-y-1.5">
@@ -783,7 +783,7 @@ export default function DashboardPage() {
         </div>
 
         {/* ── STAT CARDS ── */}
-        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+        <div data-tour="dashboard-stats" className="grid grid-cols-2 xl:grid-cols-4 gap-4">
           <StatCard label="Effective Scans"  value={stats.total}        sub="Due in window"      color="text-purple-700"  bg="bg-purple-500"  icon="📋" />
           <StatCard label="Completed"        value={stats.completed}    sub={`${stats.rate}% completion`} color="text-emerald-700" bg="bg-emerald-500" icon="✅" />
           <StatCard label="Missed"           value={stats.missed}       sub="Uncompleted rounds" color="text-rose-700"    bg="bg-rose-500"    icon="⚠️" />
@@ -791,7 +791,7 @@ export default function DashboardPage() {
         </div>
 
         {/* ── CHARTS SECTION ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div data-tour="dashboard-charts" className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
           {/* Pie Chart */}
           <div className="lg:col-span-5 glass-panel rounded-3xl p-6 flex flex-col justify-between">
@@ -845,7 +845,7 @@ export default function DashboardPage() {
         </div>
 
         {/* ── GUARD LEADERBOARD COMPONENT ── */}
-        <GuardLeaderboard guards={stats.guardLeaderboard} />
+        <div data-tour="dashboard-leaderboard"><GuardLeaderboard guards={stats.guardLeaderboard} /></div>
 
         {/* ── PATROL TIMELINE ── */}
         <div className="glass-panel rounded-3xl p-6 sm:p-8 space-y-5">
