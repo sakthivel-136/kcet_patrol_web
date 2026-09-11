@@ -94,19 +94,21 @@ const UserPDFDownloader: React.FC<Props> = ({ users }) => {
       };
 
       // If we have many users, split them into two side-by-side columns on the same page
-      const MAX_ROWS_PER_COL = 22;
+      // Reduced threshold to 15 so that 18 rows (current count) perfectly splits into two columns on one page.
+      const MAX_ROWS_PER_COL = 15;
 
       if (tableData.length <= MAX_ROWS_PER_COL) {
         // Single column
         autoTable(doc, {
           startY: 77,
+          margin: { bottom: 15 },
           head: [["Employee ID", "Employee Name", "Password / PIN"]],
           body: tableData,
           theme: "grid",
           headStyles,
           bodyStyles: { textColor: [40, 40, 40], halign: "center" },
           alternateRowStyles: { fillColor: [245, 245, 250] },
-          styles: { ...baseStyles, fontSize: 11 },
+          styles: { ...baseStyles, fontSize: 10 },
           didDrawPage: () => drawBorder(doc),
         });
       } else {
@@ -120,7 +122,7 @@ const UserPDFDownloader: React.FC<Props> = ({ users }) => {
         // Left Table
         autoTable(doc, {
           startY: 77,
-          margin: { left: 14, right: 14 + colWidth + 6 },
+          margin: { left: 14, right: 14 + colWidth + 6, bottom: 15 },
           head: [["ID", "Name", "Password"]],
           body: leftData,
           theme: "grid",
@@ -134,7 +136,7 @@ const UserPDFDownloader: React.FC<Props> = ({ users }) => {
         // Right Table
         autoTable(doc, {
           startY: 77,
-          margin: { left: 14 + colWidth + 6, right: 14 },
+          margin: { left: 14 + colWidth + 6, right: 14, bottom: 15 },
           head: [["ID", "Name", "Password"]],
           body: rightData,
           theme: "grid",
