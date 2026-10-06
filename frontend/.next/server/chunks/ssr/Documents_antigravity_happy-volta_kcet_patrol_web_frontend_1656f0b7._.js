@@ -1,3 +1,0 @@
-module.exports=[12078,a=>{a.n(a.i(83189))},13202,a=>{a.n(a.i(79972))},9394,a=>{a.n(a.i(1783))},41766,a=>{a.n(a.i(89235))},9444,a=>{a.n(a.i(58117))},65653,a=>{"use strict";var b=a.i(17380);function c(){return(0,b.jsx)("div",{children:(0,b.jsx)("h1",{children:"QR Analytics"})})}a.s(["default",()=>c])}];
-
-//# sourceMappingURL=Documents_antigravity_happy-volta_kcet_patrol_web_frontend_1656f0b7._.js.map

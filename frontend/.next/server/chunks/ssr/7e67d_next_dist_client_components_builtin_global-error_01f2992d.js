@@ -1,3 +1,0 @@
-module.exports=[47297,(a,b,c)=>{let{createClientModuleProxy:d}=a.r(15294);a.n(d("[project]/Documents/antigravity/happy-volta/kcet_patrol_web/frontend/node_modules/next/dist/client/components/builtin/global-error.js <module evaluation>"))},78173,(a,b,c)=>{let{createClientModuleProxy:d}=a.r(15294);a.n(d("[project]/Documents/antigravity/happy-volta/kcet_patrol_web/frontend/node_modules/next/dist/client/components/builtin/global-error.js"))},58117,a=>{"use strict";a.i(47297);var b=a.i(78173);a.n(b)}];
-
-//# sourceMappingURL=7e67d_next_dist_client_components_builtin_global-error_01f2992d.js.map

@@ -95,7 +95,9 @@ export default function LoginPage() {
       setSuccess(true)
 
       const destination = userRole === 'ADMIN' ? '/dashboard' : '/report-download'
-      setTimeout(() => router.push(destination), 1000)
+      setTimeout(() => {
+        window.location.href = destination
+      }, 1000)
     } catch (err: any) {
       setError(err.message || 'Login failed')
     } finally {
