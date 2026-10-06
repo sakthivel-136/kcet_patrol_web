@@ -99,7 +99,7 @@
         "transform": "lodash/{{member}}"
       }
     },
-    "outputFileTracingRoot": "/Users/rekha/Documents/antigravity/happy-volta/kcet_patrol_web/frontend",
+    "outputFileTracingRoot": "/Users/rekha",
     "allowedDevOrigins": [
       "10.10.3.2",
       "localhost"
@@ -293,12 +293,12 @@
     "bundlePagesRouterDependencies": false,
     "configFileName": "next.config.ts",
     "turbopack": {
-      "root": "/Users/rekha/Documents/antigravity/happy-volta/kcet_patrol_web/frontend"
+      "root": "/Users/rekha"
     },
     "distDirRoot": ".next"
   },
   "appDir": "/Users/rekha/Documents/antigravity/happy-volta/kcet_patrol_web/frontend",
-  "relativeAppDir": "",
+  "relativeAppDir": "Documents/antigravity/happy-volta/kcet_patrol_web/frontend",
   "files": [
     ".next/routes-manifest.json",
     ".next/server/pages-manifest.json",

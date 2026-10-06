@@ -12,6 +12,7 @@ import { getShifts } from '../api/shifts.api'
 import { fetchQRByCampus } from '../api/qr.api'
 import { getSecurityUsers } from '../api/securityUsers.api'
 import { getAllocations } from '../api/allocations.api'
+import { getRounds, PatrolRound } from '../api/rounds.api'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import { useAuthGuard } from '@/app/services/auth.guard'
@@ -19,7 +20,7 @@ import GuardLeaderboard from '../components/analytics/GuardLeaderboard'
 import { LOGO_BASE64 } from '../components/reports/logoBase64'
 import {
   Filter, Calendar, UserCheck, Shield, Clock, CheckCircle2,
-  AlertTriangle, Activity, ChevronDown, Sparkles
+  AlertTriangle, Activity, ChevronDown, Sparkles, RefreshCw
 } from 'lucide-react'
 
 /* ================================================================
@@ -33,11 +34,6 @@ type DashboardStats = {
   coverageByPoint: { name: string; done: number; total: number }[]
   recentActivity: PatrolReportItem[]
 }
-
-const ROUND_TIMES = [
-  '00:45', '02:45', '04:45', '06:45', '08:45', '10:45',
-  '12:45', '14:45', '16:45', '18:45', '20:45', '22:45'
-]
 
 /* ================================================================
    HELPERS
@@ -241,6 +237,7 @@ export default function DashboardPage() {
   const [qrs, setQrs]                         = useState<any[]>([])
   const [secUsers, setSecUsers]               = useState<any[]>([])
   const [allocations, setAllocations]         = useState<any[]>([])
+  const [roundsList, setRoundsList]           = useState<PatrolRound[]>([])
   const [loading, setLoading]                 = useState(false)
   const [lastUpdated, setLastUpdated]         = useState('')
 
@@ -267,14 +264,16 @@ export default function DashboardPage() {
       getShifts(),
       fetchQRByCampus(FIXED_CAMPUS),
       getSecurityUsers(),
-      getAllocations()
+      getAllocations(),
+      getRounds()
     ])
-      .then(([reportData, shiftsData, qrsData, usersData, allocsData]) => {
+      .then(([reportData, shiftsData, qrsData, usersData, allocsData, roundsData]) => {
         setReport(reportData || [])
         setShifts(shiftsData || [])
         setQrs(qrsData || [])
         setSecUsers(usersData || [])
         setAllocations(allocsData || [])
+        setRoundsList(roundsData || [])
         setLastUpdated(new Date().toLocaleTimeString())
       })
       .catch(() => { 
@@ -287,15 +286,6 @@ export default function DashboardPage() {
   useEffect(() => {
     fetchReportAndShifts(true)
   }, [fetchReportAndShifts])
-
-  /* ── SILENT BACKGROUND POLLING (Every 10 seconds silently) ── */
-  useEffect(() => {
-    if (!authorized || !selectedDate) return
-    const interval = setInterval(() => {
-      fetchReportAndShifts(false)
-    }, 10000)
-    return () => clearInterval(interval)
-  }, [fetchReportAndShifts, authorized, selectedDate])
 
   /* ── DATE SHORTCUT HANDLERS ── */
   const setPresetDate = (type: 'today' | 'yesterday') => {
@@ -312,6 +302,14 @@ export default function DashboardPage() {
       setSelectedDate(yest.toISOString().slice(0, 10))
     }
   }
+
+  // ── DYNAMIC ROUND TIMES ──
+  const ROUND_TIMES = useMemo(() => {
+    if (!roundsList || roundsList.length === 0) return []
+    return [...roundsList]
+      .sort((a, b) => a.round_number - b.round_number)
+      .map(r => r.start_time.substring(0, 5))
+  }, [roundsList])
 
   /* ── HELPER: DYNAMIC SHIFT GUARD RESOLUTION FROM DB ALLOCATIONS ── */
   const resolveShiftGuardNames = useCallback((roundNo: number): string[] => {
@@ -771,11 +769,17 @@ export default function DashboardPage() {
             {/* Actions */}
             <div className="lg:col-span-2 flex items-center gap-2">
               <button
+                onClick={() => fetchReportAndShifts(false)}
+                className="bg-purple-100 hover:bg-purple-200 text-purple-700 py-2.5 px-3 rounded-xl text-xs w-full justify-center flex items-center gap-1.5 transition-colors font-bold"
+              >
+                <RefreshCw size={14} /> Refresh
+              </button>
+              <button
                 id="pdf-export-btn"
                 onClick={() => exportDashboardPDF(stats, FIXED_CAMPUS, selectedCampusName, selectedDate, adminName)}
                 className="btn-primary py-2.5 px-3 text-xs w-full justify-center flex items-center gap-1.5 shadow-md shadow-purple-500/20"
               >
-                📊 Export PDF
+                📊 PDF
               </button>
             </div>
 

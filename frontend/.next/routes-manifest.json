@@ -76,6 +76,12 @@
       "namedRegex": "^/dashboard/qr\\-crud(?:/)?$"
     },
     {
+      "page": "/dashboard/rounds-crud",
+      "regex": "^/dashboard/rounds\\-crud(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/rounds\\-crud(?:/)?$"
+    },
+    {
       "page": "/login",
       "regex": "^/login(?:/)?$",
       "routeKeys": {},

@@ -16,7 +16,8 @@ from app.routes import (
     scanning_details,
     report_download,
     shifts,
-    allocations
+    allocations,
+    rounds
 )
 
 # Dependency for JWT authentication
@@ -82,6 +83,9 @@ app.include_router(report_download.router)
 
 # 🕒 Shifts
 app.include_router(shifts.router)
+
+# 🔄 Rounds
+app.include_router(rounds.router)
 
 # 📅 Shift Allocations
 app.include_router(allocations.router)

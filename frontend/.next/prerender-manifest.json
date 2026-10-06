@@ -202,6 +202,31 @@
         "x-next-revalidate-tag-token"
       ]
     },
+    "/dashboard/rounds-crud": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/dashboard/rounds-crud",
+      "dataRoute": "/dashboard/rounds-crud.rsc",
+      "prefetchDataRoute": null,
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
     "/login": {
       "experimentalBypassFor": [
         {
@@ -406,8 +431,8 @@
   "dynamicRoutes": {},
   "notFoundRoutes": [],
   "preview": {
-    "previewModeId": "73124ee8f0fde1c7180fd15bbb8ee81d",
-    "previewModeSigningKey": "9757c80e3c11d075cfc9b770cecf0aaefc35bad28a72ae4154b566331041dfd9",
-    "previewModeEncryptionKey": "1a07870e3d089cc0965e3b6b659cb067e21c283487dee485e508536a6153bbcb"
+    "previewModeId": "5522ee1eba02efd920e7167277d7dd46",
+    "previewModeSigningKey": "eb1522fa544af71b50263188c80fe65cda928771aaecfd3b8d21c7825993cf97",
+    "previewModeEncryptionKey": "860084ea17c02d2efda769c5ced022be6e68a00a0812e69641fe0cf8f6047b16"
   }
 }

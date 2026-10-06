@@ -7,6 +7,7 @@
   "/components/navbar/page": "/components/navbar",
   "/dashboard/page": "/dashboard",
   "/dashboard/qr-crud/page": "/dashboard/qr-crud",
+  "/dashboard/rounds-crud/page": "/dashboard/rounds-crud",
   "/login/page": "/login",
   "/page": "/",
   "/report-download/page": "/report-download",

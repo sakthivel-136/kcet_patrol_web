@@ -1,0 +1,16 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/dashboard/layout,_N_T_/dashboard/rounds-crud/layout,_N_T_/dashboard/rounds-crud/page,_N_T_/dashboard/rounds-crud"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/dashboard/rounds-crud/__PAGE__",
+    "/dashboard/rounds-crud",
+    "/dashboard",
+    "/_index",
+    "/_head"
+  ]
+}

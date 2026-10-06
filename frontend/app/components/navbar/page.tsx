@@ -16,6 +16,7 @@ const navIcons: Record<string, React.ReactNode> = {
   'Reports':          <FileText size={15} />,
   'Users Management': <Users size={15} />,
   'QR':               <QrCode size={15} />,
+  'Rounds':           <Clock size={15} />,
   'Shifts':           <Clock size={15} />,
 }
 
@@ -65,6 +66,7 @@ const Navbar = () => {
     { name: 'Reports',          href: '/report-download', roles: ['ADMIN', 'SUPERVISOR'] },
     { name: 'Users Management', href: '/user-crud',       roles: ['ADMIN'] },
     { name: 'QR',               href: '/dashboard/qr-crud', roles: ['ADMIN'] },
+    { name: 'Rounds',           href: '/dashboard/rounds-crud', roles: ['ADMIN'] },
     { name: 'Shifts',           href: '/shifts',          roles: ['ADMIN', 'SUPERVISOR'] },
   ]
 

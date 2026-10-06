@@ -7,6 +7,7 @@
   "/components/navbar/page": "app/components/navbar/page.js",
   "/dashboard/page": "app/dashboard/page.js",
   "/dashboard/qr-crud/page": "app/dashboard/qr-crud/page.js",
+  "/dashboard/rounds-crud/page": "app/dashboard/rounds-crud/page.js",
   "/login/page": "app/login/page.js",
   "/page": "app/page.js",
   "/report-download/page": "app/report-download/page.js",

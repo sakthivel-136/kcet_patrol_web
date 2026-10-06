@@ -10,6 +10,7 @@ import { motion } from "framer-motion";
 import { getShifts } from "../api/shifts.api";
 import { getSecurityUsers } from "../api/securityUsers.api";
 import { getAllocations } from "../api/allocations.api";
+import { getRounds, PatrolRound } from "../api/rounds.api";
 import {
   Filter, Calendar, Shield, FileText, Download, CheckCircle2,
   AlertTriangle, UserCheck, Clock, ChevronDown, Sparkles,
@@ -117,6 +118,7 @@ export default function ReportDownloadPage() {
 
   const [report, setReport] = useState<PatrolReportItem[]>([]);
   const [shifts, setShifts] = useState<any[]>([]);
+  const [roundsList, setRoundsList] = useState<PatrolRound[]>([]);
   const [secUsers, setSecUsers] = useState<any[]>([]);
   const [allocations, setAllocations] = useState<any[]>([]);
 
@@ -187,16 +189,18 @@ export default function ReportDownloadPage() {
     }
 
     try {
-      const [data, shiftsData, usersData, allocsData] = await Promise.all([
+      const [data, shiftsData, usersData, allocsData, roundsData] = await Promise.all([
         getPatrolReport(FIXED_CAMPUS, start, end),
         getShifts(),
         getSecurityUsers(),
-        getAllocations()
+        getAllocations(),
+        getRounds()
       ]);
       setReport(data || []);
       setShifts(shiftsData || []);
       setSecUsers(usersData || []);
       setAllocations(allocsData || []);
+      setRoundsList(roundsData || []);
       if (!data || data.length === 0) setError("No patrol records found for this timeframe.");
     } catch (err) {
       setError("Failed to fetch report data. Please try again.");
@@ -214,10 +218,12 @@ export default function ReportDownloadPage() {
     setTimeout(() => setPdfLoading(false), 800);
   };
 
-  const ROUND_TIMES_LIST = [
-    '00:45', '02:45', '04:45', '06:45', '08:45', '10:45',
-    '12:45', '14:45', '16:45', '18:45', '20:45', '22:45'
-  ];
+  const ROUND_TIMES_LIST = useMemo(() => {
+    if (!roundsList || roundsList.length === 0) return [];
+    return [...roundsList]
+      .sort((a, b) => a.round_number - b.round_number)
+      .map(r => r.start_time.substring(0, 5));
+  }, [roundsList]);
 
   // ================= HELPER: DYNAMIC SHIFT GUARD RESOLUTION =================
   const resolveShiftGuardNames = (roundNo: number): string[] => {
