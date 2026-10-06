@@ -1,0 +1,13 @@
+var R=require("../../chunks/ssr/[turbopack]_runtime.js")("server/app/_not-found/page.js")
+R.c("server/chunks/ssr/Documents_antigravity_happy-volta_kcet_patrol_web_frontend_f56c33ac._.js")
+R.c("server/chunks/ssr/[root-of-the-server]__54cf5192._.js")
+R.c("server/chunks/ssr/7e67d_next_dist_esm_build_templates_app-page_2d9cb4e9.js")
+R.c("server/chunks/ssr/[root-of-the-server]__9ae7b784._.js")
+R.c("server/chunks/ssr/7e67d_next_dist_5edfad3c._.js")
+R.c("server/chunks/ssr/7e67d_next_dist_3ca74945._.js")
+R.c("server/chunks/ssr/[root-of-the-server]__5ecf8e0f._.js")
+R.c("server/chunks/ssr/7e67d_next_dist_client_components_c32e2b36._.js")
+R.c("server/chunks/ssr/7e67d_next_dist_client_components_builtin_forbidden_fbc9c2b9.js")
+R.c("server/chunks/ssr/efbb8_patrol_web_frontend__next-internal_server_app__not-found_page_actions_84ec6c6a.js")
+R.m(74276)
+module.exports=R.m(74276).exports

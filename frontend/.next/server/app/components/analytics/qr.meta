@@ -1,0 +1,17 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/components/layout,_N_T_/components/analytics/layout,_N_T_/components/analytics/qr/layout,_N_T_/components/analytics/qr/page,_N_T_/components/analytics/qr"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/components/analytics/qr/__PAGE__",
+    "/components/analytics/qr",
+    "/components/analytics",
+    "/components",
+    "/_index",
+    "/_head"
+  ]
+}

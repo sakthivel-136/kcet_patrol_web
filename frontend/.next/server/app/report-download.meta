@@ -1,0 +1,15 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/report-download/layout,_N_T_/report-download/page,_N_T_/report-download"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/report-download/__PAGE__",
+    "/report-download",
+    "/_index",
+    "/_head"
+  ]
+}

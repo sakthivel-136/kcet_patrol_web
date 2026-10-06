@@ -10,6 +10,8 @@ class ScanCreate(BaseModel):
     log: Optional[float]
     status: Optional[str]
     campus_code: Optional[str]
+    round_number: Optional[int]
+    round_time: Optional[str]
 
 class ScanResponse(ScanCreate):
     id: int

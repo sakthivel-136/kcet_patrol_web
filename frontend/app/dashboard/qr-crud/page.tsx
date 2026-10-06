@@ -17,6 +17,9 @@ import { useAuthGuard } from "@/app/services/auth.guard";
 import { motion } from "framer-motion";
 import { generateSingleQrPdf, generateBulkQrPdf } from "@/app/components/qr/QrPdfGenerator";
 import { QRCodeSVG } from "qrcode.react";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import { Map, X } from "lucide-react";
 
 // ----------------- TYPES -----------------
 
@@ -38,6 +41,9 @@ export default function QrCrudPage() {
   const [currentQr, setCurrentQr] = useState<QRCode | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const [showQrOnly, setShowQrOnly] = useState(false);
+
+  const [isPathwayModalOpen, setIsPathwayModalOpen] = useState(false);
+  const [pathwaySelection, setPathwaySelection] = useState<QRCode[]>([]);
 
   const FIXED_CAMPUS = "KCET01";
 
@@ -167,6 +173,39 @@ export default function QrCrudPage() {
     );
   });
 
+  const generatePathwayPdf = () => {
+    if (pathwaySelection.length === 0) {
+      alert("Please select at least one QR code for the pathway.");
+      return;
+    }
+    const doc = new jsPDF();
+    doc.setFontSize(22);
+    doc.setTextColor(109, 40, 217);
+    doc.text("KCET Security - Optimal Patrol Pathway", 14, 22);
+    
+    doc.setFontSize(11);
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 30);
+    
+    const tableData = pathwaySelection.map((qr, index) => [
+      `${index + 1}`,
+      qr.qr_name,
+      qr.campus_code,
+      qr.lat ? `${qr.lat}, ${qr.lon}` : 'N/A'
+    ]);
+
+    autoTable(doc, {
+      startY: 40,
+      head: [['Step', 'Checkpoint Name', 'Campus', 'Coordinates']],
+      body: tableData,
+      theme: 'grid',
+      headStyles: { fillColor: [139, 92, 246] },
+      alternateRowStyles: { fillColor: [250, 245, 255] },
+    });
+    doc.save("KCET_Patrol_Pathway.pdf");
+    setIsPathwayModalOpen(false);
+  };
+
   // ----------------- RENDER -----------------
 
   return (
@@ -198,6 +237,13 @@ export default function QrCrudPage() {
                 📄 Download All QRs
               </button>
             )}
+
+            <button
+              onClick={() => { setPathwaySelection([]); setIsPathwayModalOpen(true); }}
+              className="px-4 py-2.5 bg-emerald-100 text-emerald-700 font-bold text-sm rounded-xl border border-emerald-200 hover:bg-emerald-200 transition-all flex items-center gap-2"
+            >
+              <Map size={16} /> Pathway PDF
+            </button>
 
             <motion.button
               data-tour="qr-add"
@@ -277,6 +323,69 @@ export default function QrCrudPage() {
           qr={currentQr}
           onClose={() => setIsPreviewOpen(false)}
         />
+      )}
+
+      {isPathwayModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl w-full max-w-3xl max-h-[80vh] overflow-hidden flex flex-col shadow-2xl">
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+              <h3 className="font-bold text-lg flex items-center gap-2 text-emerald-800">
+                <Map size={20} /> Create QR Pathway
+              </h3>
+              <button onClick={() => setIsPathwayModalOpen(false)} className="p-1 hover:bg-slate-100 rounded-full">
+                <X size={18} className="text-slate-500" />
+              </button>
+            </div>
+            
+            <div className="p-6 overflow-y-auto flex-1 flex flex-col md:flex-row gap-6 bg-slate-50">
+              <div className="flex-1 space-y-4">
+                <h4 className="text-sm font-bold text-slate-500 uppercase tracking-wider">Available QRs</h4>
+                <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto pr-2">
+                  {qrCodes.filter(q => !pathwaySelection.find(s => s.qr_id === q.qr_id)).map(qr => (
+                    <button
+                      key={qr.qr_id}
+                      onClick={() => setPathwaySelection([...pathwaySelection, qr])}
+                      className="text-left p-3 bg-white border border-slate-200 rounded-xl hover:border-emerald-400 hover:shadow-sm transition-all text-sm font-semibold text-slate-700"
+                    >
+                      {qr.qr_name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex-1 space-y-4 border-l border-slate-200 pl-0 md:pl-6">
+                <h4 className="text-sm font-bold text-slate-500 uppercase tracking-wider">Selected Pathway Order</h4>
+                <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
+                  {pathwaySelection.length === 0 ? (
+                    <p className="text-sm text-slate-400 p-4 text-center border-2 border-dashed border-slate-200 rounded-xl">Click QRs on the left to build a pathway.</p>
+                  ) : (
+                    pathwaySelection.map((qr, idx) => (
+                      <div key={qr.qr_id} className="flex items-center gap-3 p-3 bg-emerald-50 border border-emerald-100 rounded-xl">
+                        <div className="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold">
+                          {idx + 1}
+                        </div>
+                        <span className="flex-1 text-sm font-bold text-emerald-900">{qr.qr_name}</span>
+                        <button
+                          onClick={() => setPathwaySelection(pathwaySelection.filter(s => s.qr_id !== qr.qr_id))}
+                          className="p-1 hover:bg-emerald-200 rounded-lg text-emerald-600"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 border-t border-slate-100 bg-white flex justify-end gap-3">
+              <button onClick={() => setIsPathwayModalOpen(false)} className="px-5 py-2.5 rounded-xl font-bold text-slate-600 hover:bg-slate-100">Cancel</button>
+              <button onClick={generatePathwayPdf} className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md">
+                Download PDF
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

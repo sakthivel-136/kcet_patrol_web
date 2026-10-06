@@ -1,0 +1,3 @@
+module.exports=[14747,(a,b,c)=>{b.exports=a.x("path",()=>require("path"))},24361,(a,b,c)=>{b.exports=a.x("util",()=>require("util"))},22734,(a,b,c)=>{b.exports=a.x("fs",()=>require("fs"))},26981,a=>{"use strict";let b={get:()=>null,set(a){},remove(){}},c=()=>null;a.s(["clearAuth",0,()=>{b.remove()},"getUser",0,c,"isAuthenticated",0,()=>!!b.get()&&!!c(),"tokenService",0,b])},63952,a=>{"use strict";a.s(["getApiUrl",0,()=>"http://127.0.0.1:8000"])}];
+
+//# sourceMappingURL=%5Broot-of-the-server%5D__d254e181._.js.map

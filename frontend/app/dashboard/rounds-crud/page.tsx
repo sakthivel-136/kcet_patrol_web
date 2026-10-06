@@ -88,6 +88,40 @@ export default function RoundsCrudPage() {
     if (success) fetchAllRounds()
   }
 
+  const handleDownloadPDF = async () => {
+    const jsPDF = (await import('jspdf')).default
+    const autoTable = (await import('jspdf-autotable')).default
+    const doc = new jsPDF()
+
+    doc.setFontSize(22)
+    doc.setTextColor(109, 40, 217) // purple-700
+    doc.text("KCET Security - Patrol Rounds Schedule", 14, 22)
+    
+    doc.setFontSize(11)
+    doc.setTextColor(100, 100, 100)
+    doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 30)
+    doc.text(`Total Rounds: ${rounds.length}`, 14, 36)
+
+    const tableData = rounds.map(r => [
+      `Round ${r.round_number}`,
+      r.start_time.substring(0, 5),
+      r.end_time.substring(0, 5),
+      `${r.start_time.substring(0, 5)} to ${r.end_time.substring(0, 5)}`
+    ])
+
+    autoTable(doc, {
+      startY: 45,
+      head: [['Round Number', 'Window Opens (Start)', 'Window Closes (End)', 'Scanning Window']],
+      body: tableData,
+      theme: 'grid',
+      headStyles: { fillColor: [139, 92, 246], textColor: [255, 255, 255], fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [250, 245, 255] },
+      styles: { fontSize: 11, cellPadding: 6 },
+    })
+
+    doc.save("KCET_Patrol_Rounds_Schedule.pdf")
+  }
+
   if (!authorized) return null
 
   return (
@@ -104,12 +138,20 @@ export default function RoundsCrudPage() {
             Configure the daily schedule and timing for patrol rounds.
           </p>
         </div>
-        <button
-          onClick={() => openModal()}
-          className="btn-primary py-2.5 px-5 text-sm flex items-center gap-2"
-        >
-          <Plus size={16} /> Add Round
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleDownloadPDF}
+            className="bg-purple-100 hover:bg-purple-200 text-purple-700 py-2.5 px-5 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors"
+          >
+            📊 Download PDF
+          </button>
+          <button
+            onClick={() => openModal()}
+            className="btn-primary py-2.5 px-5 text-sm flex items-center gap-2"
+          >
+            <Plus size={16} /> Add Round
+          </button>
+        </div>
       </div>
 
       {/* List */}
