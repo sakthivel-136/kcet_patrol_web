@@ -5,6 +5,7 @@ from datetime import datetime
 import pytz
 
 from app.database import get_db
+from app.d1_client import query_d1
 from app.utils.round_slots import generate_round_slots
 from app.dependencies import get_current_user
 
@@ -36,13 +37,7 @@ def download_report(
         # ==============================
         # 1. Fetch QR codes (with created_at so we can filter historically)
         # ==============================
-        qr_codes = (
-            db.table("qr")
-            .select("qr_id, qr_name, created_at")
-            .eq("campus_code", campus_code)
-            .execute()
-            .data or []
-        )
+        qr_codes = query_d1("SELECT qr_id, qr_name, created_at FROM qr WHERE campus_code = ?", [campus_code])
 
         import dateutil.parser
         
@@ -77,22 +72,10 @@ def download_report(
         fetch_start_dt = IST.localize(fetch_start_dt) - timedelta(minutes=30)
         fetch_start = fetch_start_dt.strftime("%Y-%m-%dT%H:%M:%S+05:30")
 
-        while True:
-            batch = (
-                db.table("scanning_details")
-                .select("id, qr_id, guard_name, scan_time, lat, log, status, round_slot")
-                .eq("campus_code", campus_code)
-                .gte("scan_time", fetch_start)
-                .lte("scan_time", f"{end_date}T23:59:59+05:30")
-                .order("scan_time")
-                .range(offset, offset + page_size - 1)
-                .execute()
-                .data or []
-            )
-            scans.extend(batch)
-            if len(batch) < page_size:
-                break
-            offset += page_size
+        scans = query_d1(
+            "SELECT id, qr_id, guard_name, scan_time, lat, log, status, round_slot FROM scanning_details WHERE campus_code = ? AND scan_time >= ? AND scan_time <= ? ORDER BY scan_time",
+            [campus_code, fetch_start, f"{end_date}T23:59:59+05:30"]
+        )
 
         # ==============================
         # 3. Parse round_slot and scan_time for all scans
