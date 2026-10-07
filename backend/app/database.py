@@ -22,6 +22,7 @@ class D1QueryBuilder:
         self._update_data = None
         self._conditions = []
         self._order = None
+        self._limit = None
         
     def select(self, cols="*"):
         self.action = "SELECT"
@@ -54,9 +55,15 @@ class D1QueryBuilder:
         self._conditions.append((f"{col} <= ?", val))
         return self
         
+        
     def order(self, col, ascending=True):
         self._order = f"{col} {'ASC' if ascending else 'DESC'}"
         return self
+        
+    def limit(self, count):
+        self._limit = count
+        return self
+
         
     def execute(self):
         sql = ""
@@ -112,8 +119,13 @@ class D1QueryBuilder:
         if self.action in ["UPDATE", "DELETE"]:
             sql += " RETURNING *"
             
+
         if self.action == "SELECT" and self._order:
             sql += f" ORDER BY {self._order}"
+            
+        if self.action == "SELECT" and getattr(self, "_limit", None):
+            sql += f" LIMIT {self._limit}"
+
             
         url = f"https://api.cloudflare.com/client/v4/accounts/{CF_ACCOUNT}/d1/database/{CF_DB}/query"
         headers = {"Authorization": f"Bearer {CF_TOKEN}", "Content-Type": "application/json"}
