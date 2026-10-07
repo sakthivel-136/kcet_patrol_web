@@ -51,13 +51,15 @@ def allocate_guards_bulk(allocations: List[ShiftAllocationCreate], _: dict = Dep
             query_d1("DELETE FROM shift_allocations WHERE shift_id = ? AND allocation_date = '2099-12-31'", [shift_id])
             
             inserted = 0
+            values_sql = []
+            params = []
             for a in allocations:
                 if a.guard_id != "CLEAR":
-                    query_d1(
-                        "INSERT INTO shift_allocations (allocation_id, shift_id, security_id, allocation_date) VALUES (?, ?, ?, '2099-12-31')",
-                        [str(uuid.uuid4()), a.shift_id, a.guard_id]
-                    )
+                    values_sql.append("(?, ?, ?, '2099-12-31')")
+                    params.extend([str(uuid.uuid4()), a.shift_id, a.guard_id])
                     inserted += 1
+            if values_sql:
+                query_d1(f"INSERT INTO shift_allocations (allocation_id, shift_id, security_id, allocation_date) VALUES {','.join(values_sql)}", params)
             
             # Sync to security_users for mobile app support
             try:
@@ -66,12 +68,11 @@ def allocate_guards_bulk(allocations: List[ShiftAllocationCreate], _: dict = Dep
                     start_time = shift_res[0]["start_time"]
                     end_time = shift_res[0]["end_time"]
                     
-                    for a in allocations:
-                        if a.guard_id != "CLEAR":
-                            query_d1(
-                                "UPDATE security_users SET shift_start = ?, shift_end = ? WHERE security_id = ?",
-                                [start_time[:5], end_time[:5], a.guard_id]
-                            )
+                    valid_guards = [a.guard_id for a in allocations if a.guard_id != "CLEAR"]
+                    if valid_guards:
+                        placeholders = ",".join(["?"] * len(valid_guards))
+                        params = [start_time[:5], end_time[:5]] + valid_guards
+                        query_d1(f"UPDATE security_users SET shift_start = ?, shift_end = ? WHERE security_id IN ({placeholders})", params)
             except Exception as e:
                 print(f"Warning: Failed to sync shift times to security_users: {e}")
             
