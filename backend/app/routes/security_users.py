@@ -2,6 +2,8 @@ from fastapi import APIRouter, HTTPException, status, Depends
 from pydantic import BaseModel, Field
 from typing import Optional, List
 from app.database import supabase
+from app.d1_client import query_d1
+import uuid
 from app.dependencies import get_current_user, admin_only
 
 
@@ -48,12 +50,7 @@ router = APIRouter(
 
 @router.get("", response_model=List[SecurityUserResponse])
 def get_security_users(_: dict = Depends(get_current_user)):
-
-    result = supabase.table("security_users") \
-        .select("*") \
-        .execute()
-
-    return result.data
+    return query_d1("SELECT * FROM security_users")
 
 
 # -----------------------------
