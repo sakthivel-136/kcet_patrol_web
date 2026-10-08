@@ -91,35 +91,71 @@ export default function RoundsCrudPage() {
   const handleDownloadPDF = async () => {
     const jsPDF = (await import('jspdf')).default
     const autoTable = (await import('jspdf-autotable')).default
-    const doc = new jsPDF()
+    const doc = new jsPDF('portrait', 'pt', 'a4')
+    const pageWidth = doc.internal.pageSize.getWidth()
+    const pageHeight = doc.internal.pageSize.getHeight()
+    const margin = 30
 
-    doc.setFontSize(22)
-    doc.setTextColor(109, 40, 217) // purple-700
-    doc.text("KCET Security - Patrol Rounds Schedule", 14, 22)
+    // Header
+    doc.setDrawColor(0)
+    doc.setLineWidth(2)
+    doc.rect(15, 15, pageWidth - 30, pageHeight - 30)
+
+    doc.setFont("helvetica", "bold")
+    doc.setFontSize(18)
+    doc.setTextColor(0)
+    doc.text("STANDARD PATROL ROUNDS TIMETABLE", pageWidth / 2, 60, { align: "center" })
     
-    doc.setFontSize(11)
-    doc.setTextColor(100, 100, 100)
-    doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 30)
-    doc.text(`Total Rounds: ${rounds.length}`, 14, 36)
+    doc.setDrawColor(200)
+    doc.setLineWidth(1)
+    doc.line(margin, 75, pageWidth - margin, 75)
+
+    const calculateDuration = (start: string, end: string) => {
+      try {
+        const [sh, sm] = start.split(':').map(Number)
+        const [eh, em] = end.split(':').map(Number)
+        let diff = (eh * 60 + em) - (sh * 60 + sm)
+        if (diff < 0) diff += 24 * 60
+        const hrs = Math.floor(diff / 60)
+        const mins = diff % 60
+        return `${hrs} hr ${mins} mins`
+      } catch (e) {
+        return '-'
+      }
+    }
 
     const tableData = rounds.map(r => [
       `Round ${r.round_number}`,
       r.start_time.substring(0, 5),
       r.end_time.substring(0, 5),
-      `${r.start_time.substring(0, 5)} to ${r.end_time.substring(0, 5)}`
+      calculateDuration(r.start_time, r.end_time)
     ])
 
     autoTable(doc, {
-      startY: 45,
-      head: [['Round Number', 'Window Opens (Start)', 'Window Closes (End)', 'Scanning Window']],
+      startY: 100,
+      head: [['Round Number', 'Start Time', 'End Time', 'Duration']],
       body: tableData,
       theme: 'grid',
-      headStyles: { fillColor: [139, 92, 246], textColor: [255, 255, 255], fontStyle: 'bold' },
-      alternateRowStyles: { fillColor: [250, 245, 255] },
-      styles: { fontSize: 11, cellPadding: 6 },
+      headStyles: { fillColor: "#4F46E5", textColor: "#FFFFFF", fontStyle: "bold", halign: 'center' },
+      styles: { font: "helvetica", fontSize: 11, cellPadding: 8, halign: 'center', valign: 'middle' },
+      columnStyles: { 0: { fontStyle: 'bold' } },
+      alternateRowStyles: { fillColor: "#F8FAFC" }
     })
 
-    doc.save("KCET_Patrol_Rounds_Schedule.pdf")
+    // Footer
+    const finalY = (doc as any).lastAutoTable.finalY + 40
+    doc.setFont("helvetica", "italic")
+    doc.setFontSize(9)
+    doc.setTextColor(100)
+    doc.text("Note: All guards must complete their checkpoint scans within the allocated time windows.", pageWidth / 2, finalY, { align: "center" })
+    doc.text("Late scans will be marked as MISSED.", pageWidth / 2, finalY + 12, { align: "center" })
+
+    doc.setFont("helvetica", "normal")
+    doc.setFontSize(8)
+    doc.setTextColor(150)
+    doc.text(`Generated on: ${new Date().toLocaleString()}`, pageWidth - margin - 120, pageHeight - margin)
+
+    doc.save("Patrol_Rounds_Schedule.pdf")
   }
 
   if (!authorized) return null

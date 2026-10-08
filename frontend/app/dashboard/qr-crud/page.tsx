@@ -178,32 +178,80 @@ export default function QrCrudPage() {
       alert("Please select at least one QR code for the pathway.");
       return;
     }
-    const doc = new jsPDF();
-    doc.setFontSize(22);
-    doc.setTextColor(109, 40, 217);
-    doc.text("KCET Security - Optimal Patrol Pathway", 14, 22);
-    
-    doc.setFontSize(11);
-    doc.setTextColor(100, 100, 100);
-    doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 30);
-    
-    const tableData = pathwaySelection.map((qr, index) => [
-      `${index + 1}`,
-      qr.qr_name,
-      qr.campus_code,
-      qr.lat ? `${qr.lat}, ${qr.lon}` : 'N/A'
+    const doc = new jsPDF('landscape', 'pt', 'a4')
+    const pageWidth = doc.internal.pageSize.getWidth()
+    const pageHeight = doc.internal.pageSize.getHeight()
+    const margin = 30
+
+    // Header
+    doc.setDrawColor(0)
+    doc.setLineWidth(2)
+    doc.rect(15, 15, pageWidth - 30, pageHeight - 30)
+
+    doc.setFont("helvetica", "bold")
+    doc.setFontSize(16)
+    doc.setTextColor(0)
+    doc.text("KCET Security Systems", margin, 40)
+
+    doc.setFontSize(12)
+    doc.setTextColor(100)
+    doc.text("Checkpoint Pathway Document", pageWidth - margin, 40, { align: "right" })
+
+    doc.setFontSize(18)
+    doc.setTextColor(0)
+    doc.text("Campus QR Installation List", pageWidth / 2, 70, { align: "center" })
+
+    doc.setDrawColor(200)
+    doc.setLineWidth(1)
+    doc.line(margin, 90, pageWidth - margin, 90)
+
+    const tableData = pathwaySelection
+      .sort((a, b) => a.qr_name.localeCompare(b.qr_name))
+      .map((qr, index) => [
+        `${index + 1}`,
+        qr.qr_id.toString(),
+        qr.qr_name,
+        qr.lat?.toString() || '-',
+        qr.lon?.toString() || '-',
+        (qr as any).waiting_time || '-'
     ]);
 
     autoTable(doc, {
-      startY: 40,
-      head: [['Step', 'Checkpoint Name', 'Campus', 'Coordinates']],
+      startY: 110,
+      head: [['S.No', 'QR ID', 'Checkpoint Location Name', 'Latitude', 'Longitude', 'Wait Time (sec)']],
       body: tableData,
       theme: 'grid',
-      headStyles: { fillColor: [139, 92, 246] },
-      alternateRowStyles: { fillColor: [250, 245, 255] },
+      headStyles: { fillColor: "#4F46E5", textColor: "#FFFFFF", fontStyle: "bold", halign: 'center' },
+      styles: { font: "helvetica", fontSize: 10, cellPadding: 6, valign: 'middle' },
+      columnStyles: {
+        0: { halign: 'center', cellWidth: 40 },
+        1: { halign: 'center', fontStyle: 'bold', cellWidth: 60 },
+        5: { halign: 'center', cellWidth: 80 }
+      },
+      didParseCell: (data) => {
+        if (data.section === "body" && data.column.index === 5) {
+          data.cell.styles.fillColor = "#F1F5F9"
+        }
+      },
+      didDrawPage: (data) => {
+        // Redraw outer border for multi-page
+        if (data.pageNumber > 1) {
+          doc.setDrawColor(0)
+          doc.setLineWidth(2)
+          doc.rect(15, 15, pageWidth - 30, pageHeight - 30)
+        }
+      }
     });
-    doc.save("KCET_Patrol_Pathway.pdf");
-    setIsPathwayModalOpen(false);
+
+    const finalY = (doc as any).lastAutoTable.finalY + 50
+    if (finalY < pageHeight - 100) {
+      doc.setFont("helvetica", "bold")
+      doc.setFontSize(10)
+      doc.text("Security Officer Signature: _______________________", margin, finalY)
+    }
+
+    doc.save("KCET_Patrol_Pathway.pdf")
+    setIsPathwayModalOpen(false)
   };
 
   // ----------------- RENDER -----------------
