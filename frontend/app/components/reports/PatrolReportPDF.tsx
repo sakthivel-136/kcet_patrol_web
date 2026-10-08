@@ -51,69 +51,86 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
     const pageHeight = doc.internal.pageSize.getHeight();
     const margin = 30;
 
-    let totalScans = logs.length;
-    let completedScans = 0;
-    let missedScans = 0;
+    let totalRounds = 0;
+    let completedRounds = 0;
+    let missedRounds = 0;
+    let partialRounds = 0;
 
-    const tableData = logs.map((log, index) => {
-      const status = normalizeStatus(log.status);
-      if (status === "SUCCESS") completedScans++;
-      if (status === "MISSED") missedScans++;
-
-      return [
-        (index + 1).toString(),
-        reportDate,
-        log.round ? `Round ${log.round}` : "Unknown",
-        "-",
-        log.guard_name || "N/A",
-        log.qr_name || "N/A",
-        log.scan_time ? new Date(log.scan_time).toLocaleTimeString() : "-",
-        status
-      ];
+    // Group logs by round
+    const logsByRound: Record<string, ScanLog[]> = {};
+    logs.forEach(log => {
+      const r = log.round?.toString() || "Unknown";
+      if (!logsByRound[r]) logsByRound[r] = [];
+      logsByRound[r].push(log);
     });
 
+    const tableData = Object.keys(logsByRound)
+      .sort((a, b) => Number(a) - Number(b))
+      .map((roundStr, index) => {
+        totalRounds++;
+        const roundLogs = logsByRound[roundStr];
+        
+        let successCount = 0;
+        let guards = new Set<string>();
+        
+        roundLogs.forEach(log => {
+          if (normalizeStatus(log.status) === "SUCCESS") successCount++;
+          if (log.guard_name) guards.add(log.guard_name);
+        });
+
+        const totalQRs = roundLogs.length;
+        const completionRate = totalQRs > 0 ? (successCount / totalQRs) * 100 : 0;
+        
+        let roundStatus = "MISSED";
+        if (completionRate === 100) {
+            roundStatus = "SUCCESS";
+            completedRounds++;
+        } else if (completionRate >= 50) {
+            roundStatus = "PARTIAL";
+            partialRounds++;
+        } else {
+            missedRounds++;
+        }
+
+        const roundTimeStr = ROUND_TIMES[Number(roundStr)] 
+          ? `${ROUND_TIMES[Number(roundStr)].start} - ${ROUND_TIMES[Number(roundStr)].end}`
+          : "N/A";
+
+        return [
+          (index + 1).toString(),
+          `Round ${roundStr}`,
+          roundTimeStr,
+          Array.from(guards).join(", ") || "N/A",
+          `${successCount} / ${totalQRs}`,
+          `${completionRate.toFixed(0)}%`,
+          roundStatus
+        ];
+      });
+
     autoTable(doc, {
-      startY: 180, // Starts below the summary box
+      startY: 180,
       margin: { top: 60, right: margin, bottom: 60, left: margin },
-      head: [["S.No", "Date", "Round Slot", "Shift", "Guard Name", "Checkpoint (QR)", "Time Scanned", "Status"]],
+      head: [["S.No", "Round", "Window", "Guards Present", "Checkpoints Scanned", "Completion %", "Overall Status"]],
       body: tableData,
       theme: "grid",
       headStyles: { fillColor: "#4F46E5", textColor: "#FFFFFF", fontStyle: "bold", halign: "center", valign: "middle" },
-      styles: { font: "helvetica", fontSize: 10, valign: "middle", cellPadding: 6 },
+      styles: { font: "helvetica", fontSize: 11, valign: "middle", cellPadding: 8, halign: 'center' },
       columnStyles: {
-        0: { cellWidth: 40, halign: "center" },
-        7: { cellWidth: 70, halign: "center", fontStyle: "bold" },
+        3: { halign: "left" },
+        6: { fontStyle: "bold" },
       },
       didParseCell: (data) => {
-        if (data.section === "body" && data.column.index === 7) {
+        if (data.section === "body" && data.column.index === 6) {
           const status = data.cell.raw;
           if (status === "MISSED") {
             data.cell.styles.fillColor = "#FEE2E2";
             data.cell.styles.textColor = "#DC2626";
           } else if (status === "SUCCESS") {
+            data.cell.styles.fillColor = "#DCFCE7";
             data.cell.styles.textColor = "#16A34A";
-          }
-        }
-      },
-      willDrawCell: (data) => {
-        // Highlight entire row if missed
-        if (data.section === "body") {
-          const status = tableData[data.row.index][7];
-          if (status === "MISSED") {
-            doc.setFillColor("#FEE2E2");
-            doc.rect(data.cell.x, data.cell.y, data.cell.width, data.cell.height, "F");
-          }
-        }
-      },
-      didDrawCell: (data) => {
-        // Custom thick border for round slot changes
-        if (data.section === "body" && data.row.index > 0) {
-          const currentRound = tableData[data.row.index][2];
-          const prevRound = tableData[data.row.index - 1][2];
-          if (currentRound !== prevRound) {
-            doc.setDrawColor("#475569");
-            doc.setLineWidth(1.5);
-            doc.line(data.cell.x, data.cell.y, data.cell.x + data.cell.width, data.cell.y);
+          } else if (status === "PARTIAL") {
+            data.cell.styles.fillColor = "#FEF3C7";
+            data.cell.styles.textColor = "#D97706";
           }
         }
       },
@@ -124,14 +141,14 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
         doc.rect(15, 15, pageWidth - 30, pageHeight - 30);
 
         if (data.pageNumber === 1) {
-          // HEADER - Only on Page 1
+          // HEADER
           if (LOGO_BASE64) {
             try { doc.addImage(LOGO_BASE64, "PNG", pageWidth / 2 - 30, 25, 60, 60); } catch (e) {}
           }
           doc.setFont("helvetica", "bold");
           doc.setFontSize(18);
           doc.setTextColor(0);
-          doc.text("OFFICIAL SECURITY AUDIT REPORT", pageWidth / 2, 105, { align: "center" });
+          doc.text("OFFICIAL ROUND-WISE SECURITY REPORT", pageWidth / 2, 105, { align: "center" });
 
           doc.setFont("helvetica", "normal");
           doc.setFontSize(10);
@@ -150,14 +167,16 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
           doc.text(`Generated By: ${generatedBy}`, margin + 10, 162);
 
           doc.setFont("helvetica", "bold");
-          doc.text(`Total Scans: ${totalScans}`, pageWidth - margin - 200, 156);
+          doc.text(`Total Rounds: ${totalRounds}`, pageWidth - margin - 350, 156);
           doc.setTextColor("#16A34A");
-          doc.text(`Completed: ${completedScans}`, pageWidth - margin - 130, 156);
+          doc.text(`Completed: ${completedRounds}`, pageWidth - margin - 250, 156);
+          doc.setTextColor("#D97706");
+          doc.text(`Partial: ${partialRounds}`, pageWidth - margin - 150, 156);
           doc.setTextColor("#DC2626");
-          doc.text(`Missed: ${missedScans}`, pageWidth - margin - 60, 156);
+          doc.text(`Missed: ${missedRounds}`, pageWidth - margin - 60, 156);
         }
 
-        // FOOTER - On Every Page
+        // FOOTER
         doc.setFont("helvetica", "bold");
         doc.setFontSize(10);
         doc.setTextColor(0);
@@ -168,13 +187,12 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
         doc.setTextColor(150);
         doc.text(`Report Generated on: ${new Date().toLocaleString()}`, margin, pageHeight - margin + 2);
 
-        // Page Number
         const str = "Page " + (doc as any).internal.getNumberOfPages();
         doc.text(str, pageWidth - margin - 40, pageHeight - margin);
       }
     });
 
-    doc.save(`Security_Audit_Report_${reportDate}.pdf`);
+    doc.save(`Roundwise_Security_Report_${reportDate}.pdf`);
   };
 
   return null;

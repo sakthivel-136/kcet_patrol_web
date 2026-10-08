@@ -66,7 +66,7 @@ export const generateTimetablePDF = (shifts: any[], guards: any[], allocations: 
       return;
     }
 
-    const tableData = assignedGuards.map(g => [g.security_id, g.username]);
+    const tableData = assignedGuards.map(g => [g.security_id, g.security_name || g.username || 'Unknown']);
 
     autoTable(doc, {
       startY: currentY,
