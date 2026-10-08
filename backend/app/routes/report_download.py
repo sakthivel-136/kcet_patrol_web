@@ -37,7 +37,7 @@ def download_report(
         # ==============================
         # 1. Fetch QR codes (with created_at so we can filter historically)
         # ==============================
-        qr_codes = query_d1("SELECT qr_id, qr_name, created_at FROM qr WHERE campus_code = ?", [campus_code])
+        qr_codes = query_d1("SELECT qr_id, qr_name, created_at, status as qr_status FROM qr WHERE campus_code = ?", [campus_code])
 
         import dateutil.parser
         
@@ -139,13 +139,10 @@ def download_report(
 
                     # ── HISTORICAL FILTER ───────────────────────────────────
                     # Only include this QR if it existed BEFORE this round started.
-                    # If a QR was added AFTER the round window, skip it entirely —
-                    # it should not show as MISSED for a time it didn't exist yet.
                     qr_created = qr.get("created_at_ist")
                     if qr_created and qr_created > start_slot_dt:
-                        continue  # QR added after this round started — skip silently
+                        continue
                     # ────────────────────────────────────────────────────────
-
 
                     qr_scans = scans_by_qr.get(qr_id, [])
                     matching_scans = [
@@ -157,7 +154,6 @@ def download_report(
                     
                     scan = None
                     if matching_scans:
-                        # Prioritize successful scans (anything not 'MISSED')
                         success_scans = [s for s in matching_scans if (s.get("status") or "").upper() != "MISSED"]
                         if success_scans:
                             scan = success_scans[0]
@@ -172,12 +168,20 @@ def download_report(
                         else:
                             status = "MISSED"
                     else:
-                        # Future round (today only) → PENDING, past → MISSED
-                        # A round is still pending if its end time hasn't passed yet
                         if (is_today and end_slot_dt > now_ist) or current_dt > now_ist.date():
                             status = "PENDING"
                         else:
                             status = "MISSED"
+
+                    # ── INACTIVE QR FILTER ──────────────────────────────────
+                    # If QR is currently 'inactive', we ONLY include it in the report
+                    # if it was actually scanned successfully during this round.
+                    # This prevents inactive QRs from constantly showing up as "MISSED",
+                    # but preserves historical data if they were scanned when they were active.
+                    if (qr.get("qr_status") or "").lower() == "inactive":
+                        if status != "SUCCESS":
+                            continue  # Skip showing this inactive QR for this round
+                    # ────────────────────────────────────────────────────────
 
                     report.append({
                         "qr_name": qr["qr_name"],
