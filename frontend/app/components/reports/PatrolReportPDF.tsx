@@ -33,7 +33,12 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
     if (!Object.keys(ROUND_TIMES).length) return;
     if (!generatedBy || generatedBy.trim() === "") return;
     generatedRef.current = true;
-    generatePDF();
+    try {
+      generatePDF();
+    } catch (error) {
+      console.error("PDF Generation Error:", error);
+      alert("Failed to generate PDF. Please check the console for details.");
+    }
   }, [logs, campusCode, campusName, campusAddress, reportDate, generatedBy]);
 
   const normalizeStatus = (status?: string | null): string => {
