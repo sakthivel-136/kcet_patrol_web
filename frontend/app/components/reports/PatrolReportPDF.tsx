@@ -160,8 +160,8 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
             log.qr_name || "-",
             log.guard_name || "-",
             log.scan_time ? new Date(log.scan_time).toLocaleTimeString() : "-",
-            log.lat || "-",
-            log.lon || "-",
+            log.lat != null ? String(log.lat) : "-",
+            log.lon != null ? String(log.lon) : "-",
             status
           ];
         });
@@ -195,9 +195,10 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
             }
           },
           willDrawCell: (data) => {
-            // Optional: highlight entire row if missed
             if (data.section === "body") {
-              const status = tableData[data.row.index][6];
+              // Safely read status from the cell's raw value, falling back gracefully
+              const statusCell = data.row.cells[6];
+              const status = statusCell ? statusCell.raw : "";
               if (status === "MISSED") {
                 doc.setFillColor("#FEE2E2");
                 doc.rect(data.cell.x, data.cell.y, data.cell.width, data.cell.height, "F");
@@ -213,7 +214,7 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
           }
         });
 
-        currentY = (doc as any).lastAutoTable.finalY + 35;
+        currentY = ((doc as any).lastAutoTable?.finalY ?? currentY) + 35;
       });
 
     // ---------------- FINAL PASS: PAGE NUMBERS ----------------
