@@ -667,6 +667,8 @@ export default function ReportDownloadPage() {
               campusName="KCET Main Campus"
               campusAddress="Kamaraj College of Engineering and Technology"
               reportDate={reportDate}
+              endDate={endDate}
+              reportType={reportType}
               generatedBy={adminName}
             />
           )}

@@ -13,6 +13,8 @@ interface PatrolReportPDFProps {
   campusName: string;
   campusAddress: string;
   reportDate: string;
+  endDate?: string;
+  reportType?: string;
   generatedBy: string;
 }
 
@@ -23,6 +25,8 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
   campusName,
   campusAddress,
   reportDate,
+  endDate,
+  reportType = "single",
   generatedBy,
 }) => {
   const generatedRef = useRef(false);
@@ -39,7 +43,7 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
       console.error("PDF Generation Error:", error);
       alert("Failed to generate PDF. Please check the console for details.");
     }
-  }, [logs, campusCode, campusName, campusAddress, reportDate, generatedBy]);
+  }, [logs, campusCode, campusName, campusAddress, reportDate, endDate, generatedBy]);
 
   const normalizeStatus = (status?: string | null): string => {
     if (!status) return "No Data";
@@ -56,32 +60,69 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
     const pageHeight = doc.internal.pageSize.getHeight();
     const margin = 30;
 
-    let totalScans = logs.length;
-    let completedScans = 0;
-    let missedScans = 0;
+    // ── 1. HIERARCHICAL GROUPING BY DATE & ROUND ──
+    type DayData = {
+      date: string;
+      rounds: Record<string, ScanLog[]>;
+      totalScans: number;
+      completedScans: number;
+      missedScans: number;
+    };
 
-    // Group logs by round
-    const logsByRound: Record<string, ScanLog[]> = {};
-    logs.forEach(log => {
-      const r = log.round?.toString() || "Unknown";
-      if (!logsByRound[r]) logsByRound[r] = [];
-      logsByRound[r].push(log);
-      
+    const logsByDate: Record<string, DayData> = {};
+
+    logs.forEach((log) => {
+      // Determine date key
+      let dateKey = log.date;
+      if (!dateKey) {
+        if (log.scan_time) {
+          dateKey = log.scan_time.slice(0, 10);
+        } else {
+          dateKey = reportDate;
+        }
+      }
+
+      if (!logsByDate[dateKey]) {
+        logsByDate[dateKey] = {
+          date: dateKey,
+          rounds: {},
+          totalScans: 0,
+          completedScans: 0,
+          missedScans: 0,
+        };
+      }
+
+      const dayGroup = logsByDate[dateKey];
+      dayGroup.totalScans++;
+
       const st = normalizeStatus(log.status);
-      if (st === "SUCCESS") completedScans++;
-      if (st === "MISSED") missedScans++;
+      if (st === "SUCCESS") dayGroup.completedScans++;
+      if (st === "MISSED") dayGroup.missedScans++;
+
+      const r = log.round?.toString() || "Unknown";
+      if (!dayGroup.rounds[r]) {
+        dayGroup.rounds[r] = [];
+      }
+      dayGroup.rounds[r].push(log);
     });
 
-    const pageCountRef = { current: 1 };
+    // Sort dates chronologically
+    const sortedDates = Object.keys(logsByDate).sort();
 
-    const decoratePage = (pageNum: number) => {
+    const pageCountRef = { current: 1 };
+    const pageDateMap: Record<number, string> = {};
+
+    // Helper: Decorate Page Border & Footer
+    const decoratePage = (pageNum: number, activeDate: string) => {
       doc.setPage(pageNum);
-      // Border
+      pageDateMap[pageNum] = activeDate;
+
+      // 2px Page Border
       doc.setDrawColor(0);
       doc.setLineWidth(2);
       doc.rect(15, 15, pageWidth - 30, pageHeight - 30);
 
-      // Footer (Page numbers will be added at the end)
+      // Footer
       doc.setFont("helvetica", "bold");
       doc.setFontSize(10);
       doc.setTextColor(0);
@@ -90,59 +131,88 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
       doc.setFont("helvetica", "normal");
       doc.setFontSize(8);
       doc.setTextColor(150);
-      doc.text(`Report Generated on: ${new Date().toLocaleString()}`, margin, pageHeight - margin + 2);
+      doc.text(
+        `Report Generated on: ${new Date().toLocaleString()}`,
+        margin,
+        pageHeight - margin + 2
+      );
     };
 
-    // ---------------- PAGE 1 INITIALIZATION ----------------
-    decoratePage(1);
+    // Helper: Render Official Header & Daily Summary Box
+    const drawDateHeader = (dayData: DayData) => {
+      if (LOGO_BASE64) {
+        try {
+          doc.addImage(LOGO_BASE64, "PNG", pageWidth / 2 - 30, 25, 60, 60);
+        } catch (e) {}
+      }
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(18);
+      doc.setTextColor(0);
+      doc.text("OFFICIAL SECURITY AUDIT REPORT", pageWidth / 2, 105, { align: "center" });
 
-    if (LOGO_BASE64) {
-      try { doc.addImage(LOGO_BASE64, "PNG", pageWidth / 2 - 30, 25, 60, 60); } catch (e) {}
-    }
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(18);
-    doc.setTextColor(0);
-    doc.text("OFFICIAL SECURITY AUDIT REPORT", pageWidth / 2, 105, { align: "center" });
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.setTextColor(80);
+      doc.text(
+        `${campusName} | ${campusAddress} | Code: ${campusCode}`,
+        pageWidth / 2,
+        120,
+        { align: "center" }
+      );
 
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
-    doc.setTextColor(80);
-    doc.text(`${campusName} | ${campusAddress} | Code: ${campusCode}`, pageWidth / 2, 120, { align: "center" });
+      // Summary Box
+      doc.setFillColor("#F8FAFC");
+      doc.setDrawColor("#E2E8F0");
+      doc.setLineWidth(1);
+      doc.rect(margin, 135, pageWidth - margin * 2, 38, "FD");
 
-    // Summary Box
-    doc.setFillColor("#F8FAFC");
-    doc.setDrawColor("#E2E8F0");
-    doc.setLineWidth(1);
-    doc.rect(margin, 135, pageWidth - (margin * 2), 35, "FD");
+      doc.setFontSize(9);
+      doc.setTextColor(40);
+      doc.setFont("helvetica", "bold");
+      doc.text(`Audit Date: ${dayData.date}`, margin + 12, 151);
+      doc.setFont("helvetica", "normal");
+      doc.text(`Generated By: ${generatedBy}`, margin + 12, 164);
 
-    doc.setFontSize(9);
-    doc.setTextColor(40);
-    doc.text(`Report Date: ${reportDate}`, margin + 10, 150);
-    doc.text(`Generated By: ${generatedBy}`, margin + 10, 162);
+      // Stats on Right
+      doc.setFont("helvetica", "bold");
+      doc.text(`Total Checkpoints: ${dayData.totalScans}`, pageWidth - margin - 350, 158);
+      doc.setTextColor("#16A34A");
+      doc.text(`Completed: ${dayData.completedScans}`, pageWidth - margin - 220, 158);
+      doc.setTextColor("#DC2626");
+      doc.text(`Missed: ${dayData.missedScans}`, pageWidth - margin - 100, 158);
+    };
 
-    doc.setFont("helvetica", "bold");
-    doc.text(`Total Checkpoints: ${totalScans}`, pageWidth - margin - 350, 156);
-    doc.setTextColor("#16A34A");
-    doc.text(`Completed: ${completedScans}`, pageWidth - margin - 220, 156);
-    doc.setTextColor("#DC2626");
-    doc.text(`Missed: ${missedScans}`, pageWidth - margin - 100, 156);
+    // ── 2. PROCESS EACH DATE SEPARATELY ──
+    sortedDates.forEach((dateKey, dateIndex) => {
+      const dayData = logsByDate[dateKey];
 
-    let currentY = 200;
+      // If not the very first page of the document, add a brand new page for this new date!
+      if (dateIndex > 0) {
+        doc.addPage();
+        pageCountRef.current++;
+      }
 
-    // ---------------- DRAW TABLES PER ROUND ----------------
-    Object.keys(logsByRound)
-      .sort((a, b) => Number(a) - Number(b))
-      .forEach((roundStr) => {
-        
-        // If we are too close to bottom before starting a round, push to next page
+      // Initialize the new day's first page
+      decoratePage(pageCountRef.current, dateKey);
+      drawDateHeader(dayData);
+
+      let currentY = 205;
+
+      // Draw all rounds belonging to THIS date
+      const sortedRoundKeys = Object.keys(dayData.rounds).sort(
+        (a, b) => Number(a) - Number(b)
+      );
+
+      sortedRoundKeys.forEach((roundStr) => {
+        // If too close to the bottom for a new round table, push to next page
         if (currentY > pageHeight - 120) {
           doc.addPage();
           pageCountRef.current++;
-          decoratePage(pageCountRef.current);
+          decoratePage(pageCountRef.current, dateKey);
           currentY = 60;
         }
 
-        const roundTimeStr = ROUND_TIMES[Number(roundStr)] 
+        const roundTimeStr = ROUND_TIMES[Number(roundStr)]
           ? `${ROUND_TIMES[Number(roundStr)].start} - ${ROUND_TIMES[Number(roundStr)].end}`
           : "";
 
@@ -150,10 +220,14 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
         doc.setFont("helvetica", "bold");
         doc.setFontSize(12);
         doc.setTextColor(40);
-        doc.text(`Round ${roundStr} ${roundTimeStr ? `(${roundTimeStr})` : ""}`, margin, currentY);
+        doc.text(
+          `Round ${roundStr} ${roundTimeStr ? `(${roundTimeStr})` : ""}`,
+          margin,
+          currentY
+        );
         currentY += 15;
 
-        const tableData = logsByRound[roundStr].map((log, index) => {
+        const tableData = dayData.rounds[roundStr].map((log, index) => {
           const status = normalizeStatus(log.status);
           return [
             (index + 1).toString(),
@@ -162,21 +236,43 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
             log.scan_time ? new Date(log.scan_time).toLocaleTimeString() : "-",
             log.lat != null ? String(log.lat) : "-",
             log.lon != null ? String(log.lon) : "-",
-            status
+            status,
           ];
         });
 
         autoTable(doc, {
           startY: currentY,
           margin: { right: margin, left: margin, bottom: 60 },
-          head: [["S.No", "QR Checkpoint", "Security Name", "Time Scanned", "Latitude", "Longitude", "Status"]],
+          head: [
+            [
+              "S.No",
+              "QR Checkpoint",
+              "Security Name",
+              "Time Scanned",
+              "Latitude",
+              "Longitude",
+              "Status",
+            ],
+          ],
           body: tableData,
           theme: "grid",
-          headStyles: { fillColor: "#4F46E5", textColor: "#FFFFFF", fontStyle: "bold", halign: "center", valign: "middle" },
-          styles: { font: "helvetica", fontSize: 10, valign: "middle", cellPadding: 6, halign: "center" },
+          headStyles: {
+            fillColor: "#4F46E5",
+            textColor: "#FFFFFF",
+            fontStyle: "bold",
+            halign: "center",
+            valign: "middle",
+          },
+          styles: {
+            font: "helvetica",
+            fontSize: 10,
+            valign: "middle",
+            cellPadding: 6,
+            halign: "center",
+          },
           columnStyles: {
-            1: { halign: "left" }, // QR Checkpoint name aligned left
-            2: { halign: "left" }, // Security Name aligned left
+            1: { halign: "left" }, // QR Checkpoint
+            2: { halign: "left" }, // Security Name
             6: { fontStyle: "bold" },
           },
           didParseCell: (data) => {
@@ -196,7 +292,6 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
           },
           willDrawCell: (data) => {
             if (data.section === "body") {
-              // Safely read status from the cell's raw value, falling back gracefully
               const statusCell = data.row.cells[6];
               const status = statusCell ? statusCell.raw : "";
               if (status === "MISSED") {
@@ -206,27 +301,40 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
             }
           },
           didDrawPage: (data) => {
-            // If autoTable creates a new page, decorate it!
+            // When autoTable automatically creates an additional page
             if (data.pageNumber > pageCountRef.current) {
               pageCountRef.current = data.pageNumber;
-              decoratePage(pageCountRef.current);
+              decoratePage(pageCountRef.current, dateKey);
             }
-          }
+          },
         });
 
         currentY = ((doc as any).lastAutoTable?.finalY ?? currentY) + 35;
       });
+    });
 
-    // ---------------- FINAL PASS: PAGE NUMBERS ----------------
-    for (let i = 1; i <= pageCountRef.current; i++) {
+    // ── 3. FINAL PASS: PAGE NUMBERS WITH DATE CONTEXT ──
+    const totalPages = pageCountRef.current;
+    for (let i = 1; i <= totalPages; i++) {
       doc.setPage(i);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(8);
       doc.setTextColor(150);
-      doc.text(`Page ${i} of ${pageCountRef.current}`, pageWidth - margin - 40, pageHeight - margin + 2);
+      const pageDate = pageDateMap[i];
+      const pageLabel = sortedDates.length > 1 && pageDate 
+        ? `Date: ${pageDate} | Page ${i} of ${totalPages}` 
+        : `Page ${i} of ${totalPages}`;
+
+      doc.text(pageLabel, pageWidth - margin - 150, pageHeight - margin + 2, { align: "right" });
     }
 
-    doc.save(`Security_Audit_Report_${reportDate}.pdf`);
+    // Dynamic filename
+    let filename = `Security_Audit_Report_${reportDate}.pdf`;
+    if (sortedDates.length > 1) {
+      filename = `Security_Audit_Report_${sortedDates[0]}_to_${sortedDates[sortedDates.length - 1]}.pdf`;
+    }
+
+    doc.save(filename);
   };
 
   return null;
