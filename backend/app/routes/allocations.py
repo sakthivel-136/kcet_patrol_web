@@ -15,7 +15,7 @@ class ShiftAllocationCreate(ShiftAllocationBase):
     pass
 
 class ShiftAllocationResponse(ShiftAllocationBase):
-    id: str
+    id: Optional[str] = None
 
 router = APIRouter(
     prefix="/allocations",
@@ -35,7 +35,7 @@ def get_allocations(shift_id: Optional[str] = None, _: dict = Depends(get_curren
     mapped = []
     for r in result:
         mapped.append({
-            "id": r["allocation_id"],
+            "id": r.get("allocation_id") or str(uuid.uuid4()),
             "shift_id": r["shift_id"],
             "guard_id": r["security_id"]
         })
