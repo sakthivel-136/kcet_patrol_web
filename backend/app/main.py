@@ -212,8 +212,9 @@ def end_of_day_cleanup():
         # 1. Fetch all scans currently in Supabase (up to today midnight)
         cutoff_iso = now_ist.strftime("%Y-%m-%dT23:59:59+05:30")
         sb_res = requests.get(
-            f"{SUPABASE_URL}/rest/v1/scanning_details?scan_time=lte.{cutoff_iso}&order=id.asc&limit=1000",
+            f"{SUPABASE_URL}/rest/v1/scanning_details",
             headers=sb_headers,
+            params={"scan_time": f"lte.{cutoff_iso}", "order": "id.asc", "limit": 1000},
             timeout=15
         )
         if not sb_res.ok:
@@ -255,8 +256,9 @@ def end_of_day_cleanup():
 
         # 3. Safe to delete from Supabase
         del_res = requests.delete(
-            f"{SUPABASE_URL}/rest/v1/scanning_details?scan_time=lte.{cutoff_iso}",
+            f"{SUPABASE_URL}/rest/v1/scanning_details",
             headers=sb_headers,
+            params={"scan_time": f"lte.{cutoff_iso}"},
             timeout=15
         )
 
