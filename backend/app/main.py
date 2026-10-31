@@ -227,32 +227,37 @@ def end_of_day_cleanup():
         col_str = ", ".join(columns)
         val_placeholders = ", ".join(["?"] * len(columns))
 
-        # 2. Ensure each scan is preserved in Cloudflare D1
+        # 2. Ensure each scan is preserved in Cloudflare D1 using chunked batch inserts (8 rows per request)
         synced_count = 0
-        for s in sb_scans:
-            sid = s.get("id")
-            # Calculate round_number if missing
-            r_num = s.get("round_number")
-            if not r_num and s.get("scan_time"):
-                try:
-                    import dateutil.parser
-                    dt = dateutil.parser.parse(s["scan_time"])
-                    if dt.tzinfo is None:
-                        dt = IST.localize(dt)
-                    else:
-                        dt = dt.astimezone(IST)
-                    r_num = (dt.hour // 2) + 1
-                except Exception:
-                    r_num = None
+        batch_size = 8
+        for i in range(0, len(sb_scans), batch_size):
+            batch = sb_scans[i:i + batch_size]
+            values_clause = []
+            flat_params = []
+            for s in batch:
+                sid = s.get("id")
+                r_num = s.get("round_number")
+                if not r_num and s.get("scan_time"):
+                    try:
+                        import dateutil.parser
+                        dt = dateutil.parser.parse(s["scan_time"])
+                        if dt.tzinfo is None:
+                            dt = IST.localize(dt)
+                        else:
+                            dt = dt.astimezone(IST)
+                        r_num = (dt.hour // 2) + 1
+                    except Exception:
+                        r_num = None
 
-            insert_sql = f"INSERT OR REPLACE INTO scanning_details ({col_str}) VALUES ({val_placeholders})"
-            params = [
-                sid, s.get("guard_name"), str(s.get("qr_id", "")), s.get("qr_name"),
-                s.get("lat"), s.get("log"), s.get("status"), s.get("campus_code", "KCET01"),
-                s.get("scan_time"), s.get("round_slot"), str(r_num) if r_num else None, s.get("round_time")
-            ]
-            query_d1(insert_sql, params)
-            synced_count += 1
+                values_clause.append(f"({val_placeholders})")
+                flat_params.extend([
+                    sid, s.get("guard_name"), str(s.get("qr_id", "")), s.get("qr_name"),
+                    s.get("lat"), s.get("log"), s.get("status"), s.get("campus_code", "KCET01"),
+                    s.get("scan_time"), s.get("round_slot"), str(r_num) if r_num else None, s.get("round_time")
+                ])
+            batch_sql = f"INSERT OR REPLACE INTO scanning_details ({col_str}) VALUES {', '.join(values_clause)}"
+            query_d1(batch_sql, flat_params)
+            synced_count += len(batch)
 
         # 3. Safe to delete from Supabase
         del_res = requests.delete(
