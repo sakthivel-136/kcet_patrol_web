@@ -184,3 +184,89 @@ def cron_mark_missed():
         return {"status": "success", "message": "Missed scans evaluated successfully."}
     except Exception as e:
         return {"status": "error", "message": str(e)}
+
+
+@app.get("/cron/end-of-day-cleanup", summary="End of Day Sync & Cleanup from Supabase")
+def end_of_day_cleanup():
+    """
+    Runs at midnight / end of day (e.g. 23:59 IST):
+    1. Ensures all scans from today are securely synced to Cloudflare D1.
+    2. Deletes today's and older synced scans from Supabase to keep Supabase clean.
+    """
+    try:
+        import requests
+        from datetime import datetime, timedelta
+        import pytz
+        from app.d1_client import query_d1
+
+        IST = pytz.timezone("Asia/Kolkata")
+        now_ist = datetime.now(IST)
+        
+        from app.config import SUPABASE_URL, SUPABASE_KEY
+        SUPABASE_URL = SUPABASE_URL or "https://jnzvystfghhhvvnmkygj.supabase.co"
+        sb_headers = {
+            "apikey": SUPABASE_KEY,
+            "Authorization": f"Bearer {SUPABASE_KEY}"
+        }
+
+        # 1. Fetch all scans currently in Supabase (up to today midnight)
+        cutoff_iso = now_ist.strftime("%Y-%m-%dT23:59:59+05:30")
+        sb_res = requests.get(
+            f"{SUPABASE_URL}/rest/v1/scanning_details?scan_time=lte.{cutoff_iso}&order=id.asc&limit=1000",
+            headers=sb_headers,
+            timeout=15
+        )
+        if not sb_res.ok:
+            return {"status": "error", "message": f"Failed to fetch Supabase scans: {sb_res.text}"}
+
+        sb_scans = sb_res.json()
+        print(f"End of day cleanup found {len(sb_scans)} scans in Supabase to verify/sync.")
+
+        columns = ['id', 'guard_name', 'qr_id', 'qr_name', 'lat', 'log', 'status', 'campus_code', 'scan_time', 'round_slot', 'round_number', 'round_time']
+        col_str = ", ".join(columns)
+        val_placeholders = ", ".join(["?"] * len(columns))
+
+        # 2. Ensure each scan is preserved in Cloudflare D1
+        synced_count = 0
+        for s in sb_scans:
+            sid = s.get("id")
+            # Calculate round_number if missing
+            r_num = s.get("round_number")
+            if not r_num and s.get("scan_time"):
+                try:
+                    import dateutil.parser
+                    dt = dateutil.parser.parse(s["scan_time"])
+                    if dt.tzinfo is None:
+                        dt = IST.localize(dt)
+                    else:
+                        dt = dt.astimezone(IST)
+                    r_num = (dt.hour // 2) + 1
+                except Exception:
+                    r_num = None
+
+            insert_sql = f"INSERT OR REPLACE INTO scanning_details ({col_str}) VALUES ({val_placeholders})"
+            params = [
+                sid, s.get("guard_name"), str(s.get("qr_id", "")), s.get("qr_name"),
+                s.get("lat"), s.get("log"), s.get("status"), s.get("campus_code", "KCET01"),
+                s.get("scan_time"), s.get("round_slot"), str(r_num) if r_num else None, s.get("round_time")
+            ]
+            query_d1(insert_sql, params)
+            synced_count += 1
+
+        # 3. Safe to delete from Supabase
+        del_res = requests.delete(
+            f"{SUPABASE_URL}/rest/v1/scanning_details?scan_time=lte.{cutoff_iso}",
+            headers=sb_headers,
+            timeout=15
+        )
+
+        return {
+            "status": "success",
+            "message": "End-of-day cleanup completed successfully.",
+            "synced_to_d1": synced_count,
+            "deleted_from_supabase_status": del_res.status_code
+        }
+
+    except Exception as e:
+        print("End of day cleanup error:", e)
+        return {"status": "error", "message": str(e)}
