@@ -19,7 +19,7 @@ import { generateSingleQrPdf, generateBulkQrPdf } from "@/app/components/qr/QrPd
 import { QRCodeSVG } from "qrcode.react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { Map, X } from "lucide-react";
+import { Map, X, Download, FileSpreadsheet, FileText } from "lucide-react";
 
 // ----------------- TYPES -----------------
 
@@ -254,6 +254,152 @@ export default function QrCrudPage() {
     setIsPathwayModalOpen(false)
   };
 
+  // ----------------- DOWNLOAD QR LIST (PDF & CSV) -----------------
+
+  const downloadQrListPdf = () => {
+    if (qrCodes.length === 0) {
+      alert("No QR codes available to download.");
+      return;
+    }
+
+    const doc = new jsPDF("landscape", "pt", "a4");
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 30;
+
+    // Header border
+    doc.setDrawColor(0);
+    doc.setLineWidth(2);
+    doc.rect(15, 15, pageWidth - 30, pageHeight - 30);
+
+    // Title & Institution
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.setTextColor(15, 23, 42);
+    doc.text("Kamaraj College of Engineering & Technology (Autonomous)", margin, 42);
+
+    doc.setFontSize(10);
+    doc.setTextColor(71, 85, 105);
+    doc.setFont("helvetica", "normal");
+    doc.text("S.P.G. Chidambara Nadar - C. Nagammal Campus, Vellakulam, Tamil Nadu 625701", margin, 56);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.setTextColor(79, 70, 229);
+    doc.text("SECURITY CHECKPOINTS & QR LIST", pageWidth - margin, 42, { align: "right" });
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(100);
+    doc.text(`Total Checkpoints: ${qrCodes.length} | Campus Code: ${FIXED_CAMPUS}`, pageWidth - margin, 56, { align: "right" });
+
+    doc.setDrawColor(226, 232, 240);
+    doc.setLineWidth(1);
+    doc.line(margin, 68, pageWidth - margin, 68);
+
+    const tableData = [...qrCodes]
+      .sort((a, b) => a.qr_id - b.qr_id)
+      .map((qr, index) => [
+        `${index + 1}`,
+        qr.qr_id.toString(),
+        qr.qr_name,
+        qr.lat != null ? Number(qr.lat).toFixed(6) : "-",
+        qr.lon != null ? Number(qr.lon).toFixed(6) : "-",
+        qr.status ? qr.status.toUpperCase() : "INACTIVE",
+        qr.waiting_time ? `${qr.waiting_time}s` : "15s",
+      ]);
+
+    autoTable(doc, {
+      startY: 80,
+      margin: { right: margin, left: margin, bottom: 40 },
+      head: [["S.No", "QR ID", "QR Name / Checkpoint Location", "Latitude", "Longitude", "Status", "Wait Time"]],
+      body: tableData,
+      theme: "grid",
+      headStyles: {
+        fillColor: "#4F46E5",
+        textColor: "#FFFFFF",
+        fontStyle: "bold",
+        halign: "center",
+        valign: "middle",
+      },
+      styles: {
+        font: "helvetica",
+        fontSize: 9.5,
+        cellPadding: 5.5,
+        valign: "middle",
+        halign: "center",
+      },
+      columnStyles: {
+        0: { cellWidth: 40, halign: "center" },
+        1: { cellWidth: 60, halign: "center", fontStyle: "bold" },
+        2: { halign: "left", cellWidth: 280, fontStyle: "bold" },
+        3: { cellWidth: 110, halign: "center" },
+        4: { cellWidth: 110, halign: "center" },
+        5: { cellWidth: 80, halign: "center", fontStyle: "bold" },
+        6: { cellWidth: 70, halign: "center" },
+      },
+      didParseCell: (data) => {
+        if (data.section === "body" && data.column.index === 5) {
+          const status = data.cell.raw;
+          if (status === "ACTIVE") {
+            data.cell.styles.fillColor = "#DCFCE7";
+            data.cell.styles.textColor = "#16A34A";
+          } else {
+            data.cell.styles.fillColor = "#FEE2E2";
+            data.cell.styles.textColor = "#DC2626";
+          }
+        }
+      },
+      didDrawPage: (data) => {
+        doc.setDrawColor(0);
+        doc.setLineWidth(2);
+        doc.rect(15, 15, pageWidth - 30, pageHeight - 30);
+
+        // Footer
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8);
+        doc.setTextColor(150);
+        doc.text(
+          `Generated on: ${new Date().toLocaleString()} | Page ${data.pageNumber}`,
+          margin,
+          pageHeight - 20
+        );
+      },
+    });
+
+    doc.save(`KCET_QR_Checkpoints_List_${new Date().toISOString().slice(0, 10)}.pdf`);
+  };
+
+  const downloadQrListCsv = () => {
+    if (qrCodes.length === 0) {
+      alert("No QR codes available to download.");
+      return;
+    }
+
+    const headers = ["S.No", "QR ID", "QR Name", "Latitude", "Longitude", "Status", "Waiting Time (s)", "Campus Code"];
+    const rows = [...qrCodes]
+      .sort((a, b) => a.qr_id - b.qr_id)
+      .map((qr, index) => [
+        index + 1,
+        qr.qr_id,
+        `"${qr.qr_name.replace(/"/g, '""')}"`,
+        qr.lat ?? "",
+        qr.lon ?? "",
+        qr.status ?? "inactive",
+        qr.waiting_time ?? 15,
+        qr.campus_code ?? FIXED_CAMPUS,
+      ]);
+
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `KCET_QR_Checkpoints_List_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   // ----------------- RENDER -----------------
 
   return (
@@ -285,6 +431,23 @@ export default function QrCrudPage() {
                 📄 Download All QRs
               </button>
             )}
+
+            {/* Download QR List Buttons (PDF & Excel/CSV) */}
+            <button
+              onClick={downloadQrListPdf}
+              title="Download full QR checkpoints list with Name, Lat, Lon, Status"
+              className="px-4 py-2.5 bg-indigo-50 text-indigo-700 font-bold text-sm rounded-xl border border-indigo-200 hover:bg-indigo-100 transition-all flex items-center gap-1.5 shadow-sm"
+            >
+              <FileText size={16} /> Download List (PDF)
+            </button>
+
+            <button
+              onClick={downloadQrListCsv}
+              title="Export QR checkpoints as CSV/Excel"
+              className="px-4 py-2.5 bg-blue-50 text-blue-700 font-bold text-sm rounded-xl border border-blue-200 hover:bg-blue-100 transition-all flex items-center gap-1.5 shadow-sm"
+            >
+              <FileSpreadsheet size={16} /> Export (CSV)
+            </button>
 
             <button
               onClick={() => { setPathwaySelection([]); setIsPathwayModalOpen(true); }}
