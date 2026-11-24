@@ -8,6 +8,7 @@ import { LOGO_BASE64 } from "./logoBase64";
 
 interface PatrolReportPDFProps {
   logs: ScanLog[];
+  rawReport?: any[];
   shifts: any[];
   campusCode: string;
   campusName: string;
@@ -20,6 +21,7 @@ interface PatrolReportPDFProps {
 
 const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
   logs,
+  rawReport,
   shifts,
   campusCode,
   campusName,
@@ -137,18 +139,28 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
       );
     };
 
-    // Helper: Compute Top 3 Performers (Highest successful scans)
+    // Helper: Compute Top 3 Performers (Highest actual scans by security officer)
     const computeTopPerformers = (dayLogs: ScanLog[]) => {
       const counts: Record<string, number> = {};
-      dayLogs.forEach((l) => {
-        if (normalizeStatus(l.status) === "SUCCESS" && l.guard_name && l.guard_name !== "-") {
-          const names = l.guard_name
-            .split(",")
-            .map((n) => n.trim())
-            .filter((n) => n && n.toUpperCase() !== "SYSTEM_MISSED");
-          names.forEach((name) => {
-            counts[name] = (counts[name] || 0) + 1;
-          });
+      const sourceList = rawReport && rawReport.length > 0 ? rawReport : dayLogs;
+
+      sourceList.forEach((l: any) => {
+        // Count strictly when there is an actual scan_time recorded
+        if (l.scan_time && l.guard_name) {
+          const rawGuard = String(l.guard_name).trim();
+          if (
+            rawGuard &&
+            rawGuard !== "-" &&
+            rawGuard.toUpperCase() !== "SYSTEM_MISSED"
+          ) {
+            const names = rawGuard
+              .split(",")
+              .map((n: string) => n.trim())
+              .filter((n: string) => n && n.toUpperCase() !== "SYSTEM_MISSED");
+            names.forEach((name: string) => {
+              counts[name] = (counts[name] || 0) + 1;
+            });
+          }
         }
       });
 

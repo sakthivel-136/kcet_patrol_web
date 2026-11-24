@@ -328,20 +328,28 @@ export default function ReportDownloadPage() {
       });
   }, [report, selectedGuard, selectedRound, selectedStatus, shifts, allocations, secUsers]);
 
-  // ================= TOP PERFORMERS (1 ROW x 3 COLS) =================
+  // ================= TOP PERFORMERS: BASED ON WHO ACTUALLY SCANNED (RAW SCAN COUNT) =================
   const topPerformers = useMemo(() => {
     const counts: Record<string, number> = {};
-    cleanLogs.forEach((l) => {
-      const s = (l.status || "").toLowerCase().trim();
-      const isSuccess = s === "success" || s === "completed" || s === "done";
-      if (isSuccess && l.guard_name && l.guard_name !== "-") {
-        const names = l.guard_name
-          .split(",")
-          .map((n) => n.trim())
-          .filter((n) => n && n.toUpperCase() !== "SYSTEM_MISSED");
-        names.forEach((name) => {
-          counts[name] = (counts[name] || 0) + 1;
-        });
+    
+    // Look at the raw report returned from the database where scan_time exists
+    report.forEach((item) => {
+      // Must be an actual scan with a recorded scan_time (not missed or shift fallback)
+      if (item.scan_time && item.guard_name) {
+        const rawGuard = item.guard_name.trim();
+        if (
+          rawGuard &&
+          rawGuard !== "-" &&
+          rawGuard.toUpperCase() !== "SYSTEM_MISSED"
+        ) {
+          const names = rawGuard
+            .split(",")
+            .map((n) => n.trim())
+            .filter((n) => n && n.toUpperCase() !== "SYSTEM_MISSED");
+          names.forEach((name) => {
+            counts[name] = (counts[name] || 0) + 1;
+          });
+        }
       }
     });
 
@@ -355,7 +363,7 @@ export default function ReportDownloadPage() {
       }));
 
     return sorted;
-  }, [cleanLogs]);
+  }, [report]);
 
   if (!authorized) {
     return <div className="p-6 text-slate-500 min-h-screen flex items-center justify-center">Checking access...</div>;
@@ -673,7 +681,7 @@ export default function ReportDownloadPage() {
         </div>
 
         {/* TOP PERFORMERS WIDGET: 1 ROW x 3 COLUMNS */}
-        {cleanLogs.length > 0 && (
+        {report.length > 0 && (
           <div className="glass-panel rounded-3xl p-5 border border-purple-100/90 shadow-md">
             <div className="flex items-center justify-between mb-3.5 pb-2.5 border-b border-purple-100/70">
               <div className="flex items-center gap-2">
@@ -682,7 +690,7 @@ export default function ReportDownloadPage() {
                   Top Performers
                 </h3>
                 <span className="text-xs text-slate-500 font-medium hidden sm:inline">
-                  — Highest scans completed
+                  — Highest actual scans recorded
                 </span>
               </div>
               <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
@@ -774,6 +782,7 @@ export default function ReportDownloadPage() {
             <PatrolReportPDF
               key={pdfTrigger}
               logs={cleanLogs}
+              rawReport={report}
               shifts={shifts}
               campusCode={FIXED_CAMPUS}
               campusName="KCET Main Campus"
