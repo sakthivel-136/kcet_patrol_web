@@ -329,7 +329,7 @@ export default function ReportDownloadPage() {
   }, [report, selectedGuard, selectedRound, selectedStatus, shifts, allocations, secUsers]);
 
   // ================= TOP PERFORMERS: BASED ON WHO ACTUALLY SCANNED (RAW SCAN COUNT) =================
-  const topPerformers = useMemo(() => {
+  const { topPerformers, needsImprovement } = useMemo(() => {
     const counts: Record<string, number> = {};
     
     // Look at the raw report returned from the database where scan_time exists
@@ -353,16 +353,22 @@ export default function ReportDownloadPage() {
       }
     });
 
-    const sorted = Object.entries(counts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3)
-      .map(([name, count], idx) => ({
-        rank: `${idx + 1}${idx === 0 ? "st" : idx === 1 ? "nd" : "rd"}`,
+    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+
+    const top = sorted.slice(0, 3).map(([name, count], idx) => ({
+      rank: `${idx + 1}${idx === 0 ? "st" : idx === 1 ? "nd" : "rd"}`,
+      name,
+      count,
+    }));
+
+    const needs = sorted
+      .filter(([_, count]) => count < 12)
+      .map(([name, count]) => ({
         name,
         count,
       }));
 
-    return sorted;
+    return { topPerformers: top, needsImprovement: needs };
   }, [report]);
 
   if (!authorized) {
@@ -760,6 +766,28 @@ export default function ReportDownloadPage() {
                 );
               })}
             </div>
+
+            {/* NEEDS IMPROVEMENT: Displayed only if there are guards with < 12 scans */}
+            {needsImprovement.length > 0 && (
+              <div className="mt-4 pt-3.5 border-t border-purple-100/70 flex flex-wrap items-center gap-2.5">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-100 text-rose-800 border border-rose-200">
+                  <AlertTriangle size={13} className="text-rose-600" /> Needs Improvement (&lt; 12 Scans):
+                </span>
+                <div className="flex flex-wrap items-center gap-2">
+                  {needsImprovement.map((g, i) => (
+                    <span
+                      key={i}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-rose-50 text-rose-900 border border-rose-200/80 shadow-xs"
+                    >
+                      <span className="font-bold">{g.name}</span>
+                      <span className="text-[10px] px-1.5 py-0.2 bg-rose-200/60 rounded text-rose-900 font-bold">
+                        {g.count}
+                      </span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
