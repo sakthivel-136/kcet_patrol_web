@@ -57,7 +57,12 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
   };
 
   const generatePDF = () => {
-    const doc = new jsPDF("landscape", "pt", "a4");
+    const doc = new jsPDF({
+      orientation: "landscape",
+      unit: "pt",
+      format: "a4",
+      compress: true, // Enables Flate compression for all streams and text
+    });
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
     const margin = 30;
@@ -177,7 +182,7 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
       // ── LEFT DIV: COLLEGE LOGO ──
       if (LOGO_BASE64) {
         try {
-          doc.addImage(LOGO_BASE64, "PNG", logoX, logoY, logoSize, logoSize);
+          doc.addImage(LOGO_BASE64, "PNG", logoX, logoY, logoSize, logoSize, "college_logo", "FAST");
         } catch (e) {}
       }
 
