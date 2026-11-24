@@ -14,7 +14,7 @@ import { getRounds, PatrolRound } from "../api/rounds.api";
 import {
   Filter, Calendar, Shield, FileText, Download, CheckCircle2,
   AlertTriangle, UserCheck, Clock, ChevronDown, Sparkles,
-  CalendarDays, Layers, Grid
+  CalendarDays, Layers, Grid, Trophy, Award, Medal
 } from "lucide-react";
 
 // ================= TYPES =================
@@ -327,6 +327,35 @@ export default function ReportDownloadPage() {
         };
       });
   }, [report, selectedGuard, selectedRound, selectedStatus, shifts, allocations, secUsers]);
+
+  // ================= TOP PERFORMERS (1 ROW x 3 COLS) =================
+  const topPerformers = useMemo(() => {
+    const counts: Record<string, number> = {};
+    cleanLogs.forEach((l) => {
+      const s = (l.status || "").toLowerCase().trim();
+      const isSuccess = s === "success" || s === "completed" || s === "done";
+      if (isSuccess && l.guard_name && l.guard_name !== "-") {
+        const names = l.guard_name
+          .split(",")
+          .map((n) => n.trim())
+          .filter((n) => n && n.toUpperCase() !== "SYSTEM_MISSED");
+        names.forEach((name) => {
+          counts[name] = (counts[name] || 0) + 1;
+        });
+      }
+    });
+
+    const sorted = Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([name, count], idx) => ({
+        rank: `${idx + 1}${idx === 0 ? "st" : idx === 1 ? "nd" : "rd"}`,
+        name,
+        count,
+      }));
+
+    return sorted;
+  }, [cleanLogs]);
 
   if (!authorized) {
     return <div className="p-6 text-slate-500 min-h-screen flex items-center justify-center">Checking access...</div>;
@@ -642,6 +671,89 @@ export default function ReportDownloadPage() {
             </div>
           </div>
         </div>
+
+        {/* TOP PERFORMERS WIDGET: 1 ROW x 3 COLUMNS */}
+        {cleanLogs.length > 0 && (
+          <div className="glass-panel rounded-3xl p-5 border border-purple-100/90 shadow-md">
+            <div className="flex items-center justify-between mb-3.5 pb-2.5 border-b border-purple-100/70">
+              <div className="flex items-center gap-2">
+                <Trophy size={18} className="text-amber-500" />
+                <h3 className="text-sm font-extrabold uppercase tracking-wider text-purple-950">
+                  Top Performers
+                </h3>
+                <span className="text-xs text-slate-500 font-medium hidden sm:inline">
+                  — Highest scans completed
+                </span>
+              </div>
+              <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                1st, 2nd, 3rd Leaderboard
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[0, 1, 2].map((idx) => {
+                const item = topPerformers[idx];
+                const rankLabels = ["1st", "2nd", "3rd"];
+                const styles = [
+                  {
+                    bg: "bg-gradient-to-br from-amber-50/80 to-yellow-50/60",
+                    border: "border-amber-200/90",
+                    badge: "bg-amber-500 text-white shadow-amber-500/20",
+                    textColor: "text-amber-950",
+                    icon: Trophy,
+                    iconColor: "text-amber-600",
+                  },
+                  {
+                    bg: "bg-gradient-to-br from-slate-50/90 to-slate-100/60",
+                    border: "border-slate-300/80",
+                    badge: "bg-slate-600 text-white shadow-slate-600/20",
+                    textColor: "text-slate-900",
+                    icon: Medal,
+                    iconColor: "text-slate-500",
+                  },
+                  {
+                    bg: "bg-gradient-to-br from-orange-50/80 to-amber-50/50",
+                    border: "border-orange-200/90",
+                    badge: "bg-orange-500 text-white shadow-orange-500/20",
+                    textColor: "text-orange-950",
+                    icon: Award,
+                    iconColor: "text-orange-600",
+                  },
+                ][idx];
+
+                const IconComponent = styles.icon;
+
+                return (
+                  <div
+                    key={idx}
+                    className={`rounded-2xl p-4 border ${styles.bg} ${styles.border} shadow-sm flex items-center justify-between gap-3`}
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center font-black text-xs shadow-md ${styles.badge}`}
+                      >
+                        {rankLabels[idx]}
+                      </div>
+                      <div className="min-w-0">
+                        <div
+                          className={`text-sm font-bold truncate ${styles.textColor}`}
+                          title={item ? item.name : "No Data"}
+                        >
+                          {item ? item.name : "—"}
+                        </div>
+                        <div className="text-[11px] font-semibold text-slate-500">
+                          {item ? `${item.count} Scans` : "0 Scans"}
+                        </div>
+                      </div>
+                    </div>
+
+                    <IconComponent size={20} className={`${styles.iconColor} shrink-0 opacity-80`} />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* REPORT TABLE */}
         <div data-tour="report-table" className="glass-panel rounded-3xl p-6">
