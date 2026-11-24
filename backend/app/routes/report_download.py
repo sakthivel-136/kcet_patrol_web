@@ -60,21 +60,29 @@ def download_report(
 
         # ==============================
         # 2. Fetch ALL scan logs for the range (paginated to avoid 1000-row limit)
-        #    Buffer 30 min before start_date to catch guards who begin
-        #    Round 1 patrol slightly before midnight
+        #    Buffer 30 min before midnight IST to catch guards who begin Round 1 early.
+        #    D1 stores scan_time in UTC (e.g. '2026-11-23T18:30:00.000Z' or '+05:30').
+        #    Convert the IST range to UTC so SQLite string comparisons match correctly!
         # ==============================
         scans = []
         page_size = 1000
         offset = 0
-        fetch_start = f"{start_date}T00:00:00+05:30"
-        # Extend fetch window 30 min before midnight to capture early Round 1 scans
-        fetch_start_dt = datetime.strptime(start_date, "%Y-%m-%d")
-        fetch_start_dt = IST.localize(fetch_start_dt) - timedelta(minutes=30)
-        fetch_start = fetch_start_dt.strftime("%Y-%m-%dT%H:%M:%S+05:30")
+
+        # Midnight IST - 30 mins in UTC
+        start_ist_dt = IST.localize(datetime.strptime(start_date, "%Y-%m-%d")) - timedelta(minutes=30)
+        end_ist_dt = IST.localize(datetime.strptime(end_date, "%Y-%m-%d")).replace(hour=23, minute=59, second=59)
+
+        fetch_start_utc = start_ist_dt.astimezone(pytz.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        fetch_end_utc = end_ist_dt.astimezone(pytz.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+        # Fallback strings for any legacy non-UTC ISO timestamps
+        fetch_start_ist = start_ist_dt.strftime("%Y-%m-%dT%H:%M:%S")
+        fetch_end_ist = end_ist_dt.strftime("%Y-%m-%dT%H:%M:%S+05:30")
 
         scans = query_d1(
-            "SELECT id, qr_id, guard_name, scan_time, lat, log, status, round_slot FROM scanning_details WHERE campus_code = ? AND scan_time >= ? AND scan_time <= ? ORDER BY scan_time",
-            [campus_code, fetch_start, f"{end_date}T23:59:59+05:30"]
+            "SELECT id, qr_id, guard_name, scan_time, lat, log, status, round_slot FROM scanning_details "
+            "WHERE campus_code = ? AND ((scan_time >= ? AND scan_time <= ?) OR (scan_time >= ? AND scan_time <= ?)) ORDER BY scan_time",
+            [campus_code, fetch_start_utc, fetch_end_utc, fetch_start_ist, fetch_end_ist]
         )
 
         # ==============================
