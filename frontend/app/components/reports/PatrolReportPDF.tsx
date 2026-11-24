@@ -306,35 +306,46 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
 
       if (needsImprovementList.length > 0) {
         const alertY = currentEndY;
-        const alertHeight = 24;
+        const textX = margin + 140;
+        const maxTextWidth = availableWidth - 150;
+
+        // Build the full text containing all guard names and their counts
+        const guardDetails = needsImprovementList
+          .map((item) => `${item.name} (${item.count} scans)`)
+          .join("   •   ");
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(8.5);
+        doc.setTextColor("#991B1B"); // red-800
+
+        // Split text to fit within page width without any truncating!
+        const lines: string[] = doc.splitTextToSize(guardDetails, maxTextWidth);
+        const lineHeight = 11;
+        const textBlockHeight = lines.length * lineHeight;
+        const alertHeight = Math.max(26, textBlockHeight + 14);
+
+        // Background box
         doc.setFillColor("#FEF2F2"); // red-50
         doc.setDrawColor("#FCA5A5"); // red-300
         doc.setLineWidth(1);
         doc.roundedRect(margin, alertY, availableWidth, alertHeight, 3, 3, "FD");
 
-        // Badge: Needs Improvement
+        // Badge: Needs Improvement (<12)
         doc.setFillColor("#DC2626"); // red-600
-        doc.roundedRect(margin + 8, alertY + 5, 105, 14, 2, 2, "F");
+        doc.roundedRect(margin + 8, alertY + 6, 122, 15, 2, 2, "F");
         doc.setFont("helvetica", "bold");
         doc.setFontSize(7.5);
         doc.setTextColor("#FFFFFF");
-        doc.text("NEEDS IMPROVEMENT (<12)", margin + 60, alertY + 15, { align: "center" });
+        doc.text("NEEDS IMPROVEMENT (<12)", margin + 69, alertY + 16.5, { align: "center" });
 
-        // List guards with count
+        // Draw all lines of guard names
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(8);
-        doc.setTextColor("#991B1B"); // red-800
-        const guardDetails = needsImprovementList
-          .map((item) => `${item.name} (${item.count} scans)`)
-          .join("   •   ");
+        doc.setFontSize(8.5);
+        doc.setTextColor("#991B1B");
 
-        const maxDetailLen = 100;
-        const safeGuardDetails =
-          guardDetails.length > maxDetailLen
-            ? guardDetails.substring(0, maxDetailLen) + "..."
-            : guardDetails;
-
-        doc.text(safeGuardDetails, margin + 122, alertY + 15);
+        lines.forEach((line: string, lineIndex: number) => {
+          doc.text(line, textX, alertY + 17 + lineIndex * lineHeight);
+        });
 
         currentEndY = alertY + alertHeight + 12;
       }
