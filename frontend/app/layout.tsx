@@ -8,6 +8,7 @@ import NavbarClient from "@/app/components/navbar/NavbarClient";
 import NavbarWrapper from "@/app/components/navbar/NavbarWrapper";
 import { TourProvider } from "@/app/context/TourContext";
 import TourOverlay from "@/app/components/tutorial/TourOverlay";
+import FloatingRefreshButton from "@/app/components/ui/FloatingRefreshButton";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -55,6 +56,9 @@ export default function RootLayout({
           <main className="min-h-screen">
             {children}
           </main>
+
+          {/* Floating Refresh Button across all pages */}
+          <FloatingRefreshButton />
 
           {/* Global Tour Overlay - renders on top of every page */}
           <TourOverlay />
