@@ -5,7 +5,7 @@ from datetime import time
 from app.database import supabase
 from app.d1_client import query_d1
 import uuid
-from app.dependencies import get_current_user, admin_only
+from app.dependencies import get_current_user, admin_only, supervisor_or_admin
 
 class ShiftBase(BaseModel):
     shift_name: str
@@ -30,7 +30,7 @@ def get_shifts(_: dict = Depends(get_current_user)):
     return results
 
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=ShiftResponse)
-def create_shift(payload: ShiftCreate, _: dict = Depends(admin_only)):
+def create_shift(payload: ShiftCreate, _: dict = Depends(supervisor_or_admin)):
     shift_id = str(uuid.uuid4())
     query_d1(
         "INSERT INTO shifts (shift_id, shift_name, start_time, end_time) VALUES (?, ?, ?, ?)",
@@ -50,7 +50,7 @@ def create_shift(payload: ShiftCreate, _: dict = Depends(admin_only)):
     return created[0]
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_shift(id: str, _: dict = Depends(admin_only)):
+def delete_shift(id: str, _: dict = Depends(supervisor_or_admin)):
     query_d1("DELETE FROM shifts WHERE shift_id = ?", [id])
     return
 
@@ -60,7 +60,7 @@ class ShiftUpdate(BaseModel):
     end_time: Optional[time] = None
 
 @router.put("/{id}", response_model=ShiftResponse)
-def update_shift(id: str, payload: ShiftUpdate, _: dict = Depends(admin_only)):
+def update_shift(id: str, payload: ShiftUpdate, _: dict = Depends(supervisor_or_admin)):
     data = payload.model_dump(exclude_unset=True)
     if "start_time" in data:
         data["start_time"] = data["start_time"].isoformat()

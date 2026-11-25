@@ -123,6 +123,7 @@ export default function ReportDownloadPage() {
   const [allocations, setAllocations] = useState<any[]>([]);
 
   // ── ADVANCED FILTERS ──
+  const [selectedShift, setSelectedShift] = useState("ALL");
   const [selectedGuard, setSelectedGuard] = useState("ALL");
   const [selectedRound, setSelectedRound] = useState("ALL");
   const [selectedStatus, setSelectedStatus] = useState("ALL");
@@ -287,10 +288,33 @@ export default function ReportDownloadPage() {
     return Array.from(setG).sort();
   }, [secUsers, report, shifts, allocations]);
 
+  // Helper: check if a round falls inside a shift's time window
+  const isRoundInShift = (roundNo: number, shiftId: string): boolean => {
+    if (shiftId === "ALL") return true;
+    const targetShift = shifts.find(s => s.shift_id === shiftId);
+    if (!targetShift || !targetShift.start_time || !targetShift.end_time) return false;
+    if (roundNo < 1 || roundNo > ROUND_TIMES_LIST.length) return false;
+    const roundTimeStr = ROUND_TIMES_LIST[roundNo - 1];
+    const [rH, rM] = roundTimeStr.split(":").map(Number);
+    const roundMins = rH * 60 + rM;
+
+    const [sH, sM] = targetShift.start_time.split(":").map(Number);
+    const [eH, eM] = targetShift.end_time.split(":").map(Number);
+    const startMins = sH * 60 + sM;
+    let endMins = eH * 60 + eM;
+    if (endMins <= startMins) {
+      return roundMins >= startMins || roundMins < endMins;
+    }
+    return roundMins >= startMins && roundMins < endMins;
+  };
+
   // ================= CLEAN & FILTERED LOGS =================
   const cleanLogs = useMemo(() => {
     return report
       .filter((i) => {
+        if (selectedShift !== "ALL" && !isRoundInShift(i.round, selectedShift)) {
+          return false;
+        }
         if (selectedGuard !== "ALL") {
           const sLower = selectedGuard.toLowerCase().trim();
           let match = false;
@@ -326,15 +350,17 @@ export default function ReportDownloadPage() {
           guard_name: gName,
         };
       });
-  }, [report, selectedGuard, selectedRound, selectedStatus, shifts, allocations, secUsers]);
+  }, [report, selectedShift, selectedGuard, selectedRound, selectedStatus, shifts, allocations, secUsers, ROUND_TIMES_LIST]);
 
-  // ================= TOP PERFORMERS: BASED ON WHO ACTUALLY SCANNED (RAW SCAN COUNT) =================
+  // ================= TOP PERFORMERS & NEEDS IMPROVEMENT (SHIFT-BASED & < 8 SCANS) =================
   const { topPerformers, needsImprovement } = useMemo(() => {
     const counts: Record<string, number> = {};
     
-    // Look at the raw report returned from the database where scan_time exists
+    // Look at report items that match the selected shift (or all shifts)
     report.forEach((item) => {
-      // Must be an actual scan with a recorded scan_time (not missed or shift fallback)
+      if (selectedShift !== "ALL" && !isRoundInShift(item.round, selectedShift)) {
+        return;
+      }
       if (item.scan_time && item.guard_name) {
         const rawGuard = item.guard_name.trim();
         if (
@@ -361,15 +387,16 @@ export default function ReportDownloadPage() {
       count,
     }));
 
+    // Needs Improvement threshold is now 8 scans
     const needs = sorted
-      .filter(([_, count]) => count < 12)
+      .filter(([_, count]) => count < 8)
       .map(([name, count]) => ({
         name,
         count,
       }));
 
     return { topPerformers: top, needsImprovement: needs };
-  }, [report]);
+  }, [report, selectedShift, shifts, ROUND_TIMES_LIST]);
 
   if (!authorized) {
     return <div className="p-6 text-slate-500 min-h-screen flex items-center justify-center">Checking access...</div>;
@@ -603,6 +630,28 @@ export default function ReportDownloadPage() {
               </div>
             )}
 
+            {/* SHIFT FILTER */}
+            <div className="md:col-span-2 space-y-1.5">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1">
+                <Clock size={13} /> Shift
+              </label>
+              <div className="relative">
+                <select
+                  value={selectedShift}
+                  onChange={(e) => setSelectedShift(e.target.value)}
+                  className="input-field py-2.5 text-xs bg-white/90 cursor-pointer font-bold text-purple-950 pr-8 appearance-none"
+                >
+                  <option value="ALL">All Shifts</option>
+                  {shifts.map((s) => (
+                    <option key={s.shift_id} value={s.shift_id}>
+                      {s.shift_name}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-purple-400 pointer-events-none" />
+              </div>
+            </div>
+
             {/* GUARD FILTER */}
             <div data-tour="report-filters" className="md:col-span-3 space-y-1.5">
               <label className="text-[11px] font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1">
@@ -767,11 +816,11 @@ export default function ReportDownloadPage() {
               })}
             </div>
 
-            {/* NEEDS IMPROVEMENT: Displayed only if there are guards with < 12 scans */}
+            {/* NEEDS IMPROVEMENT: Displayed only if there are guards with < 8 scans */}
             {needsImprovement.length > 0 && (
               <div className="mt-4 pt-3.5 border-t border-purple-100/70 flex flex-wrap items-center gap-2.5">
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-100 text-rose-800 border border-rose-200">
-                  <AlertTriangle size={13} className="text-rose-600" /> Needs Improvement (&lt; 12 Scans):
+                  <AlertTriangle size={13} className="text-rose-600" /> Needs Improvement (&lt; 8 Scans):
                 </span>
                 <div className="flex flex-wrap items-center gap-2">
                   {needsImprovement.map((g, i) => (

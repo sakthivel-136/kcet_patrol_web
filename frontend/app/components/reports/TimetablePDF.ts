@@ -91,6 +91,50 @@ export const generateTimetablePDF = (shifts: any[], guards: any[], allocations: 
     currentY = (doc as any).lastAutoTable.finalY + 30;
   });
 
+  // ── UNALLOCATED GUARDS (ABSENT) SECTION ──
+  const allocatedGuardIds = new Set(allocations.filter(a => a.guard_id !== 'CLEAR').map(a => a.guard_id));
+  const unallocatedGuards = guards.filter(g => !allocatedGuardIds.has(g.security_id));
+
+  if (unallocatedGuards.length > 0) {
+    if (currentY > pageHeight - 150) {
+      doc.addPage();
+      drawHeader(doc);
+      currentY = 100;
+    }
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.setTextColor(220, 38, 38); // red-600
+    doc.text(`NOT ALLOCATED / ABSENT PERSONNEL (${unallocatedGuards.length})`, margin, currentY);
+    currentY += 15;
+
+    const unallocData = unallocatedGuards.map(g => [g.security_id, g.security_name || g.username || 'Unknown', 'ABSENT / UNASSIGNED']);
+
+    autoTable(doc, {
+      startY: currentY,
+      head: [["Guard ID", "Guard Name", "Status"]],
+      body: unallocData,
+      theme: "grid",
+      margin: { left: margin, right: margin, bottom: 50 },
+      headStyles: { fillColor: "#FEE2E2", textColor: "#991B1B", fontStyle: "bold" },
+      styles: { font: "helvetica", fontSize: 10, cellPadding: 6 },
+      columnStyles: {
+        2: { fontStyle: "bold", textColor: "#DC2626" }
+      },
+      alternateRowStyles: { fillColor: "#FFF1F2" },
+      pageBreak: "auto",
+      didDrawPage: (data) => {
+        if (data.pageNumber > 1) {
+          doc.setDrawColor(0);
+          doc.setLineWidth(2);
+          doc.rect(15, 15, pageWidth - 30, pageHeight - 30);
+        }
+      }
+    });
+
+    currentY = (doc as any).lastAutoTable.finalY + 30;
+  }
+
   // Footer on all pages
   const pageCount = (doc as any).internal.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {

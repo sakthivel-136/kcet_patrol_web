@@ -243,6 +243,63 @@ export default function ShiftsPage() {
             })}
           </div>
         )}
+
+        {/* ABSENT / UNALLOCATED GUARDS SECTION */}
+        {!loading && guards.length > 0 && (() => {
+          const allocatedSet = new Set(allocations.filter(a => a.guard_id !== 'CLEAR').map(a => a.guard_id))
+          const unallocatedGuards = guards.filter(g => !allocatedSet.has(g.security_id))
+
+          return (
+            <div className="mt-10 glass-panel rounded-3xl p-6 border border-rose-200/80 bg-rose-50/30 shadow-sm">
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-rose-100">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-3 h-3 rounded-full bg-rose-500 animate-pulse" />
+                  <h3 className="text-lg font-bold text-slate-800 tracking-tight">
+                    Unallocated Personnel (Marked as Absent)
+                  </h3>
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-700 border border-rose-200">
+                    {unallocatedGuards.length} Absent
+                  </span>
+                </div>
+                <p className="text-xs font-medium text-slate-500">
+                  Guards not assigned to any shift are automatically classified as absent.
+                </p>
+              </div>
+
+              {unallocatedGuards.length === 0 ? (
+                <div className="py-6 text-center text-sm font-semibold text-emerald-700 bg-emerald-50 rounded-2xl border border-emerald-100">
+                  ✓ All guards are currently allocated to shifts (0 absent personnel).
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {unallocatedGuards.map((g) => (
+                    <div
+                      key={g.security_id}
+                      className="flex items-center justify-between p-3 rounded-2xl bg-white border border-rose-200 shadow-sm"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-8 h-8 rounded-full bg-rose-100 text-rose-700 font-black text-xs flex items-center justify-center shrink-0">
+                          {g.security_name.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-xs font-bold text-slate-800 truncate" title={g.security_name}>
+                            {g.security_name}
+                          </div>
+                          <div className="text-[10px] text-slate-400 font-mono">
+                            ID: {g.security_id}
+                          </div>
+                        </div>
+                      </div>
+                      <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-rose-50 text-rose-700 border border-rose-200 uppercase tracking-wide">
+                        Absent
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )
+        })()}
       </motion.div>
 
       {/* Glassmorphic Edit Modal */}

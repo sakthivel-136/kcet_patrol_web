@@ -303,10 +303,10 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
 
       let currentEndY = topBoxY + topBoxHeight + 10;
 
-      // ── NEEDS IMPROVEMENT SECTION (< 12 SCANS) ──
-      // Only displayed when there are officers who performed less than 12 scans!
+      // ── NEEDS IMPROVEMENT SECTION (< 8 SCANS) ──
+      // Only displayed when there are officers who performed less than 8 scans!
       const needsImprovementList = sortedGuards
-        .filter(([_, count]) => count < 12)
+        .filter(([_, count]) => count < 8)
         .map(([name, count]) => ({ name, count }));
 
       if (needsImprovementList.length > 0) {
@@ -335,13 +335,13 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
         doc.setLineWidth(1);
         doc.roundedRect(margin, alertY, availableWidth, alertHeight, 3, 3, "FD");
 
-        // Badge: Needs Improvement (<12)
+        // Badge: Needs Improvement (<8)
         doc.setFillColor("#DC2626"); // red-600
         doc.roundedRect(margin + 8, alertY + 6, 122, 15, 2, 2, "F");
         doc.setFont("helvetica", "bold");
         doc.setFontSize(7.5);
         doc.setTextColor("#FFFFFF");
-        doc.text("NEEDS IMPROVEMENT (<12)", margin + 69, alertY + 16.5, { align: "center" });
+        doc.text("NEEDS IMPROVEMENT (<8)", margin + 69, alertY + 16.5, { align: "center" });
 
         // Draw all lines of guard names
         doc.setFont("helvetica", "bold");
