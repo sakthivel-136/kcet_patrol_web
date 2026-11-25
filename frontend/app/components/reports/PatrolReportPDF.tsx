@@ -57,17 +57,19 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
   };
 
   const generatePDF = () => {
+    // ── PORTRAIT A4 CONFIGURATION ──
     const doc = new jsPDF({
-      orientation: "landscape",
+      orientation: "portrait",
       unit: "pt",
       format: "a4",
-      compress: true, // Enables Flate compression for all streams and text
+      compress: true,
     });
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    const margin = 30;
+    const pageWidth = doc.internal.pageSize.getWidth(); // ~595 pt
+    const pageHeight = doc.internal.pageSize.getHeight(); // ~842 pt
+    const margin = 24;
+    const availableWidth = pageWidth - margin * 2; // ~547 pt
 
-    // ── 1. HIERARCHICAL GROUPING BY DATE & ROUND ──
+    // ── 1. GROUPING BY DATE & ROUND ──
     type DayData = {
       date: string;
       rounds: Record<string, ScanLog[]>;
@@ -112,7 +114,6 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
       dayGroup.rounds[r].push(log);
     });
 
-    // Sort dates chronologically
     const sortedDates = Object.keys(logsByDate).sort();
 
     const pageCountRef = { current: 1 };
@@ -123,24 +124,24 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
       doc.setPage(pageNum);
       pageDateMap[pageNum] = activeDate;
 
-      // Outer 2px border
+      // Outer border
       doc.setDrawColor(0);
-      doc.setLineWidth(2);
-      doc.rect(15, 15, pageWidth - 30, pageHeight - 30);
+      doc.setLineWidth(1.5);
+      doc.rect(12, 12, pageWidth - 24, pageHeight - 24);
 
       // Footer
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(10);
+      doc.setFontSize(8.5);
       doc.setTextColor(0);
-      doc.text("Authorized By: ____________________", margin, pageHeight - margin - 10);
+      doc.text("Authorized By: ____________________", margin, pageHeight - margin - 4);
 
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(8);
-      doc.setTextColor(150);
+      doc.setFontSize(7.5);
+      doc.setTextColor(140);
       doc.text(
-        `Report Generated on: ${new Date().toLocaleString()}`,
+        `Generated: ${new Date().toLocaleString()}`,
         margin,
-        pageHeight - margin + 2
+        pageHeight - margin + 8
       );
     };
 
@@ -150,7 +151,6 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
       const sourceList = rawReport && rawReport.length > 0 ? rawReport : dayLogs;
 
       sourceList.forEach((l: any) => {
-        // Count strictly when there is an actual scan_time recorded
         if (l.scan_time && l.guard_name) {
           const rawGuard = String(l.guard_name).trim();
           if (
@@ -172,79 +172,74 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
       return counts;
     };
 
-    // Helper: Render Official 2-Column Header, Daily Summary Box, Top Performers, & Needs Improvement
+    // Helper: Render Official Portrait Header, Daily Summary Box, Top Performers, & Needs Improvement
     const drawDateHeader = (dayData: DayData, dayAllLogs: ScanLog[]): number => {
-      const startY = 25;
-      const logoSize = 65;
-      const logoX = margin + 15;
+      const startY = 20;
+      const logoSize = 48;
+      const logoX = margin + 4;
       const logoY = startY;
 
-      // ── LEFT DIV: COLLEGE LOGO ──
+      // ── LEFT: COLLEGE LOGO ──
       if (LOGO_BASE64) {
         try {
           doc.addImage(LOGO_BASE64, "PNG", logoX, logoY, logoSize, logoSize, "college_logo", "FAST");
         } catch (e) {}
       }
 
-      // ── RIGHT DIV: SECURITY ROUNDS REPORT + INSTITUTION DETAILS ──
-      const textStartX = logoX + logoSize + 25;
+      // ── RIGHT: TITLE & ADDRESS (PORTRAIT COMPACT) ──
+      const textStartX = logoX + logoSize + 14;
 
-      // Title 1: SECURITY ROUNDS REPORT
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(18);
-      doc.setTextColor(15, 23, 42); // slate-900
-      doc.text("SECURITY ROUNDS REPORT", textStartX, startY + 16);
+      doc.setFontSize(14);
+      doc.setTextColor(15, 23, 42);
+      doc.text("SECURITY ROUNDS REPORT", textStartX, startY + 13);
 
-      // Institution Name
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(12);
-      doc.setTextColor(30, 41, 59); // slate-800
-      doc.text("Kamaraj College of Engineering & Technology (Autonomous)", textStartX, startY + 34);
+      doc.setFontSize(9.5);
+      doc.setTextColor(30, 41, 59);
+      doc.text("Kamaraj College of Engineering & Technology (Autonomous)", textStartX, startY + 26);
 
-      // Address
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(9);
-      doc.setTextColor(71, 85, 105); // slate-600
+      doc.setFontSize(7.5);
+      doc.setTextColor(71, 85, 105);
       doc.text(
-        "S.P.G, Chidambara Nadar, C, Nagammal Campus, Vellakulam, Vellakulam II, Tamil Nadu 625701",
+        "S.P.G. Chidambara Nadar - C. Nagammal Campus, Vellakulam, Tamil Nadu 625701",
         textStartX,
-        startY + 48
+        startY + 38
       );
 
-      // Campus Code Tagline
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(8.5);
-      doc.setTextColor(99, 102, 241); // indigo-500
-      doc.text(`Campus Code: ${campusCode}`, textStartX, startY + 62);
+      doc.setFontSize(7.5);
+      doc.setTextColor(99, 102, 241);
+      doc.text(`Campus Code: ${campusCode}`, textStartX, startY + 48);
 
-      // Divider Line below header
-      doc.setDrawColor(226, 232, 240); // slate-200
+      // Separator Line
+      doc.setDrawColor(226, 232, 240);
       doc.setLineWidth(1);
-      doc.line(margin, startY + 72, pageWidth - margin, startY + 72);
+      doc.line(margin, startY + 56, pageWidth - margin, startY + 56);
 
-      // ── DAILY AUDIT SUMMARY BOX ──
-      const summaryY = startY + 80;
+      // ── SUMMARY METRICS BOX ──
+      const summaryY = startY + 62;
       doc.setFillColor("#F8FAFC");
       doc.setDrawColor("#CBD5E1");
       doc.setLineWidth(1);
-      doc.rect(margin, summaryY, pageWidth - margin * 2, 30, "FD");
+      doc.rect(margin, summaryY, availableWidth, 24, "FD");
 
-      doc.setFontSize(8.5);
+      doc.setFontSize(8);
       doc.setTextColor(40);
       doc.setFont("helvetica", "bold");
-      doc.text(`Audit Date: ${dayData.date}`, margin + 12, summaryY + 18);
+      doc.text(`Date: ${dayData.date}`, margin + 8, summaryY + 15);
       doc.setFont("helvetica", "normal");
-      doc.text(`Generated By: ${generatedBy}`, margin + 140, summaryY + 18);
+      doc.text(`By: ${generatedBy}`, margin + 95, summaryY + 15);
 
-      // Stats on Right
       doc.setFont("helvetica", "bold");
-      doc.text(`Total Checkpoints: ${dayData.totalScans}`, pageWidth - margin - 350, summaryY + 18);
+      doc.text(`Total: ${dayData.totalScans}`, availableWidth - 170, summaryY + 15);
       doc.setTextColor("#16A34A");
-      doc.text(`Completed: ${dayData.completedScans}`, pageWidth - margin - 220, summaryY + 18);
+      doc.text(`Completed: ${dayData.completedScans}`, availableWidth - 110, summaryY + 15);
       doc.setTextColor("#DC2626");
-      doc.text(`Missed: ${dayData.missedScans}`, pageWidth - margin - 100, summaryY + 18);
+      doc.text(`Missed: ${dayData.missedScans}`, availableWidth - 30, summaryY + 15);
 
-      // ── TOP PERFORMERS: 1 ROW x 3 COLUMNS ──
+      // ── TOP PERFORMERS: 1 ROW x 3 COLUMNS (PORTRAIT SCALED) ──
       const guardCounts = computeGuardScanCounts(dayAllLogs);
       const sortedGuards = Object.entries(guardCounts).sort((a, b) => b[1] - a[1]);
 
@@ -254,16 +249,15 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
         scans: scanCount,
       }));
 
-      const topBoxY = summaryY + 36;
-      const topBoxHeight = 40;
-      const availableWidth = pageWidth - margin * 2;
-      const colGap = 12;
+      const topBoxY = summaryY + 30;
+      const topBoxHeight = 34;
+      const colGap = 8;
       const colWidth = (availableWidth - colGap * 2) / 3;
 
       const rankColors = [
-        { fill: "#FEF9C3", border: "#CA8A04", text: "#854D0E", badge: "#EAB308", label: "1st Place" },
-        { fill: "#F1F5F9", border: "#94A3B8", text: "#334155", badge: "#64748B", label: "2nd Place" },
-        { fill: "#FFEDD5", border: "#EA580C", text: "#9A3412", badge: "#F97316", label: "3rd Place" },
+        { fill: "#FEF9C3", border: "#CA8A04", text: "#854D0E", badge: "#EAB308" },
+        { fill: "#F1F5F9", border: "#94A3B8", text: "#334155", badge: "#64748B" },
+        { fill: "#FFEDD5", border: "#EA580C", text: "#9A3412", badge: "#F97316" },
       ];
 
       for (let i = 0; i < 3; i++) {
@@ -273,112 +267,108 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
 
         doc.setFillColor(style.fill);
         doc.setDrawColor(style.border);
-        doc.setLineWidth(1);
-        doc.roundedRect(colX, topBoxY, colWidth, topBoxHeight, 4, 4, "FD");
+        doc.setLineWidth(0.8);
+        doc.roundedRect(colX, topBoxY, colWidth, topBoxHeight, 3, 3, "FD");
 
         // Rank Badge
         doc.setFillColor(style.badge);
-        doc.roundedRect(colX + 8, topBoxY + 7, 28, 13, 2, 2, "F");
+        doc.roundedRect(colX + 5, topBoxY + 6, 22, 11, 2, 2, "F");
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(7.5);
+        doc.setFontSize(7);
         doc.setTextColor("#FFFFFF");
-        doc.text(p ? p.rank : `${i + 1}${i === 0 ? "st" : i === 1 ? "nd" : "rd"}`, colX + 22, topBoxY + 16, { align: "center" });
+        doc.text(p ? p.rank : `${i + 1}${i === 0 ? "st" : i === 1 ? "nd" : "rd"}`, colX + 16, topBoxY + 14, { align: "center" });
 
-        // Guard Name (BOLD)
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(9.5);
-        doc.setTextColor(style.text);
-        const displayName = p ? p.name : "No Data";
-        const maxNameLen = 22;
-        const safeName = displayName.length > maxNameLen ? displayName.substring(0, maxNameLen) + "..." : displayName;
-        doc.text(safeName, colX + 42, topBoxY + 17);
-
-        // Scan count subtitle
+        // Guard Name
         doc.setFont("helvetica", "bold");
         doc.setFontSize(8);
+        doc.setTextColor(style.text);
+        const displayName = p ? p.name : "No Data";
+        const maxNameLen = 17;
+        const safeName = displayName.length > maxNameLen ? displayName.substring(0, maxNameLen) + ".." : displayName;
+        doc.text(safeName, colX + 32, topBoxY + 15);
+
+        // Scans Completed
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(7);
         doc.setTextColor("#475569");
         const countText = p ? `${p.scans} Scans Completed` : "0 Scans";
-        doc.text(countText, colX + 42, topBoxY + 31);
+        doc.text(countText, colX + 32, topBoxY + 26);
       }
 
-      let currentEndY = topBoxY + topBoxHeight + 10;
+      let currentEndY = topBoxY + topBoxHeight + 8;
 
       // ── NEEDS IMPROVEMENT SECTION (< 8 SCANS) ──
-      // Only displayed when there are officers who performed less than 8 scans!
       const needsImprovementList = sortedGuards
         .filter(([_, count]) => count < 8)
         .map(([name, count]) => ({ name, count }));
 
       if (needsImprovementList.length > 0) {
         const alertY = currentEndY;
-        const textX = margin + 140;
-        const maxTextWidth = availableWidth - 150;
+        const textX = margin + 118;
+        const maxTextWidth = availableWidth - 128;
 
-        // Build the full text containing all guard names and their counts
         const guardDetails = needsImprovementList
           .map((item) => `${item.name} (${item.count} scans)`)
           .join("   •   ");
 
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(8.5);
-        doc.setTextColor("#991B1B"); // red-800
+        doc.setFontSize(7.5);
+        doc.setTextColor("#991B1B");
 
-        // Split text to fit within page width without any truncating!
         const lines: string[] = doc.splitTextToSize(guardDetails, maxTextWidth);
-        const lineHeight = 11;
+        const lineHeight = 9.5;
         const textBlockHeight = lines.length * lineHeight;
-        const alertHeight = Math.max(26, textBlockHeight + 14);
+        const alertHeight = Math.max(22, textBlockHeight + 10);
 
-        // Background box
-        doc.setFillColor("#FEF2F2"); // red-50
-        doc.setDrawColor("#FCA5A5"); // red-300
-        doc.setLineWidth(1);
+        doc.setFillColor("#FEF2F2");
+        doc.setDrawColor("#FCA5A5");
+        doc.setLineWidth(0.8);
         doc.roundedRect(margin, alertY, availableWidth, alertHeight, 3, 3, "FD");
 
         // Badge: Needs Improvement (<8)
-        doc.setFillColor("#DC2626"); // red-600
-        doc.roundedRect(margin + 8, alertY + 6, 122, 15, 2, 2, "F");
+        doc.setFillColor("#DC2626");
+        doc.roundedRect(margin + 6, alertY + 5, 104, 12, 2, 2, "F");
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(6.5);
+        doc.setTextColor("#FFFFFF");
+        doc.text("NEEDS IMPROVEMENT (<8)", margin + 58, alertY + 13.5, { align: "center" });
+
+        // Draw Lines
         doc.setFont("helvetica", "bold");
         doc.setFontSize(7.5);
-        doc.setTextColor("#FFFFFF");
-        doc.text("NEEDS IMPROVEMENT (<8)", margin + 69, alertY + 16.5, { align: "center" });
-
-        // Draw all lines of guard names
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(8.5);
         doc.setTextColor("#991B1B");
 
         lines.forEach((line: string, lineIndex: number) => {
-          doc.text(line, textX, alertY + 17 + lineIndex * lineHeight);
+          doc.text(line, textX, alertY + 13 + lineIndex * lineHeight);
         });
 
-        currentEndY = alertY + alertHeight + 12;
+        currentEndY = alertY + alertHeight + 8;
       }
 
       return currentEndY;
     };
 
-    // Helper: Minimal Header for Sub-pages of the same date
+    // Helper: Minimal Header for Subsequent Pages
     const drawDateSubHeader = (dayData: DayData) => {
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(10.5);
+      doc.setFontSize(9.5);
       doc.setTextColor(30, 41, 59);
-      doc.text("Kamaraj College of Engineering & Technology — Security Rounds Report", margin, 36);
+      doc.text("Kamaraj College of Engineering & Technology — Security Audit", margin, 28);
 
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(8.5);
+      doc.setFontSize(7.5);
       doc.setTextColor(100);
-      doc.text(`Date: ${dayData.date} | Code: ${campusCode} | Generated By: ${generatedBy}`, pageWidth - margin, 36, { align: "right" });
+      doc.text(`Date: ${dayData.date} | Code: ${campusCode} | By: ${generatedBy}`, pageWidth - margin, 28, { align: "right" });
 
       doc.setDrawColor("#E2E8F0");
-      doc.setLineWidth(1);
-      doc.line(margin, 44, pageWidth - margin, 44);
+      doc.setLineWidth(0.8);
+      doc.line(margin, 34, pageWidth - margin, 34);
     };
 
-    // ── 2. PROCESS EACH DATE AND EACH ROUND ON ITS OWN PAGE ──
-    let isFirstPage = true;
+    // ── 2. DYNAMIC TABLE PACKING (PAGE 1: ~3 TABLES, SUBSEQUENT PAGES: ~4 TABLES) ──
+    const BOTTOM_MARGIN_LIMIT = pageHeight - 38; // reserve space for footer
 
-    sortedDates.forEach((dateKey) => {
+    sortedDates.forEach((dateKey, dateIdx) => {
       const dayData = logsByDate[dateKey];
       const dayAllLogs: ScanLog[] = [];
       Object.values(dayData.rounds).forEach((rLogs) => dayAllLogs.push(...rLogs));
@@ -387,60 +377,63 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
         (a, b) => Number(a) - Number(b)
       );
 
-      sortedRoundKeys.forEach((roundStr, rIdx) => {
-        // EACH ROUND GETS ITS OWN CLEAN PAGE TO COMPLETELY AVOID OVERLAPPING!
-        if (!isFirstPage) {
-          doc.addPage();
-          pageCountRef.current++;
-        }
-        isFirstPage = false;
+      // Start page for this date
+      if (dateIdx > 0) {
+        doc.addPage();
+        pageCountRef.current++;
+      }
 
-        decoratePage(pageCountRef.current, dateKey);
+      decoratePage(pageCountRef.current, dateKey);
+      let currentY = drawDateHeader(dayData, dayAllLogs);
 
-        let currentY = 56;
-
-        // If it's the very first round of this date, draw the full 2-div header + Top Performers + Needs Improvement
-        if (rIdx === 0) {
-          currentY = drawDateHeader(dayData, dayAllLogs);
-        } else {
-          // Subsequent rounds get the clean sub-header
-          drawDateSubHeader(dayData);
-          currentY = 56;
-        }
-
+      sortedRoundKeys.forEach((roundStr) => {
+        const roundRows = dayData.rounds[roundStr];
         const roundTimeStr = ROUND_TIMES[Number(roundStr)]
           ? `${ROUND_TIMES[Number(roundStr)].start} - ${ROUND_TIMES[Number(roundStr)].end}`
           : "";
 
-        // Round Sub-Header Banner
+        // Estimate required height for this round banner + table
+        // Banner: 18pt + Gap: 6pt + Table Head: 16pt + Rows: count * ~13.5pt + Padding: 12pt
+        const estimatedTableHeight = 18 + 6 + 16 + (roundRows.length * 13.5) + 12;
+
+        // If this table doesn't fit in the remaining space of current page, start a fresh page!
+        if (currentY + estimatedTableHeight > BOTTOM_MARGIN_LIMIT) {
+          doc.addPage();
+          pageCountRef.current++;
+          decoratePage(pageCountRef.current, dateKey);
+          drawDateSubHeader(dayData);
+          currentY = 44;
+        }
+
+        // Render Compact Round Banner
         doc.setFillColor("#EEF2FF");
         doc.setDrawColor("#C7D2FE");
-        doc.setLineWidth(1);
-        doc.roundedRect(margin, currentY, pageWidth - margin * 2, 22, 3, 3, "FD");
+        doc.setLineWidth(0.8);
+        doc.roundedRect(margin, currentY, availableWidth, 17, 2.5, 2.5, "FD");
 
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(10.5);
+        doc.setFontSize(8.5);
         doc.setTextColor("#3730A3");
         doc.text(
           `Round ${roundStr} Slot: ${roundTimeStr || "Custom Time"}`,
-          margin + 10,
-          currentY + 15
+          margin + 8,
+          currentY + 11.5
         );
 
         doc.setFont("helvetica", "normal");
-        doc.setFontSize(8.5);
+        doc.setFontSize(7.5);
         doc.setTextColor("#6366F1");
         doc.text(
-          `${dayData.rounds[roundStr].length} Checkpoints`,
-          pageWidth - margin - 12,
-          currentY + 15,
+          `${roundRows.length} Checkpoints`,
+          pageWidth - margin - 8,
+          currentY + 11.5,
           { align: "right" }
         );
 
-        currentY += 28;
+        currentY += 21;
 
-        // Table Rows
-        const tableData = dayData.rounds[roundStr].map((log, index) => {
+        // Prepare table data
+        const tableData = roundRows.map((log, index) => {
           const status = normalizeStatus(log.status);
           let displayTime = "-";
           if (log.scan_time) {
@@ -461,23 +454,24 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
             log.qr_name || "-",
             log.guard_name || "-",
             displayTime,
-            log.lat != null ? String(log.lat) : "-",
-            log.lon != null ? String(log.lon) : "-",
+            log.lat != null ? Number(log.lat).toFixed(4) : "-",
+            log.lon != null ? Number(log.lon).toFixed(4) : "-",
             status,
           ];
         });
 
+        // Portrait table: width fits ~547 pt cleanly without crowding
         autoTable(doc, {
           startY: currentY,
-          margin: { right: margin, left: margin, bottom: 50 },
+          margin: { right: margin, left: margin, bottom: 36 },
           head: [
             [
               "S.No",
-              "QR Checkpoint",
+              "QR Checkpoint Location",
               "Security Guard / Officer",
-              "Time Scanned",
-              "Latitude",
-              "Longitude",
+              "Time",
+              "Lat",
+              "Lon",
               "Status",
             ],
           ],
@@ -489,22 +483,26 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
             fontStyle: "bold",
             halign: "center",
             valign: "middle",
+            fontSize: 7.5,
+            cellPadding: 2.5,
           },
           styles: {
             font: "helvetica",
-            fontSize: 8.5,
+            fontSize: 7.5,
             valign: "middle",
-            cellPadding: 4.5,
+            cellPadding: 2.5,
             halign: "center",
+            lineColor: [226, 232, 240],
+            lineWidth: 0.5,
           },
           columnStyles: {
-            0: { cellWidth: 35 },
-            1: { halign: "left", cellWidth: 160 }, // QR Checkpoint
-            2: { halign: "left", cellWidth: 260 }, // Security Name
-            3: { cellWidth: 90 },
-            4: { cellWidth: 70 },
-            5: { cellWidth: 70 },
-            6: { fontStyle: "bold" },
+            0: { cellWidth: 26, halign: "center" },
+            1: { halign: "left", cellWidth: 155 },
+            2: { halign: "left", cellWidth: 168 },
+            3: { cellWidth: 54 },
+            4: { cellWidth: 44, fontSize: 6.5 },
+            5: { cellWidth: 44, fontSize: 6.5 },
+            6: { cellWidth: 56, fontStyle: "bold" },
           },
           didParseCell: (data) => {
             if (data.section === "body" && data.column.index === 6) {
@@ -521,16 +519,6 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
               }
             }
           },
-          willDrawCell: (data) => {
-            if (data.section === "body") {
-              const statusCell = data.row.cells[6];
-              const status = statusCell ? statusCell.raw : "";
-              if (status === "MISSED") {
-                doc.setFillColor("#FEE2E2");
-                doc.rect(data.cell.x, data.cell.y, data.cell.width, data.cell.height, "F");
-              }
-            }
-          },
           didDrawPage: (data) => {
             if (data.pageNumber > pageCountRef.current) {
               pageCountRef.current = data.pageNumber;
@@ -539,25 +527,28 @@ const PatrolReportPDF: React.FC<PatrolReportPDFProps> = ({
             }
           },
         });
+
+        // Update currentY to point directly after the table + comfortable spacing
+        currentY = ((doc as any).lastAutoTable?.finalY ?? currentY) + 12;
       });
     });
 
-    // ── 3. FINAL PASS: PAGE NUMBERS WITH DATE CONTEXT ──
+    // ── 3. FINAL PASS: DYNAMIC PAGE NUMBERING ──
     const totalPages = pageCountRef.current;
     for (let i = 1; i <= totalPages; i++) {
       doc.setPage(i);
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(8);
-      doc.setTextColor(150);
+      doc.setFontSize(7.5);
+      doc.setTextColor(140);
       const pageDate = pageDateMap[i];
-      const pageLabel = sortedDates.length > 1 && pageDate 
-        ? `Date: ${pageDate} | Page ${i} of ${totalPages}` 
-        : `Page ${i} of ${totalPages}`;
+      const pageLabel =
+        sortedDates.length > 1 && pageDate
+          ? `Date: ${pageDate} | Page ${i} of ${totalPages}`
+          : `Page ${i} of ${totalPages}`;
 
-      doc.text(pageLabel, pageWidth - margin - 150, pageHeight - margin + 2, { align: "right" });
+      doc.text(pageLabel, pageWidth - margin - 8, pageHeight - margin + 8, { align: "right" });
     }
 
-    // Dynamic filename
     let filename = `Security_Audit_Report_${reportDate}.pdf`;
     if (sortedDates.length > 1) {
       filename = `Security_Audit_Report_${sortedDates[0]}_to_${sortedDates[sortedDates.length - 1]}.pdf`;
