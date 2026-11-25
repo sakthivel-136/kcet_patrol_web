@@ -98,7 +98,7 @@ export const TOUR_STEPS: TourStep[] = [
     page: '/user-crud',
     target: 'user-table',
     title: '👮 Security User Table',
-    description: 'All registered users are listed here with their Employee ID, Name, and masked password. Click the 👁️ eye icon to reveal a password. Admin passwords require the Supreme Passcode.',
+    description: 'All registered users are listed here with their Employee ID, Name, and masked password. Click the 👁️ eye icon to reveal or hide a password.',
     position: 'top',
   },
   // ── QR MANAGEMENT ──────────────────────────────────────

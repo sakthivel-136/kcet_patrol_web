@@ -213,3 +213,49 @@ def download_report(
             "message": str(e)
         }
 
+
+@router.delete("/cleanup-old-scans")
+def cleanup_old_scans(
+    days_to_keep: int = Query(15, ge=1, le=365, description="Number of recent days of scan data to keep"),
+    current_user: dict = Depends(get_current_user),
+):
+    """
+    Deletes scans from scanning_details that are older than the specified days (default 15 days),
+    keeping the most recent 15 days of data intact in Cloudflare D1.
+    """
+    try:
+        from datetime import datetime, timedelta
+        import pytz
+
+        # Calculate cutoff datetime in UTC
+        cutoff_dt = datetime.now(pytz.utc) - timedelta(days=days_to_keep)
+        cutoff_str = cutoff_dt.strftime("%Y-%m-%d %H:%M:%S")
+        cutoff_iso = cutoff_dt.isoformat()
+
+        # Check count of records to be deleted
+        count_rows = query_d1(
+            "SELECT COUNT(*) as count FROM scanning_details WHERE scan_time < ? OR scan_time < ?",
+            [cutoff_str, cutoff_iso]
+        )
+        to_delete_count = count_rows[0].get("count", 0) if count_rows else 0
+
+        # Execute deletion from Cloudflare D1
+        query_d1(
+            "DELETE FROM scanning_details WHERE scan_time < ? OR scan_time < ?",
+            [cutoff_str, cutoff_iso]
+        )
+
+        return {
+            "success": True,
+            "deleted_count": to_delete_count,
+            "cutoff_date": cutoff_str,
+            "message": f"Successfully deleted scans older than {days_to_keep} days ({to_delete_count} records removed)."
+        }
+    except Exception as e:
+        print("CLEANUP ERROR:", e)
+        return {
+            "success": False,
+            "message": f"Failed to clean up old scans: {str(e)}"
+        }
+
+

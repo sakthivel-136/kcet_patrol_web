@@ -1,7 +1,6 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from pydantic import BaseModel, Field
 from typing import Optional, List
-from app.database import supabase
 from app.d1_client import query_d1
 import uuid
 from app.dependencies import get_current_user, admin_only
@@ -50,7 +49,7 @@ router = APIRouter(
 
 @router.get("", response_model=List[SecurityUserResponse])
 def get_security_users(_: dict = Depends(get_current_user)):
-    return query_d1("SELECT * FROM security_users")
+    return query_d1("SELECT * FROM security_users WHERE security_id != 'SUPREME_PASSCODE'")
 
 
 # -----------------------------
@@ -59,16 +58,10 @@ def get_security_users(_: dict = Depends(get_current_user)):
 
 @router.get("/{security_id}", response_model=SecurityUserResponse)
 def get_security_user(security_id: str, _: dict = Depends(get_current_user)):
-
-    result = supabase.table("security_users") \
-        .select("*") \
-        .eq("security_id", security_id) \
-        .execute()
-
-    if not result.data:
+    rows = query_d1("SELECT * FROM security_users WHERE security_id = ?", [security_id])
+    if not rows:
         raise HTTPException(404, "Security user not found")
-
-    return result.data[0]
+    return rows[0]
 
 
 # -----------------------------
@@ -81,59 +74,36 @@ def get_security_user(security_id: str, _: dict = Depends(get_current_user)):
     response_model=SecurityUserResponse
 )
 def create_security_user(payload: SecurityUserCreate, _: dict = Depends(admin_only)):
+    # Check duplicate ID
+    existing_id = query_d1("SELECT security_id FROM security_users WHERE security_id = ?", [payload.security_id])
+    if existing_id:
+        raise HTTPException(400, "Security ID already exists, try another ID")
 
-    # Check duplicate ID or Password
-    existing_id = supabase.table("security_users") \
-        .select("*") \
-        .eq("security_id", payload.security_id) \
-        .execute()
-
-    if existing_id.data:
-        raise HTTPException(400, "Already exists, try new or create new password or employee ID")
-
-    existing_pass = supabase.table("security_users") \
-        .select("*") \
-        .eq("security_password", payload.security_password) \
-        .execute()
-
-    if existing_pass.data:
-        raise HTTPException(400, "Already exists, try new or create new password or employee ID")
-
-    data = {
-        "security_id": payload.security_id,
-        "security_name": payload.security_name,
-        "security_password": payload.security_password,  # Plain PIN
-        "campus": payload.campus,
-        "role": payload.role
-    }
+    # Check duplicate Password
+    existing_pass = query_d1("SELECT security_id FROM security_users WHERE security_password = ?", [payload.security_password])
+    if existing_pass:
+        raise HTTPException(400, "Password already in use, please choose another password")
 
     try:
-        result = supabase.table("security_users") \
-            .insert(data) \
-            .execute()
-        
-        created_user = result.data[0]
+        query_d1(
+            "INSERT INTO security_users (security_id, security_name, security_password, campus, role) VALUES (?, ?, ?, ?, ?)",
+            [payload.security_id, payload.security_name, payload.security_password, payload.campus, payload.role]
+        )
 
-        # Automatically assign the new user to all available shifts 
-        # (Permanent roster date: 2099-12-31)
-        shifts_res = supabase.table("shifts").select("shift_id").execute()
-        shifts = shifts_res.data or []
-        
-        allocations = []
+        # Automatically assign the new user to all available shifts
+        shifts = query_d1("SELECT shift_id FROM shifts")
         for shift in shifts:
-            allocations.append({
-                "shift_id": shift["shift_id"],
-                "security_id": payload.security_id,
-                "allocation_date": "2099-12-31"
-            })
-            
-        if allocations:
-            supabase.table("shift_allocations").insert(allocations).execute()
+            alloc_id = str(uuid.uuid4())
+            query_d1(
+                "INSERT INTO shift_allocations (allocation_id, shift_id, security_id, allocation_date) VALUES (?, ?, ?, '2099-12-31')",
+                [alloc_id, shift["shift_id"], payload.security_id]
+            )
 
-        return created_user
+        created = query_d1("SELECT * FROM security_users WHERE security_id = ?", [payload.security_id])
+        return created[0]
     except Exception as e:
         err_msg = str(e)
-        if "23505" in err_msg or "already exists" in err_msg:
+        if "UNIQUE" in err_msg or "already exists" in err_msg:
             raise HTTPException(400, "Security ID already exists")
         raise HTTPException(500, f"Database error: {err_msg}")
 
@@ -144,14 +114,8 @@ def create_security_user(payload: SecurityUserCreate, _: dict = Depends(admin_on
 
 @router.put("/{security_id}", response_model=SecurityUserResponse)
 def update_security_user(security_id: str, payload: SecurityUserUpdate, _: dict = Depends(admin_only)):
-
-    # Check exists
-    existing = supabase.table("security_users") \
-        .select("*") \
-        .eq("security_id", security_id) \
-        .execute()
-
-    if not existing.data:
+    existing = query_d1("SELECT * FROM security_users WHERE security_id = ?", [security_id])
+    if not existing:
         raise HTTPException(404, "Security user not found")
 
     update_data = payload.dict(
@@ -160,21 +124,20 @@ def update_security_user(security_id: str, payload: SecurityUserUpdate, _: dict 
     )
 
     if "security_password" in update_data:
-        existing_pass = supabase.table("security_users") \
-            .select("security_id") \
-            .eq("security_password", update_data["security_password"]) \
-            .neq("security_id", security_id) \
-            .execute()
-            
-        if existing_pass.data:
-            raise HTTPException(400, "Already exists, try new or create new password or employee ID")
+        existing_pass = query_d1(
+            "SELECT security_id FROM security_users WHERE security_password = ? AND security_id != ?",
+            [update_data["security_password"], security_id]
+        )
+        if existing_pass:
+            raise HTTPException(400, "Password already in use, choose another password")
 
-    result = supabase.table("security_users") \
-        .update(update_data) \
-        .eq("security_id", security_id) \
-        .execute()
+    if update_data:
+        set_clauses = [f"{k} = ?" for k in update_data.keys()]
+        params = list(update_data.values()) + [security_id]
+        query_d1(f"UPDATE security_users SET {', '.join(set_clauses)} WHERE security_id = ?", params)
 
-    return result.data[0]
+    updated = query_d1("SELECT * FROM security_users WHERE security_id = ?", [security_id])
+    return updated[0]
 
 
 # -----------------------------
@@ -183,18 +146,10 @@ def update_security_user(security_id: str, payload: SecurityUserUpdate, _: dict 
 
 @router.delete("/{security_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_security_user(security_id: str, _: dict = Depends(admin_only)):
-
-    existing = supabase.table("security_users") \
-        .select("*") \
-        .eq("security_id", security_id) \
-        .execute()
-
-    if not existing.data:
+    existing = query_d1("SELECT security_id FROM security_users WHERE security_id = ?", [security_id])
+    if not existing:
         raise HTTPException(404, "Security user not found")
 
-    supabase.table("security_users") \
-        .delete() \
-        .eq("security_id", security_id) \
-        .execute()
-
+    query_d1("DELETE FROM shift_allocations WHERE security_id = ?", [security_id])
+    query_d1("DELETE FROM security_users WHERE security_id = ?", [security_id])
     return

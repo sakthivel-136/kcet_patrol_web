@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { deleteSecurityUser } from '@/app/api/securityUsers.api'
 import { SecurityUser } from '@/app/types/securityUser'
-import axiosClient from '@/app/api/axiosClient'
 
 interface UsersTableProps {
   users: SecurityUser[]
@@ -19,13 +18,6 @@ export default function UsersTable({
 }: UsersTableProps) {
 
   const [visiblePasswords, setVisiblePasswords] = useState<Record<string, boolean>>({})
-  const [supremeModal, setSupremeModal] = useState<{ isOpen: boolean; action: 'VIEW' | 'EDIT'; targetUser: SecurityUser | null }>({
-    isOpen: false,
-    action: 'VIEW',
-    targetUser: null
-  })
-  const [passcodeInput, setPasscodeInput] = useState('')
-  const [verifying, setVerifying] = useState(false)
 
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this user?')) return
@@ -39,50 +31,14 @@ export default function UsersTable({
   }
 
   const handleToggleAttempt = (user: SecurityUser) => {
-    if (visiblePasswords[user.security_id]) {
-      // Just hide it if it's already visible
-      setVisiblePasswords(prev => ({ ...prev, [user.security_id]: false }))
-      return
-    }
-
-    const requiresPasscode = (user.role || '').toUpperCase() === 'ADMIN' || user.security_id === 'SUPREME_PASSCODE'
-
-    if (requiresPasscode) {
-      setSupremeModal({ isOpen: true, action: 'VIEW', targetUser: user })
-      setPasscodeInput('')
-    } else {
-      setVisiblePasswords(prev => ({ ...prev, [user.security_id]: true }))
-    }
+    setVisiblePasswords(prev => ({ ...prev, [user.security_id]: !prev[user.security_id] }))
   }
 
   const handleEditAttempt = (user: SecurityUser) => {
-    if (user.security_id === 'SUPREME_PASSCODE') return // No edit allowed
-
-    if ((user.role || '').toUpperCase() === 'ADMIN') {
-      setSupremeModal({ isOpen: true, action: 'EDIT', targetUser: user })
-      setPasscodeInput('')
-    } else {
-      onEditUser(user)
-    }
+    onEditUser(user)
   }
 
-  const verifySupreme = async () => {
-    setVerifying(true)
-    try {
-      await axiosClient.post('/auth/verify-supreme', { passcode: passcodeInput })
-      // Success!
-      if (supremeModal.action === 'VIEW' && supremeModal.targetUser) {
-        setVisiblePasswords(prev => ({ ...prev, [supremeModal.targetUser!.security_id]: true }))
-      } else if (supremeModal.action === 'EDIT' && supremeModal.targetUser) {
-        onEditUser(supremeModal.targetUser)
-      }
-      setSupremeModal({ isOpen: false, action: 'VIEW', targetUser: null })
-    } catch (err: any) {
-      alert(err.response?.data?.detail || "Invalid Supreme Passcode")
-    } finally {
-      setVerifying(false)
-    }
-  }
+  const filteredUsers = users.filter(u => u.security_id !== 'SUPREME_PASSCODE')
 
   return (
     <>
@@ -98,7 +54,7 @@ export default function UsersTable({
             </tr>
           </thead>
           <tbody className="bg-white/50 divide-y divide-slate-100/50 backdrop-blur-sm">
-            {users.length === 0 ? (
+            {filteredUsers.length === 0 ? (
               <tr>
                 <td colSpan={5} className="px-6 py-12 text-center">
                   <div className="flex flex-col items-center justify-center space-y-2">
@@ -112,7 +68,7 @@ export default function UsersTable({
                 </td>
               </tr>
             ) : (
-              users.map((user) => (
+              filteredUsers.map((user) => (
                 <tr key={user.security_id} className="hover:bg-white/60 transition-colors duration-150 group">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-mono font-bold text-slate-800">{user.security_id}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-700">{user.security_name}</td>
@@ -137,18 +93,12 @@ export default function UsersTable({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex items-center justify-end gap-3">
-                      {user.security_id !== 'SUPREME_PASSCODE' ? (
-                        <>
-                          <button onClick={() => handleEditAttempt(user)} className="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">
-                            Edit
-                          </button>
-                          <button onClick={() => handleDelete(user.security_id)} className="text-slate-600 hover:text-red-600 transition-colors duration-200 font-medium">
-                            Delete
-                          </button>
-                        </>
-                      ) : (
-                        <span className="text-slate-400 text-xs italic">System Record</span>
-                      )}
+                      <button onClick={() => handleEditAttempt(user)} className="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">
+                        Edit
+                      </button>
+                      <button onClick={() => handleDelete(user.security_id)} className="text-slate-600 hover:text-red-600 transition-colors duration-200 font-medium">
+                        Delete
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -157,42 +107,6 @@ export default function UsersTable({
           </tbody>
         </table>
       </div>
-
-      {supremeModal.isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl p-6 shadow-xl w-full max-w-sm">
-            <h3 className="text-lg font-bold text-slate-800 mb-2">Admin Protection</h3>
-            <p className="text-sm text-slate-500 mb-4">Please enter the Supreme Passcode to {supremeModal.action === 'EDIT' ? 'edit' : 'view'} this protected account.</p>
-            <input
-              type="password"
-              value={passcodeInput}
-              onChange={e => setPasscodeInput(e.target.value)}
-              placeholder="Supreme Passcode"
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-purple-400 focus:border-purple-400 outline-none transition-all mb-4"
-              autoFocus
-              onKeyDown={e => {
-                if (e.key === 'Enter') verifySupreme()
-                if (e.key === 'Escape') setSupremeModal({ isOpen: false, action: 'VIEW', targetUser: null })
-              }}
-            />
-            <div className="flex gap-3 justify-end">
-              <button 
-                onClick={() => setSupremeModal({ isOpen: false, action: 'VIEW', targetUser: null })}
-                className="px-4 py-2 rounded-xl text-slate-500 hover:bg-slate-100 font-medium transition-colors"
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={verifySupreme}
-                disabled={verifying || !passcodeInput}
-                className="px-4 py-2 rounded-xl bg-purple-600 text-white hover:bg-purple-700 font-medium disabled:opacity-50 transition-colors"
-              >
-                {verifying ? 'Checking...' : 'Verify'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   )
 }

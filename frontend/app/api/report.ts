@@ -138,3 +138,19 @@ export async function getPatrolReportPDF(
     items,
   };
 }
+
+/* =====================================================
+   EXPORT 3: Cleanup old scan data (>15 days)
+===================================================== */
+
+export async function cleanupOldScans(daysToKeep = 15): Promise<{
+  success: boolean;
+  deleted_count?: number;
+  message?: string;
+}> {
+  const res = await api.delete("/report/cleanup-old-scans", {
+    params: { days_to_keep: daysToKeep }
+  });
+  return res.data;
+}
+

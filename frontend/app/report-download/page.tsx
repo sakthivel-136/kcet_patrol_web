@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useMemo } from "react";
-import { getPatrolReport, PatrolReportItem } from "../api/report";
+import { getPatrolReport, cleanupOldScans, PatrolReportItem } from "../api/report";
 import { getCampuses } from "../api/campuses.api";
 import ReportTable from "../components/reports/ReportTable";
 import PatrolReportPDF from "../components/reports/PatrolReportPDF";
@@ -14,7 +14,7 @@ import { getRounds, PatrolRound } from "../api/rounds.api";
 import {
   Filter, Calendar, Shield, FileText, Download, CheckCircle2,
   AlertTriangle, UserCheck, Clock, ChevronDown, Sparkles,
-  CalendarDays, Layers, Grid, Trophy, Award, Medal
+  CalendarDays, Layers, Grid, Trophy, Award, Medal, Trash2
 } from "lucide-react";
 
 // ================= TYPES =================
@@ -129,6 +129,7 @@ export default function ReportDownloadPage() {
   const [selectedStatus, setSelectedStatus] = useState("ALL");
 
   const [loading, setLoading] = useState(false);
+  const [cleaning, setCleaning] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [pdfTrigger, setPdfTrigger] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -208,6 +209,30 @@ export default function ReportDownloadPage() {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // ================= CLEANUP OLD SCANS (>15 DAYS) =================
+  const handleCleanupOldScans = async () => {
+    const confirmed = window.confirm(
+      "⚠️ Are you sure you want to delete scan logs older than 15 days?\n\nThis will permanently remove historical scans from Cloudflare while keeping the most recent 15 days intact."
+    );
+    if (!confirmed) return;
+
+    setCleaning(true);
+    try {
+      const res = await cleanupOldScans(15);
+      if (res.success) {
+        alert(`✅ Cleanup Complete!\n${res.message || 'Old scan logs deleted successfully.'}`);
+        await fetchReport();
+      } else {
+        alert(`❌ Cleanup Failed: ${res.message || 'Unknown error'}`);
+      }
+    } catch (err: any) {
+      console.error(err);
+      alert(`❌ Cleanup Failed: ${err.message || 'Network or server error'}`);
+    } finally {
+      setCleaning(false);
     }
   };
 
@@ -422,9 +447,25 @@ export default function ReportDownloadPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2 px-3.5 py-2 glass-panel rounded-2xl text-xs font-semibold text-purple-900 border border-purple-100 shadow-sm">
-            <Shield size={14} className="text-purple-600" />
-            <span>Admin: {adminName || "Loading..."}</span>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleCleanupOldScans}
+              disabled={cleaning || loading}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100/80 border border-rose-200 transition-all shadow-sm disabled:opacity-50"
+              title="Delete scan logs older than 15 days, keeping the last 15 days of data"
+            >
+              {cleaning ? (
+                <span className="w-3.5 h-3.5 border-2 border-rose-400 border-t-rose-700 rounded-full animate-spin" />
+              ) : (
+                <Trash2 size={14} className="text-rose-600" />
+              )}
+              <span>{cleaning ? "Deleting..." : "Delete Old Data (>15 Days)"}</span>
+            </button>
+
+            <div className="flex items-center gap-2 px-3.5 py-2 glass-panel rounded-2xl text-xs font-semibold text-purple-900 border border-purple-100 shadow-sm">
+              <Shield size={14} className="text-purple-600" />
+              <span>Admin: {adminName || "Loading..."}</span>
+            </div>
           </div>
         </div>
 
